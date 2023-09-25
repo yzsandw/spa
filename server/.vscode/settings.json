@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "fwknopd_common.h": "c",
+        "stat.h": "c",
+        "utils.h": "c",
+        "cstdlib": "c"
+    }
+}
