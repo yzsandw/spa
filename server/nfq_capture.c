@@ -2,6 +2,7 @@
  * \file server/nfq_capture.c
  *
  * \brief Capture routine for fwknopd that uses libnetfilter_queue.
+ * \brief 使用 libnetfilter_queue 的 fwknopd 抓包例程
  */
 
 /*
@@ -46,13 +47,13 @@
 #include <linux/netfilter_ipv4.h>
 #include <libnetfilter_queue/libnetfilter_queue.h>
 
-static int process_nfq_packet(struct nfq_q_handle *qh,
-        struct nfgenmsg *nfmsg,
-        struct nfq_data *nfa,
+static int process_nfq_packet(struct nfq_q_handle *qh,//Netfilter Queue 队列的处理句柄。
+        struct nfgenmsg *nfmsg,//netlink 消息的通用消息头
+        struct nfq_data *nfa,//Netfilter Queue 队列中接收到的数据包
         void *data)
-{
+{   //Netfilter Queue 库（libnetfilter_queue）交互的数据包头结构体，它通常在捕获或处理网络数据包时使用。
     struct nfqnl_msg_packet_hdr *ph;
-    int pkt_len = 0;
+    int pkt_len = 0;//数据包长度
     int verdict;
     unsigned char *full_packet;
     fko_srv_options_t   *opts = (fko_srv_options_t *)data;
@@ -68,13 +69,20 @@ static int process_nfq_packet(struct nfq_q_handle *qh,
 
         /* Retrieve packet payload
         */
+
+        //是libnetfilter_queue库中的一个函数，用于获取netfilter队列中数据包的有效载荷（payload）
         pkt_len = nfq_get_payload(nfa, &full_packet);
 
+        //处理数据包
         process_packet(opts, pkt_len, full_packet);
 
         /* Verdict on what to do with the packet.  If it is coming from
          * the INPUT chain (NF_IP_LOCAL_IN), then it is assumed to be
          * a spa packet and can be dropped. Otherwise, let it through.
+         * 对数据包的处理结果。
+         * 如果数据包来自 INPUT 链（NF_IP_LOCAL_IN），
+         * 则假定它是一个 SPA 数据包，并且可以被丢弃。
+         * 否则，允许其通过。
         */
         verdict = (ph->hook == NF_IP_LOCAL_IN) ? NF_DROP : NF_ACCEPT;
         nfq_set_verdict(qh, ph->packet_id, verdict, 0, NULL);
@@ -83,7 +91,7 @@ static int process_nfq_packet(struct nfq_q_handle *qh,
 }
 
 
-/* The nfq capture routine.
+/* 
 */
 int
 nfq_capture(fko_srv_options_t *opts)
@@ -109,6 +117,7 @@ nfq_capture(fko_srv_options_t *opts)
     }
 
     /* Unbind existing nf_queue handler for AF_INET (if any)
+    *解绑已存在的AF_INET地址族的nf_queue处理程序（如果有的话）。
     */
     res = nfq_unbind_pf(nfq_h, AF_INET);
     if (res < 0)  {
@@ -116,6 +125,7 @@ nfq_capture(fko_srv_options_t *opts)
     }
 
     /* Bind the given queue connection handle to process packets.
+    *  将给定的队列连接句柄绑定到处理数据包。
     */
     res =  nfq_bind_pf(nfq_h, AF_INET);
     if ( res < 0) {

@@ -52,10 +52,14 @@
 
 /* Prototypes
 */
+//检测文件所有权
 int     verify_file_perms_ownership(const char *file, int fd);
+//解析目标地址
 int     resolve_dst_addr(const char *dns_str, struct addrinfo *hints,
             char *ip_str, size_t ip_bufsize, fko_cli_options_t *opts);
+//int -> str
 short   proto_inttostr(int proto, char *proto_str, size_t proto_size);
+//str -> int
 short   proto_strtoint(const char *pr_str);
 
 #endif  /* UTILS_H */

@@ -30,6 +30,8 @@
 #ifndef FWKNOPD_COMMON_H
 #define FWKNOPD_COMMON_H
 
+#include "common.h"
+//检测是否是openbsd系统
 #if PLATFORM_OPENBSD
   #include <netinet/in.h>
 #endif
@@ -44,19 +46,23 @@
 
 /* My Name and Version
 */
+//我的名字和版本
 #define MY_NAME     "fwknopd"
 #define MY_DESC     "Single Packet Authorization server"
 
 /* Get our program version from VERSION (defined in config.h).
 */
+//从VERSION（在config.h中定义）获取我们的程序版本。
 #define MY_VERSION VERSION
 
 /* Some program defaults.
 */
+//一些程序默认值。
 #ifndef DEF_CONF_DIR
   /* Our default config directory is based on SYSCONFDIR as set by the
    * configure script.
   */
+ //我们的默认配置目录基于由配置脚本设置的SYSCONFDIR。
   #define DEF_CONF_DIR      SYSCONFDIR"/"PACKAGE_NAME
 #endif
 
@@ -67,11 +73,13 @@
   /* Our default run directory is based on LOCALSTATEDIR as set by the
    * configure script. This is where we put the PID and digest cache files.
   */
+ //我们的默认运行目录基于由配置脚本设置的LOCALSTATEDIR。这是我们放置PID和摘要缓存文件的地方。
   #define DEF_RUN_DIR       SYSRUNDIR"/"PACKAGE_NAME
 #endif
 
 /* More Conf defaults
 */
+//更多Conf默认值
 #define DEF_PID_FILENAME                MY_NAME".pid"
 #if USE_FILE_CACHE
   #define DEF_DIGEST_CACHE_FILENAME       "digest.cache"
@@ -149,6 +157,7 @@
 
 /* FirewallD-specific defines
 */
+//防火墙特定定义
 #if FIREWALL_FIREWALLD
 
   #define DEF_FLUSH_FIREWD_AT_INIT         "Y"
@@ -169,6 +178,7 @@
 
 /* Iptables-specific defines
 */
+//iptables特定定义
 #elif FIREWALL_IPTABLES
 
   #define DEF_FLUSH_IPT_AT_INIT         "Y"
@@ -189,6 +199,7 @@
 
 /* Ipfw-specific defines
 */
+//  Ipfw特定定义
 #elif FIREWALL_IPFW
 
   #define DEF_FLUSH_IPFW_AT_INIT         "Y"
@@ -220,6 +231,7 @@
 
 /* fwknopd-specific limits
 */
+//fwknopd特定限制
 #define MAX_PCAP_FILTER_LEN     1024
 #define MAX_IFNAME_LEN          128
 #define MAX_SPA_PACKET_LEN      1500 /* --DSS check this? */
@@ -227,6 +239,7 @@
 
 /* The minimum possible valid SPA data size.
 */
+//最小可能的有效SPA数据大小
 #define MIN_SPA_DATA_SIZE   140
 
 /* Configuration file parameter tags.
@@ -236,6 +249,9 @@
  * Note: It is important to maintain an equivalence between this enum and the
  *       config_map[] array in server/cmd_opts.h
 */
+//配置文件参数标签
+//这将对应于配置参数数组中的条目
+//注意:重要的是要保持这个枚举和server/cmd_opts.h中的config_map[]数组之间的等价性
 enum {
     CONF_CONFIG_FILE = 0,
     CONF_OVERRIDE_CONFIG,
@@ -356,6 +372,7 @@ enum {
 /* A simple linked list of uints for the access stanza items that allow
  * multiple comma-separated entries.
 */
+//一个简单的链表，用于允许多个逗号分隔条目的访问部分条目。
 typedef struct acc_int_list
 {
     unsigned int        maddr;
@@ -366,6 +383,7 @@ typedef struct acc_int_list
 /* A simple linked list of proto and ports for the access stanza items that
  * allow multiple comma-separated entries.
 */
+//一个简单的链表，用于允许多个逗号分隔条目的访问部分条目。
 typedef struct acc_port_list
 {
     unsigned int            proto;
@@ -376,6 +394,7 @@ typedef struct acc_port_list
 /* A simple linked list of strings for the access stanza items that
  * allow multiple comma-separated entries.
 */
+//一个简单的链表，用于允许多个逗号分隔条目的访问部分条目。
 typedef struct acc_string_list
 {
     char                    *str;
@@ -384,6 +403,7 @@ typedef struct acc_string_list
 
 /* Access stanza list struct.
 */
+//访问部分列表结构。
 typedef struct acc_stanza
 {
     char                *source;
@@ -454,6 +474,7 @@ typedef struct acc_stanza
 
 /* A simple linked list of strings for command open/close cycles
 */
+//一个简单的链表，用于命令打开/关闭周期的字符串
 typedef struct cmd_cycle_list
 {
     char                    src_ip[MAX_IPV4_STR_LEN];
@@ -464,7 +485,7 @@ typedef struct cmd_cycle_list
 } cmd_cycle_list_t;
 
 /* Firewall-related data and types. */
-
+//防火墙相关数据和类型。
 #if FIREWALL_FIREWALLD
   /* --DSS XXX: These are arbitrary. We should determine appropriate values.
   */
@@ -596,6 +617,7 @@ typedef struct cmd_cycle_list
 
 /* SPA Packet info struct.
 */
+//SPA数据包信息结构。
 typedef struct spa_pkt_info
 {
     unsigned int    packet_data_len;
@@ -609,6 +631,7 @@ typedef struct spa_pkt_info
 
 /* Struct for (processed and verified) SPA data used by the server.
 */
+//服务器使用的（已处理和验证的）SPA数据的结构。
 typedef struct spa_data
 {
     char           *username;
@@ -630,41 +653,45 @@ typedef struct spa_data
 
 /* fwknopd server configuration parameters and values
 */
+//fwknopd服务器配置参数和值
 typedef struct fko_srv_options
 {
     /* The command-line options or flags that invoke an immediate response
      * then exit.
     */
-    unsigned char   dump_config;        /* Dump current configuration flag */
-    unsigned char   foreground;         /* Run in foreground flag */
-    unsigned char   kill;               /* flag to initiate kill of fwknopd */
-    unsigned char   rotate_digest_cache;/* flag to force rotation of digest */
-    unsigned char   restart;            /* Restart fwknopd flag */
-    unsigned char   status;             /* Get fwknopd status flag */
-    unsigned char   fw_list;            /* List current firewall rules */
-    unsigned char   fw_list_all;        /* List all current firewall rules */
-    unsigned char   fw_flush;           /* Flush current firewall rules */
-    unsigned char   key_gen;            /* Generate keys and exit */
-    unsigned char   exit_after_parse_config; /* Parse config and exit */
-    unsigned char   exit_parse_digest_cache; /* Parse digest cache and exit */
+   //调用立即响应然后退出的命令行选项或标志。
+    unsigned char   dump_config;        /* Dump current configuration flag 转储当前配置标志*/
+    unsigned char   foreground;         /* Run in foreground flag 在前台运行标志*/
+    unsigned char   kill;               /* flag to initiate kill of fwknopd 启动fwknopd杀进程的标志*/
+    unsigned char   rotate_digest_cache;/* flag to force rotation of digest 强制旋转摘要缓存的标志*/
+    unsigned char   restart;            /* Restart fwknopd flag 重新启动fwknopd的标志*/
+    unsigned char   status;             /* Get fwknopd status flag 获取fwknopd状态的标志*/
+    unsigned char   fw_list;            /* List current firewall rules 列出当前防火墙规则的标志*/
+    unsigned char   fw_list_all;        /* List all current firewall rules 列出所有当前防火墙规则的标志*/
+    unsigned char   fw_flush;           /* Flush current firewall rules 清空当前防火墙规则的标志*/
+    unsigned char   key_gen;            /* Generate keys and exit 生成密钥并退出的标志*/
+    unsigned char   exit_after_parse_config; /* Parse config and exit 解析配置并退出的标志*/
+    unsigned char   exit_parse_digest_cache; /* Parse digest cache and exit 解析摘要缓存并退出的标志*/
 
     /* Operational flags
     */
-    unsigned char   test;               /* Test mode flag */
-    unsigned char   afl_fuzzing;        /* SPA pkts from stdin for AFL fuzzing */
-    unsigned char   verbose;            /* Verbose mode flag */
-    unsigned char   enable_udp_server;  /* Enable UDP server mode */
-    unsigned char   enable_nfq_capture; /* Enable Netfilter Queue capture mode */
+    unsigned char   test;               /* Test mode flag 测试模式标志*/
+    unsigned char   afl_fuzzing;        /* SPA pkts from stdin for AFL fuzzing 用于AFL模糊测试的SPA数据包标志*/
+    unsigned char   verbose;            /* Verbose mode flag 详细模式标志*/
+    unsigned char   enable_udp_server;  /* Enable UDP server mode 启用UDP服务器模式的标志*/
+    unsigned char   enable_nfq_capture; /* Enable Netfilter Queue capture mode 启用Netfilter队列捕获模式的标志*/
     unsigned char   enable_fw;          /* Command modes by themselves don't
-                                           need firewall support. */
+                                           need firewall support. 仅命令模式本身不需要防火墙支持的标志*/
 
-    unsigned char   firewd_disable_check_support; /* Don't use firewall-cmd ... -C */
-    unsigned char   ipt_disable_check_support;    /* Don't use iptables -C */
+    unsigned char   firewd_disable_check_support; /* Don't use firewall-cmd ... -C 不使用firewall-cmd ... -C的标志*/
+    unsigned char   ipt_disable_check_support;    /* Don't use iptables -C 不使用iptables -C的标志*/
 
     /* Flag for permitting SPA packets regardless of directionality test
      * w.r.t. the sniffing interface.  This can sometimes be useful for SPA
      * packets that are sent _through_ a system and fwknopd is sniffing on
      * the outbound interface as far as these packets are concerned.
+     * 用于允许SPA数据包的标志，无论嗅探接口的方向性测试如何。
+     * 对于通过系统发送的SPA数据包，fwknopd在这些数据包的角度看出站接口上嗅探时，有时会很有用。
     */
     unsigned char   pcap_any_direction;
 
@@ -673,6 +700,7 @@ typedef struct fko_srv_options
     int             lock_fd;
 
     /* Values used in --key-gen mode only
+     * 仅在--key-gen模式下使用的值
     */
     char key_gen_file[MAX_PATH_LEN];
     int  key_len;
@@ -683,21 +711,24 @@ typedef struct fko_srv_options
     struct digest_cache_list *digest_cache;   /* In-memory digest cache list */
 #endif
 
-    spa_pkt_info_t  spa_pkt;            /* The current SPA packet */
+    spa_pkt_info_t  spa_pkt;            /* The current SPA packet 当前的 SPA 数据包信息*/
 
     /* Counter set from the command line to exit after the specified
      * number of SPA packets are processed.
+     *从命令行设置的计数器，用于在处理指定数量的 SPA 数据包后退出。
     */
     unsigned int    packet_ctr_limit;
-    unsigned int    packet_ctr;  /* counts packets with >0 payload bytes */
+    unsigned int    packet_ctr;  /* counts packets with >0 payload bytes 统计有效载荷字节数大于 0 的数据包*/
 
     /* This array holds all of the config file entry values as strings
      * indexed by their tag name.
+     *这个数组保存所有配置文件条目的值，使用标签名作为索引。
     */
     char           *config[NUMBER_OF_CONFIG_ENTRIES];
 
     /* Data elements that are derived from configuration entries - avoids
      * calling strtol_wrapper() after the config is parsed.
+     *从配置条目中派生出来的数据元素，避免在配置解析后再调用 strtol_wrapper()。
     */
     unsigned short tcpserv_port;
     unsigned short udpserv_port;
@@ -708,24 +739,31 @@ typedef struct fko_srv_options
     int            max_sniff_bytes;
     int            max_spa_packet_age;
 
-    acc_stanza_t   *acc_stanzas;       /* List of access stanzas */
+    acc_stanza_t   *acc_stanzas;       /* List of access stanzas 访问配置段的链表*/
 
     /* Firewall config info.
+    * 防火墙配置信息
     */
     struct fw_config *fw_config;
 
     /* Rule checking counter - this is for garbage cleanup mode to remove
      * any rules with an expired timer (even those that may have been
      * added by a third-party program).
+     * 规则检查计数器 - 用于垃圾清理模式，
+     * 删除任何已过期计时器的规则（甚至可能由第三方程序添加的规则）。
+     * 
     */
     unsigned int check_rules_ctr;
 
     /* Track external command execution cycles (track source IP, access.conf
      * stanza number, and instantiation time).
+     * 跟踪外部命令执行周期（跟踪源 IP、access.conf 配置段编号和实例化时间）。
     */
     cmd_cycle_list_t *cmd_cycle_list;
 
-    /* Set to 1 when messages have to go through syslog, 0 otherwise */
+    /* Set to 1 when messages have to go through syslog, 0 otherwise 
+    *  当消息必须通过 syslog 时设置为 1，否则为 0。 
+    */
     unsigned char   syslog_enable;
 
 } fko_srv_options_t;

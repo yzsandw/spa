@@ -25,44 +25,99 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  */
+//本文件头文件
+
+//本文件头文件
+
 
 #include "fwknop.h"
+//设置初始化
 #include "config_init.h"
+//导入spa包读写操作
 #include "spa_comm.h"
+//导入工具头文件
 #include "utils.h"
+//提供了从文件读取密钥的函数
 #include "getpasswd.h"
 
+
+//文件状态和文件控制
 #include <sys/stat.h>
 #include <fcntl.h>
 
 
 /* prototypes
 */
+
+// get_keys: 用于获取密钥，包括加密密钥和 HMAC 密钥。
 static int get_keys(fko_ctx_t ctx, fko_cli_options_t *options,
     char *key, int *key_len, char *hmac_key, int *hmac_key_len);
+
+// errmsg: 用于输出错误消息。
 static void errmsg(const char *msg, const int err);
+// prev_exec: 1.初始化“命令参数文件”的保存路径，并把新的参数存入。 2.根据option判断，是否执行文件中最后一次（上一次）执行的命令，是否将该命令行参数展示，是否保存当前执行的新命令。
 static int prev_exec(fko_cli_options_t *options, int argc, char **argv);
+// get_save_file: //将命令参数的保存路径设置为Linux的home或者win的用户名下的fwknop.run文件中
 static int get_save_file(char *args_save_file);
+// show_last_command: 用于显示最后一条命令。
 static int show_last_command(const char * const args_save_file);
+// save_args: 用于保存命令行参数。
 static int save_args(int argc, char **argv, const char * const args_save_file);
+// run_last_args: 从上一次调用中获取命令行参数
 static int run_last_args(fko_cli_options_t *options,
         const char * const args_save_file);
+// set_message_type: 用于设置消息类型。
 static int set_message_type(fko_ctx_t ctx, fko_cli_options_t *options);
+// set_nat_access: 用于设置 NAT 访问。
 static int set_nat_access(fko_ctx_t ctx, fko_cli_options_t *options,
         const char * const access_buf);
+// set_access_buf: 用于设置访问缓冲区。
 static int set_access_buf(fko_ctx_t ctx, fko_cli_options_t *options,
         char *access_buf);
+// get_rand_port: 用于获取随机端口。
 static int get_rand_port(fko_ctx_t ctx);
+// resolve_ip_https: 用于解析 HTTPS IP 地址。
 int resolve_ip_https(fko_cli_options_t *options);
+// resolve_ip_http: 用于解析 HTTP IP 地址。
 int resolve_ip_http(fko_cli_options_t *options);
+// clean_exit: 用于清理并退出程序。
 static void clean_exit(fko_ctx_t ctx, fko_cli_options_t *opts,
     char *key, int *key_len, char *hmac_key, int *hmac_key_len,
     unsigned int exit_status);
+// zero_buf_wrapper: 用于将缓冲区清零。
 static void zero_buf_wrapper(char *buf, int len);
+
+
+/*
+这段代码是一个条件编译块，用于判断是否启用了libfiu库，并定义了一个名为enable_fault_injections的函数。
+
+根据条件编译宏HAVE_LIBFIU来确定是否启用了libfiu库。如果启用了该库，则进入条件编译块。
+
+在函数内部，定义了一个名为enable_fault_injections的函数，该函数接受一个指向fko_cli_options_t类型的指针作为参数，
+并返回一个整数值。
+
+该函数的具体实现需要根据上下文中给出的代码内容进行补充，因为当前代码中只有函数的声明，没有给出具体的实现内容。
+
+该函数的作用是在启用了libfiu库的情况下，根据传入的opts参数来进行故障注入的设置或配置。
+具体的实现需要根据代码中其他部分的逻辑来确定。
+
+*/
 #if HAVE_LIBFIU
 static int enable_fault_injections(fko_cli_options_t * const opts);
 #endif
 
+
+/*
+这段代码是一个条件编译块，用于在AFL模糊测试模式下定义两个常量。如果定义了宏AFL_FUZZING，则进入条件编译块。
+
+在条件编译块内部，定义了两个常量：
+
+    AFL_ENC_KEY：表示AFL模糊测试模式下使用的加密密钥，其取值为字符串"aflenckey"。
+    AFL_HMAC_KEY：表示AFL模糊测试模式下使用的HMAC密钥，其取值为字符串"aflhmackey"。
+
+这些常量的作用是在AFL模糊测试模式下使用固定的密钥和HMAC密钥，以确保每次模糊测试循环时都使用相同的密钥，
+避免因密钥变动而导致不一致的测试结果。
+*/
 #if AFL_FUZZING
   /* These are used in AFL fuzzing mode so the fuzzing cycle is not
    * interrupted by trying to read from stdin
@@ -71,35 +126,94 @@ static int enable_fault_injections(fko_cli_options_t * const opts);
   #define AFL_HMAC_KEY              "aflhmackey"
 #endif
 
-#define NAT_ACCESS_STR_TEMPLATE     "%s,%d"             /*!< Template for a nat access string ip,port with sscanf*/
-#define HOSTNAME_BUFSIZE            64                  /*!< Maximum size of a hostname string */
-#define CTX_DUMP_BUFSIZE            4096                /*!< Maximum size allocated to a FKO context dump */
+/*
+这段代码定义了三个宏常量：
+
+    
+
+    
+
+    CTX_DUMP_BUFSIZE：表示用于FKO上下文转储的最大缓冲区大小，其取值为4096。
+
+这些宏常量用于在代码中指定特定的字符串模板和缓冲区大小，以便在编译时进行预定义和统一控制。
+这样可以提高代码的可读性和维护性，并且能够方便地对字符串和缓冲区大小进行修改。
+
+*/
+#define NAT_ACCESS_STR_TEMPLATE     "%s,%d"             //NAT_ACCESS_STR_TEMPLATE：表示一个用于解析NAT访问字符串(ip地址和端口)的模板，
+                                                        //使用sscanf函数。其取值为"%s,%d"，其中%s表示字符串，%d表示整数。
+#define HOSTNAME_BUFSIZE            64                  //HOSTNAME_BUFSIZE：表示主机名字符串的最大长度，其取值为64。
+#define CTX_DUMP_BUFSIZE            4096               //CTX_DUMP_BUFSIZE：表示用于FKO上下文转储的最大缓冲区大小，其取值为4096。
 
 int
 main(int argc, char **argv)
-{
-    fko_ctx_t           ctx  = NULL;
+{   
+    /*
+    这段代码声明了一些变量和数组：
+
+    fko_ctx_t ctx = NULL; 和 fko_ctx_t ctx2 = NULL;：声明了两个类型为 fko_ctx_t 的变量 ctx 和 ctx2，
+    并将其初始化为 NULL。这些变量可能是用于表示 FK0 上下文的指针。
+
+    int res;：声明了一个名为 res 的整型变量，用于存储函数调用的返回值。
+
+    char *spa_data=NULL, *version=NULL;：声明了两个字符指针变量 spa_data 和 version，
+    并将它们初始化为 NULL。这些变量可能用于存储字符串数据。
+
+    char access_buf[MAX_LINE_LEN] = {0};：声明了一个字符数组 access_buf，长度为 MAX_LINE_LEN，
+    并将其所有元素初始化为 0。这个数组可能用于存储访问缓冲区的数据。
+
+    char key[MAX_KEY_LEN+1] = {0}; 和 char hmac_key[MAX_KEY_LEN+1] = {0};：
+    声明了两个字符数组 key 和 hmac_key，长度为 MAX_KEY_LEN+1，并将其所有元素初始化为 0。
+    这些数组可能用于存储密钥或密码相关的数据。
+
+    int key_len = 0, orig_key_len = 0, hmac_key_len = 0, enc_mode;：
+    声明了四个整型变量 key_len、orig_key_len、hmac_key_len 和 enc_mode，
+    并分别初始化为 0。这些变量可能用于存储长度或加密模式等相关信息。
+
+    int tmp_port = 0;：声明了一个整型变量 tmp_port，并初始化为 0。这个变量可能用于存储临时的端口号。
+
+    char dump_buf[CTX_DUMP_BUFSIZE];：声明了一个字符数组 dump_buf，长度为 CTX_DUMP_BUFSIZE，
+    用于存储 FK0 上下文转储的数据。
+
+    */
+    //用于保存发送消息  
+    fko_ctx_t           ctx  = NULL; //fkocontext的指针
     fko_ctx_t           ctx2 = NULL;
-    int                 res;
-    char               *spa_data=NULL, *version=NULL;
-    char                access_buf[MAX_LINE_LEN] = {0};
-    char                key[MAX_KEY_LEN+1]       = {0};
-    char                hmac_key[MAX_KEY_LEN+1]  = {0};
-    int                 key_len = 0, orig_key_len = 0, hmac_key_len = 0, enc_mode;
-    int                 tmp_port = 0;
+    int                 res; //用于判断函数调用是否成功
+    char               *spa_data=NULL, *version=NULL; //用于存储SPA数据和版本信息
+    char                access_buf[MAX_LINE_LEN] = {0}; //存储访问控制规则
+    char                key[MAX_KEY_LEN+1]       = {0}; //存储加密密钥
+    char                hmac_key[MAX_KEY_LEN+1]  = {0}; //HMAC密钥
+    int                 key_len = 0, orig_key_len = 0, hmac_key_len = 0, enc_mode; //存储密钥的长度、加密模式
+    int                 tmp_port = 0; //存储临时端口
     char                dump_buf[CTX_DUMP_BUFSIZE];
 
+    //fwknop存储客户端配置参数和对应值的结构体
     fko_cli_options_t   options;
 
+
+    //将客户端配置参数值初始化为0
     memset(&options, 0x0, sizeof(fko_cli_options_t));
-
-    /* Initialize the log module */
+    //初始化消息模块
+    //设置日志级别为普通日志级别 -lkx
     log_new();
-
+    //处理命令行  
     /* Handle command line
     */
+   //将命令行参数和客户端配置信息，传递给config进行初始化 -lkx
     config_init(&options, argc, argv);
 
+/*
+这段代码是一个条件编译的代码块，当宏定义 HAVE_LIBFIU 存在时执行。它用于设置故障注入点。
+
+在这段代码中，首先调用 enable_fault_injections(&options) 函数来设置故障注入点，
+&options 是一个选项结构体的指针。如果故障注入点设置失败，那么会调用 clean_exit() 函数进行清理操作，
+传递了一些参数，包括 ctx 上下文指针、options 选项结构体指针、key 和 hmac_key 密钥相关的数据指针，
+以及退出状态码 EXIT_FAILURE。
+
+换句话说，该代码块用于在程序运行时通过故障注入来测试和模拟异常情况，以验证程序的稳定性和鲁棒性。
+这通常用于调试和测试目的。
+
+*/
 #if HAVE_LIBFIU
         /* Set any fault injection points early
         */
@@ -110,26 +224,31 @@ main(int argc, char **argv)
 
     /* Handle previous execution arguments if required
     */
+   //处理之前的执行参数
+   //该函数主要用来显示上一个命令，或者执行上一个命令，或者保存当前命令到命令参数表 -lkx
     if(prev_exec(&options, argc, argv) != 1)
+        //执行退出程序前的必要清理工作
         clean_exit(ctx, &options, key, &key_len, hmac_key,
                 &hmac_key_len, EXIT_FAILURE);
-
-    if(options.show_last_command)
+    //这里如果命令行设置了show_last_command，就直接结束程序了，为啥？ -lkx
+    if(options.show_last_command) //显示 fwknop 使用的最后一个命令行参数
         clean_exit(ctx, &options, key, &key_len, hmac_key,
                 &hmac_key_len, EXIT_SUCCESS);
 
     /* Intialize the context
     */
+   //初始化数据包       
     res = fko_new(&ctx);
     if(res != FKO_SUCCESS)
     {
         errmsg("fko_new", res);
         clean_exit(ctx, &options, key, &key_len, hmac_key,
                 &hmac_key_len, EXIT_FAILURE);
-    }
+    }       
 
     /* Display version info and exit.
     */
+   //显示版本信息
     if(options.version)
     {
         fko_get_version(ctx, &version);
@@ -143,6 +262,7 @@ main(int argc, char **argv)
 
     /* Set client timeout
     */
+   //设置超时时间，超时就自动断开
     if(options.fw_timeout >= 0)
     {
         res = fko_set_spa_client_timeout(ctx, options.fw_timeout);
@@ -156,6 +276,8 @@ main(int argc, char **argv)
 
     /* Set the SPA packet message type based on command line options
     */
+   //设置spa消息类型基于命令行选项
+   //设置消息类型是为了指定并约定在 SPA 通信中使用的消息的类型，以实现不同用途和格式的消息交互，并控制通信流程和支持系统的扩展性
     res = set_message_type(ctx, &options);
     if(res != FKO_SUCCESS)
     {
@@ -166,6 +288,7 @@ main(int argc, char **argv)
 
     /* Adjust the SPA timestamp if necessary
     */
+   //调整spa时间戳
     if(options.time_offset_plus > 0)
     {
         res = fko_set_timestamp(ctx, options.time_offset_plus);
@@ -192,14 +315,27 @@ main(int argc, char **argv)
         /* Set the access message to a command that the server will
          * execute
         */
+       //设置访问消息到服务器将执行的命令
         snprintf(access_buf, MAX_LINE_LEN, "%s%s%s",
                 options.allow_ip_str, ",", options.server_command);
     }
     else
     {
+
         /* Resolve the client's public facing IP address if requestesd.
          * if this fails, consider it fatal.
         */
+    //解析客户端的公网ip地址
+    /*
+       获取到客户端的公网IP地址之后，可以进行一系列操作，包括但不限于以下几个方面：
+
+    访问控制：通过公网IP地址可以对客户端进行访问控制。你可以根据客户端的公网IP地址来限制或允许其访问特定的资源、
+    服务或功能。例如，你可以设置防火墙规则、访问列表或白名单，以基于IP地址对客户端进行访问控制。
+
+    安全验证：公网IP地址也可以用于安全验证机制。你可以将公网IP地址用作身份验证的一部分，
+    以确保只有特定的客户端可以通过验证并访问敏感信息或受限资源。
+
+       */
         if (options.resolve_ip_http_https)
         {
             if(options.resolve_http_only)
@@ -226,10 +362,14 @@ main(int argc, char **argv)
          * to be specified as well, so in this case append the string
          * "none/0" to the allow IP.
         */
+       //设置消息字符串通过结合允许ip和端口/协议
+       //fwknopd服务器允许没有端口/协议指定以及，所以在这种情况下附加字符串“none/0”到允许ip
+
         if(set_access_buf(ctx, &options, access_buf) != 1)
             clean_exit(ctx, &options, key, &key_len,
                     hmac_key, &hmac_key_len, EXIT_FAILURE);
     }
+    //设置spa消息
     res = fko_set_spa_message(ctx, access_buf);
     if(res != FKO_SUCCESS)
     {
@@ -240,6 +380,13 @@ main(int argc, char **argv)
 
     /* Set NAT access string
     */
+   //todo ??? 设置nat访问字符串 问题:
+   /*
+   设置NAT访问字符串的目的是为了实现私有网络和公网之间的连接和通信，
+   提供互联网访问、安全性、地址管理和网络扩展等功能。这样可以更好地控制和管理网络流量，
+   并确保私有网络内的设备通过共享的公网IP地址有效地与互联网上的其他主机进行通信。
+   
+   */
     if (options.nat_local || options.nat_access_str[0] != 0x0)
     {
         res = set_nat_access(ctx, &options, access_buf);
@@ -253,6 +400,7 @@ main(int argc, char **argv)
 
     /* Set username
     */
+   //设置用户名
     if(options.spoof_user[0] != 0x0)
     {
         res = fko_set_username(ctx, options.spoof_user);
@@ -265,19 +413,29 @@ main(int argc, char **argv)
     }
 
     /* Set up for using GPG if specified.
+    
     */
+   //设置使用gpg
+   /*
+   * 在软件开发或配置中，GPG 是一种常用的加密和签名工具，
+   * 用于保护敏感信息和验证数据的完整性。
+   * 如果在特定的设置或配置中明确指定要使用 GPG，
+   * 那么相应的操作或流程需要进行适当的 GPG 设置，
+   * 以确保正确地使用 GPG 加密、解密或签名等功能。
+   */
     if(options.use_gpg)
     {
         /* If use-gpg-agent was not specified, then remove the GPG_AGENT_INFO
          * ENV variable if it exists.
+         *如果未指定"use-gpg-agent"，则如果存在"GPG_AGENT_INFO"环境变量，则将其删除。
         */
 #ifndef WIN32
         if(!options.use_gpg_agent)
-            unsetenv("GPG_AGENT_INFO");
+            unsetenv("GPG_AGENT_INFO"); //删除环境变量
 #endif
-
-        res = fko_set_spa_encryption_type(ctx, FKO_ENCRYPTION_GPG);
-        if(res != FKO_SUCCESS)
+        //设置gpg加密模式，一种非对称加密模式
+        res = fko_set_spa_encryption_type(ctx, FKO_ENCRYPTION_GPG); //设置spa加密模式
+        if(res != FKO_SUCCESS) //报错
         {
             errmsg("fko_set_spa_encryption_type", res);
             clean_exit(ctx, &options, key, &key_len,
@@ -286,6 +444,7 @@ main(int argc, char **argv)
 
         /* Set gpg path if necessary
         */
+       //设置gpb的可执行文件的路径
         if(strlen(options.gpg_exe) > 0)
         {
             res = fko_set_gpg_exe(ctx, options.gpg_exe);
@@ -301,6 +460,7 @@ main(int argc, char **argv)
          * this has to occur before calling any of the other GPG-related
          * functions.
         */
+       //如果已经指定了gpg的主目录，使用指定的主目录
         if(strlen(options.gpg_home_dir) > 0)
         {
             res = fko_set_gpg_home_dir(ctx, options.gpg_home_dir);
@@ -311,7 +471,7 @@ main(int argc, char **argv)
                         hmac_key, &hmac_key_len, EXIT_FAILURE);
             }
         }
-
+        //设置GPG加密的收件人，并获取相应的GPG密钥
         res = fko_set_gpg_recipient(ctx, options.gpg_recipient_key);
         if(res != FKO_SUCCESS)
         {
@@ -325,6 +485,7 @@ main(int argc, char **argv)
 
         if(strlen(options.gpg_signer_key) > 0)
         {
+            //设置签名者密钥
             res = fko_set_gpg_signer(ctx, options.gpg_signer_key);
             if(res != FKO_SUCCESS)
             {
@@ -337,7 +498,8 @@ main(int argc, char **argv)
             }
         }
 
-        res = fko_set_spa_encryption_mode(ctx, FKO_ENC_MODE_ASYMMETRIC);
+        //设置SPA数据包加密格式，这种格式是指用哪种加密算法，例如AES、DES等
+        res = fko_set_spa_encryption_mode(ctx, FKO_ENC_MODE_ASYMMETRIC);//这里只是说了使用非对称加密，没有具体指出
         if(res != FKO_SUCCESS)
         {
             errmsg("fko_set_spa_encryption_mode", res);
@@ -345,9 +507,10 @@ main(int argc, char **argv)
                     hmac_key, &hmac_key_len, EXIT_FAILURE);
         }
     }
-
+    //如果加密模式存在且不使用gpg加密数据
     if(options.encryption_mode && !options.use_gpg)
     {
+        //直接设置SPA加密格式
         res = fko_set_spa_encryption_mode(ctx, options.encryption_mode);
         if(res != FKO_SUCCESS)
         {
@@ -359,6 +522,7 @@ main(int argc, char **argv)
 
     /* Set Digest type.
     */
+   //设置摘要类型
     if(options.digest_type)
     {
         res = fko_set_spa_digest_type(ctx, options.digest_type);
@@ -372,12 +536,14 @@ main(int argc, char **argv)
 
     /* Acquire the necessary encryption/hmac keys
     */
+   //获取加密和hmac密钥
     if(get_keys(ctx, &options, key, &key_len, hmac_key, &hmac_key_len) != 1)
         clean_exit(ctx, &options, key, &key_len,
                 hmac_key, &hmac_key_len, EXIT_FAILURE);
 
     orig_key_len = key_len;
-
+    
+    //判断加密格式和密钥格式有没有是否符合要求
     if(options.encryption_mode == FKO_ENC_MODE_CBC_LEGACY_IV
             && key_len > 16)
     {
@@ -392,6 +558,7 @@ main(int argc, char **argv)
 
     /* Finalize the context data (encrypt and encode the SPA data)
     */
+   //最终化上下文数据（加密和编码SPA数据）
     res = fko_spa_data_final(ctx, key, key_len, hmac_key, hmac_key_len);
     if(res != FKO_SUCCESS)
     {
@@ -405,6 +572,7 @@ main(int argc, char **argv)
 
     /* Display the context data.
     */
+   //显示上下文数据
     if (options.verbose || options.test)
     {
         res = dump_ctx_to_buffer(ctx, dump_buf, sizeof(dump_buf));
@@ -415,13 +583,62 @@ main(int argc, char **argv)
                     fko_errstr(res));
     }
 
+
+
+
+
     /* Save packet data payload if requested.
     */
+   //如果请求，保存数据包数据负载。？？？
+    /*
+    数据包的负载是指在网络通信中传输的实际数据部分，通常是需要发送或接收的有效信息。
+    在网络协议中，数据包通常由首部和负载两部分组成，首部包含了协议相关的控制信息，而负载则包含了实际传输的数据。
+
+保存数据包负载的目的可以有多个：
+
+    调试和故障排除：在网络通信过程中，如果出现问题或异常情况，保存数据包负载可以帮助开发人员进行调试和故障排除。
+    通过分析保存的数据包负载，可以检查数据是否被正确传输、解析和处理，从而找出问题所在。
+
+    分析网络流量：保存数据包负载可以用于网络流量分析。通过分析保存的数据包，
+    可以获取有关通信双方之间的交互细节、协议使用情况、传输的数据类型等信息。
+    这对于网络性能优化、安全审计、行为分析等方面非常有用。
+
+    法律合规和取证：在一些场景下，需要保存数据包负载以满足法律合规要求或作为取证的依据。
+    例如，在网络安全事件调查中，保存数据包负载可以用于追踪攻击来源和行为，
+    提供证据以支持调查和法律追诉。
+
+综上所述，保存数据包负载对于网络调试、流量分析和法律合规等方面都具有重要的作用。
+   
+    */
+
     if (options.save_packet_file[0] != 0x0)
         write_spa_packet_data(ctx, &options);
 
     /* SPA packet random destination port handling
     */
+
+
+   //SPA数据包随机目标端口处理,生成一个随机端口，放到options中
+   /*
+   在某些情况下，将随机端口的生成放在客户端可能是有一定必要性的。
+
+首先，生成随机端口可以增加数据包的多样性和随机性。如果服务器端固定分配目标端口，
+攻击者可能会利用这个可预测的端口信息进行潜在的攻击。通
+过在客户端生成随机端口，可以增加攻击者猜测端口号的难度，提高网络传输的安全性。
+
+其次，客户端生成随机端口可以减轻服务器负担。如果服务器需要为每个连接或请求生成随机端口，
+会增加服务器的计算和资源消耗。而将生成随机端口的任务放在客户端完成，可以分摊服务器的负担，提高服务器的处理能力和性能。
+
+此外，在特定的应用场景中，需要将目标端口信息从客户端传递到服务器端。例如，当客户端与服务器建立连接时，
+需要指定目标端口以确定服务端口。在这种情况下，客户端生成随机端口可以直接将生成的端口信息传递给服务器，
+避免了额外的通信和交互。
+
+综上所述，客户端生成随机端口可以增加安全性，减轻服务器负担，并满足特定应用场景的需求。
+然而，具体是否在客户端生成随机端口，取决于系统设计和实际需求。在某些情况下，
+仍然可能需要在服务器端生成随机端口来满足特定的安全要求或业务需求。
+
+   
+   */
     if (options.rand_port)
     {
         tmp_port = get_rand_port(ctx);
@@ -435,11 +652,31 @@ main(int argc, char **argv)
      * we're going to spoof the SPA packet source IP), then select
      * a random source port unless the source port is already set
     */
+   //如果我们使用“原始”模式之一（通常是因为我们要欺骗SPA数据包源IP），则选择随机源端口，除非源端口已经设置
+   /*
+   换句话说，当以"raw"模式发送SPA数据包时，如果源端口还没有被设置过，那么就会随机选择一个源端口。
+   这是为了增加欺骗/伪造的隐蔽性和安全性。同时，在已经设置过源端口的情况下，不再改变源端口的值。
+   */
+
+    /*
+    如果options.spa_proto的值是FKO_PROTO_TCP_RAW、FKO_PROTO_UDP_RAW或FKO_PROTO_ICMP，
+    并且options.spa_src_port的值为0（即还没有设置源端口），则会执行以下操作：
+
+    调用get_rand_port(ctx)函数获取一个随机端口，并将返回的端口号赋值给tmp_port变量。
+    如果获取随机端口失败（tmp_port小于0），则会调用clean_exit()函数进行清理操作，并退出程序。
+    将tmp_port的值赋给options.spa_src_port，即将随机端口设置为源端口。
+
+    这段代码的作用是在使用"raw"模式发送TCP、UDP或ICMP的SPA数据包时，
+    如果源端口还未设置，则会生成一个随机端口，并将其设置为源端口。
+    这样可以确保在发送伪造的SPA数据包时，源端口具有随机性，增加欺骗性和安全性。
+    
+    */
     if ((options.spa_proto == FKO_PROTO_TCP_RAW
             || options.spa_proto == FKO_PROTO_UDP_RAW
             || options.spa_proto == FKO_PROTO_ICMP)
             && !options.spa_src_port)
     {
+        //获取随机源端口，也即是客户端发送spa数据包的端口，而不是服务器接收数据包的端口
         tmp_port = get_rand_port(ctx);
         if(tmp_port < 0)
             clean_exit(ctx, &options, key, &orig_key_len,
@@ -447,6 +684,8 @@ main(int argc, char **argv)
         options.spa_src_port = tmp_port;
     }
 
+
+    //发送SPA数据包，该函数会判断使用哪种协议发送数据
     res = send_spa_packet(ctx, &options);
     if(res < 0)
     {
@@ -462,12 +701,32 @@ main(int argc, char **argv)
     /* Run through a decode cycle in test mode (--DSS XXX: This test/decode
      * portion should be moved elsewhere).
     */
+   //在测试模式下运行解码周期（-DSS XXX：此测试/解码部分应移至其他位置）。
+    /*
+        这段代码是一个条件语句的代码块。如果options.test为真，则执行以下操作：
+
+    调用fko_get_spa_data()函数获取第一个上下文的数据，并将结果存储在spa_data中。
+    调用fko_get_spa_encryption_mode()函数获取加密模式，并将结果存储在enc_mode中。
+    判断是否使用了gpg-home-dir，如果是，则推迟解密过程，先创建一个空的上下文ctx2，然后使用加密数据填充它，并设置选项，最后解密数据。
+    如果使用了gpg并且需要设置GPG home dir，则调用fko_set_gpg_home_dir()函数设置ctx2的GPG home dir。
+    调用fko_decrypt_spa_data()函数对ctx2中的数据进行解密。
+    如果解密过程出现错误，则根据错误类型打印错误信息。
+    如果options.verbose为真，则在详细模式下将解密后的数据打印出来。
+    销毁ctx2。
+    执行一些清理工作。
+    返回EXIT_SUCCESS。
+
+    整个代码块的功能是对加密数据进行解密，并在需要时打印解密后的数据。
+    
+    */
+
     if (options.test)
     {
         /************** Decoding now *****************/
 
         /* Now we create a new context based on data from the first one.
         */
+       //现在，我们根据第一个上下文中的数据创建一个新的内容。
         res = fko_get_spa_data(ctx, &spa_data);
         if(res != FKO_SUCCESS)
         {
@@ -478,6 +737,7 @@ main(int argc, char **argv)
 
         /* Pull the encryption mode.
         */
+       //获取加密模式
         res = fko_get_spa_encryption_mode(ctx, &enc_mode);
         if(res != FKO_SUCCESS)
         {
@@ -501,6 +761,10 @@ main(int argc, char **argv)
          * This also verifies the HMAC and truncates it if there are no
          * problems.
         */
+    //    如果指定了gpg-home-dir，则必须推迟解密，如果我们使用fko_new_with_data（）函数，
+    //    因为我们需要设置gpg home dir在上下文创建之后，但在我们尝试解密数据之前。因此
+    //    ，我们要么传递NULL用于解密密钥fko_new_with_data（），要么使用fko_new（）创建一个空上下文
+    //    ，用加密数据填充它，设置选项，然后解码它。这也验证HMAC并在没有问题的情况下截断它。
         res = fko_new_with_data(&ctx2, spa_data, NULL,
             0, enc_mode, hmac_key, hmac_key_len, options.hmac_type);
         if(res != FKO_SUCCESS)
@@ -513,7 +777,7 @@ main(int argc, char **argv)
             clean_exit(ctx, &options, key, &orig_key_len,
                 hmac_key, &hmac_key_len, EXIT_FAILURE);
         }
-
+        //设置加密模式
         res = fko_set_spa_encryption_mode(ctx2, enc_mode);
         if(res != FKO_SUCCESS)
         {
@@ -528,10 +792,13 @@ main(int argc, char **argv)
 
         /* See if we are using gpg and if we need to set the GPG home dir.
         */
+       //如果使用gpg加密
         if(options.use_gpg)
         {
+            //自定义了gpg主目录
             if(strlen(options.gpg_home_dir) > 0)
             {
+                //给ctx2设置gpg主目录
                 res = fko_set_gpg_home_dir(ctx2, options.gpg_home_dir);
                 if(res != FKO_SUCCESS)
                 {
@@ -547,6 +814,7 @@ main(int argc, char **argv)
         }
 
         /* Decrypt
+        解密
         */
         res = fko_decrypt_spa_data(ctx2, key, key_len);
 
@@ -565,6 +833,11 @@ main(int argc, char **argv)
                  * tests that use a single key pair for encryption and
                  * authentication, so decryption become possible for these
                  * tests. */
+                //我们最有可能无法解密gpg加密的数据，因为我们没有访问与用于加密的公钥相关联的私钥。
+                //由于这是预期的，返回0而不是错误条件（因此调用程序如fwknop测试套件不会将其解释为不可恢复的错误），
+                //但打印错误字符串以进行调试目的。测试套件确实运行一系列使用单个密钥对进行加密和身份验证的测试，
+                //因此对于这些测试，解密变得可能。
+
                 log_msg(LOG_VERBOSITY_ERROR, "GPG ERR: %s\n%s", fko_gpg_errstr(ctx2),
                     "No access to recipient private key?");
             }
@@ -596,6 +869,28 @@ main(int argc, char **argv)
     return EXIT_SUCCESS;  /* quiet down a gcc warning */
 }
 
+
+/**
+ * 这是一个名为 free_configs 的函数，用于释放 fko_cli_options_t 结构体中的资源。
+
+具体的操作包括：
+
+    检查 opts->resolve_url 是否为 NULL，如果不为 NULL，则调用 free 函数释放该指针指向的内存。
+
+    检查 opts->wget_bin 是否为 NULL，如果不为 NULL，则调用 free 函数释放该指针指向的内存。
+
+    调用 zero_buf_wrapper 函数将 opts->key 数组中的数据清零，这里假设 zero_buf_wrapper 
+    函数的作用是将指定的缓冲区清零。
+
+    类似地，使用 zero_buf_wrapper 函数将 opts->key_base64、opts->hmac_key、
+    opts->hmac_key_base64、opts->gpg_recipient_key、opts->gpg_signer_key、
+    opts->gpg_home_dir 和 opts->server_command 对应的缓冲区数据清零。
+
+这段代码的目的是在释放 fko_cli_options_t 结构体之前，确保相关的指针和数组内容被正确清理和释放，
+以避免内存泄漏和悬挂指针的问题。
+
+ * 
+*/
 void
 free_configs(fko_cli_options_t *opts)
 {
@@ -603,7 +898,7 @@ free_configs(fko_cli_options_t *opts)
         free(opts->resolve_url);
     if (opts->wget_bin != NULL)
         free(opts->wget_bin);
-    zero_buf_wrapper(opts->key, MAX_KEY_LEN+1);
+    zero_buf_wrapper(opts->key, MAX_KEY_LEN+1); //zero_buf_wrapper用来清空缓冲区
     zero_buf_wrapper(opts->key_base64, MAX_B64_KEY_LEN+1);
     zero_buf_wrapper(opts->hmac_key, MAX_KEY_LEN+1);
     zero_buf_wrapper(opts->hmac_key_base64, MAX_B64_KEY_LEN+1);
@@ -612,7 +907,35 @@ free_configs(fko_cli_options_t *opts)
     zero_buf_wrapper(opts->gpg_home_dir, MAX_PATH_LEN);
     zero_buf_wrapper(opts->server_command, MAX_LINE_LEN);
 }
+/*
+这是一个名为 get_rand_port 的函数，用于获取一个随机的端口号。
 
+具体的操作包括：
+
+    声明了一个字符串指针 rand_val 并将其初始化为 NULL，声明了一个字符数组 port_str 并将其初始化为全零。
+
+    声明了一些整型变量 tmpint、is_err、port 和 res，并初始化为 0。
+
+    调用 fko_get_rand_value 函数获取一个随机值并将结果保存在 rand_val 中，
+    同时将返回值保存在 res 中。如果返回值不等于 FKO_SUCCESS，则输出错误信息并返回 -1。
+
+    使用 strlcpy 函数将 rand_val 复制到 port_str 中，确保复制的长度不超过 port_str 数组的大小。
+
+    使用 strtol_wrapper 函数将 port_str 转换成整数型值并保存在 tmpint 中，
+    同时将返回值保存在 is_err 中。如果 is_err 不等于 FKO_SUCCESS，则输出错误信息并返回 -1。
+
+    将 tmpint 对应的端口号转换成一个介于 1024 和 65535 之间的随机值，并保存在 port 中。
+
+    使用 fko_set_rand_value 函数将 ctx 中的随机值设为 NULL，以确保下次调用时会生成一个新的随机值。
+    同时将返回值保存在 res 中。如果返回值不等于 FKO_SUCCESS，则输出错误信息并返回 -1。
+
+    返回获取到的随机端口号 port。
+
+这段代码的目的是获取一个随机的端口号，并确保每次调用 get_rand_port 函数时都能获得不同的随机值，
+以增加安全性和保护 SPA 数据的加密内容。
+
+*/
+//注意：这里生成的是随机目标端口号，而不是源端口号
 static int
 get_rand_port(fko_ctx_t ctx)
 {
@@ -647,6 +970,7 @@ get_rand_port(fko_ctx_t ctx)
     /* Force libfko to calculate a new random value since we don't want to
      * give anyone a hint (via the port value) about the contents of the
      * encrypted SPA data.
+     * 强制 libfko 计算一个新的随机值，因为我们不希望通过端口值向任何人提示加密的 SPA 数据内容。
     */
     res = fko_set_rand_value(ctx, NULL);
     if(res != FKO_SUCCESS)
@@ -659,6 +983,48 @@ get_rand_port(fko_ctx_t ctx)
 }
 
 /* Set access buf
+*/
+/**
+ 这是一个名为 set_access_buf 的静态函数，用于设置访问缓冲区。
+
+具体的操作包括：
+
+    声明了一些局部变量，包括指针 ndx，字符数组 tmp_nat_port（长度为 MAX_PORT_STR_LEN+1），
+    整型变量 nat_port。并将 tmp_nat_port 数组初始化为全零。
+
+    首先检查 options->access_str 是否不为空。如果不为空，进入条件语句。
+
+    在选项 options 中判断是否启用了随机端口模式 nat_rand_port。如果是，
+    则调用 get_rand_port 函数获取一个随机端口号，并将结果保存在 nat_port 中；
+    同时将 nat_port 的值赋给 options->nat_port。如果没有启用随机端口模式，
+    则判断 options->nat_port 是否非零，如果非零，则将值赋给 nat_port。
+
+    判断 nat_port 的值是否在有效的端口范围内（大于0且小于等于 MAX_PORT）。
+    如果是，则进行下一步操作；否则，将 access_buf 设置为包含 options->allow_ip_str、
+    逗号和 options->access_str 的字符串，然后返回 1。
+
+    使用 strchr 函数在 options->access_str 中查找字符 '/' 的位置，并将结果保存在 ndx 中。
+    如果未找到字符 '/'，则输出错误信息并返回 0。
+
+    使用 snprintf 函数将 options->allow_ip_str 和逗号拼接到 access_buf 中。
+
+    将 options->access_str（从开头到字符 '/'）追加到 access_buf 中，确保长度足够。
+
+    使用 strchr 函数查找第一个字符 '/' 之后是否还有其他字符 '/'. 如果有，则输出错误信息并返回 0。
+
+    使用 snprintf 函数将 nat_port 转换为字符串并保存在 tmp_nat_port 中。
+
+    将 tmp_nat_port 追加到 access_buf 中，确保长度足够。
+
+    如果 options->access_str 为空，则重新设置 access_buf 为包含 options->allow_ip_str、
+    逗号和字符串 "none/0" 的内容。
+
+    返回 1 表示成功设置访问缓冲区。
+
+这个函数的作用是根据输入的选项 options 设置访问缓冲区 access_buf，
+并根据选项中的不同设置来调整访问字符串（options->access_str）中的端口号或生成新的访问字符串。
+
+ * 
 */
 static int
 set_access_buf(fko_ctx_t ctx, fko_cli_options_t *options, char *access_buf)
@@ -687,6 +1053,11 @@ set_access_buf(fko_ctx_t ctx, fko_cli_options_t *options, char *access_buf)
              * utlimate target of the incoming connection after the SPA
              * packet is sent).
             */
+        //    将访问字符串的端口替换为NAT端口，因为NAT端口是手动指定的（--nat-port）
+        //    或从随机数据中派生的（--nat-rand-port）。在NAT模式下，fwknopd服务器使
+        //    用访问字符串中的端口作为NAT的端口，并且通过此转换后的端口授予访问权限给
+        //    --nat-access IP:port所指定的目标（因此，在发送SPA数据包之后，此服务是
+        //    传入连接的最终目标）。
             ndx = strchr(options->access_str, '/');
             if(ndx == NULL)
             {
@@ -730,6 +1101,21 @@ set_access_buf(fko_ctx_t ctx, fko_cli_options_t *options, char *access_buf)
 
 /* Set NAT access string
 */
+/**
+ * 这是一段用C语言编写的函数，实现了设置NAT（网络地址转换）访问的功能。
+ * 该函数接受一个上下文对象fko_ctx_t ctx、一个命令行选项对象fko_cli_options_t *options和
+ * 一个表示访问信息的字符串const char * const access_buf作为参数。函数首先初始化一些变量，
+ * 然后解析命令行选项中的访问信息。如果解析不成功，会返回相应的错误代码。
+接着，函数会根据命令行选项中是否指定了本地NAT转换和访问字符串，来生成NAT访问的字符串。
+如果没有指定访问字符串，则会检查是否指定了NAT访问字符串。如果指定了NAT访问字符串，
+则会解析主机和端口，并验证其有效性。最后，函数会输出一个日志信息，
+显示分配给该访问的随机端口，并调用相关的函数设置NAT访问。
+
+该函数的具体实现可能依赖于其他头文件和函数定义。
+
+ * 
+*/
+
 static int
 set_nat_access(fko_ctx_t ctx, fko_cli_options_t *options, const char * const access_buf)
 {
@@ -847,6 +1233,27 @@ set_nat_access(fko_ctx_t ctx, fko_cli_options_t *options, const char * const acc
     return fko_set_spa_nat_access(ctx, nat_access_buf);
 }
 
+
+/**
+ * 这是一个用C语言编写的函数，用于执行前一个命令或显示前一个命令。
+ * 该函数接受一个命令行选项对象fko_cli_options_t *options、参数数量int argc和参数数组char **argv作为输入。
+
+函数首先初始化一些变量，然后检查是否指定了保存参数文件的路径。
+如果指定了保存参数文件的路径，则将其复制到args_save_file数组中；
+如果未指定保存参数文件的路径，则根据配置选择的模式来确定保存参数文件的路径。
+如果配置为--no-home-dir模式，则必须使用-E选项设置保存参数文件的路径；
+否则，将调用get_save_file函数确定保存参数文件的路径。
+
+然后，根据命令行选项的不同，函数执行相应的操作。
+如果设置了--run-last-command选项，则调用run_last_args函数执行前一个命令；
+如果设置了--show-last-command选项，则调用show_last_command函数显示前一个命令；
+如果没有设置--no-save-args选项，则调用save_args函数保存当前命令的参数到文件中。
+
+最后，函数返回执行结果。
+
+请注意，该函数的具体实现可能依赖于其他头文件和函数定义。
+
+*/
 static int
 prev_exec(fko_cli_options_t *options, int argc, char **argv)
 {
@@ -854,11 +1261,12 @@ prev_exec(fko_cli_options_t *options, int argc, char **argv)
     int        res = 1;
 
     if(options->args_save_file[0] != 0x0)
-    {
+    {//配置了保存路径
+        
         strlcpy(args_save_file, options->args_save_file, sizeof(args_save_file));
     }
     else
-    {
+    {//没有配置保存路径
         if(options->no_home_dir)
         {
             log_msg(LOG_VERBOSITY_ERROR,
@@ -876,7 +1284,7 @@ prev_exec(fko_cli_options_t *options, int argc, char **argv)
     }
 
     if(options->run_last_command)
-        res = run_last_args(options, args_save_file);
+        res = run_last_args(options, args_save_file);//使用上次调用中的命令行参数（如果有）执行 fwknop。参数是从 ~/.fwknop.run 文件中解析出来的
     else if(options->show_last_command)
         res = show_last_command(args_save_file);
     else if (!options->no_save_args)
@@ -885,15 +1293,34 @@ prev_exec(fko_cli_options_t *options, int argc, char **argv)
     return res;
 }
 
+
+
+/*该函数接受一个保存参数文件路径的字符串const char * const args_save_file作为输入。
+
+函数首先初始化一些变量，然后尝试打开保存参数文件。
+如果无法打开文件，则输出错误信息并返回0。
+接下来，函数会验证文件的权限和所属权。如果权限或所属权不正确，则关闭文件并返回0。
+
+然后，函数尝试从文件中读取一行内容，并将其存储在args_str数组中。
+如果成功读取了一行内容，则输出日志信息，显示上一个命令；
+否则，输出错误信息并关闭文件，然后返回0。
+
+最后，函数关闭文件，并返回1表示执行成功。
+
+请注意，该函数依赖于其他函数和头文件的定义，包括log_msg函数和相关的文件操作函数。
+
+ * 
+*/
 /* Show the last command that was executed
 */
+//展示最后一次执行的命令（以及参数保存文件的读写鉴权）
 static int
 show_last_command(const char * const args_save_file)
 {
     char args_str[MAX_LINE_LEN] = {0};
     FILE *args_file_ptr = NULL;
 
-    if ((args_file_ptr = fopen(args_save_file, "r")) == NULL) {
+    if ((args_file_ptr = fopen(args_save_file, "r")) == NULL) {     //只读模式打开
         log_msg(LOG_VERBOSITY_ERROR, "Could not open args file: %s",
             args_save_file);
         return 0;
@@ -925,6 +1352,7 @@ show_last_command(const char * const args_save_file)
 
 /* Get the command line arguments from the previous invocation
 */
+// 从上一次调用中获取命令行参数
 static int
 run_last_args(fko_cli_options_t *options, const char * const args_save_file)
 {
@@ -941,6 +1369,14 @@ run_last_args(fko_cli_options_t *options, const char * const args_save_file)
                 args_save_file);
         return 0;
     }
+    /*
+    * fileno 是C语言标准库 <stdio.h> 中的一个函数，用于获取给定文件流（FILE 结构体指针）对应的文件描述符。
+    * 文件描述符的值在不同的上下文中有不同的含义，常见的包括：
+    * 标准输入（stdin）：文件描述符为0
+    * 标准输出（stdout）：文件描述符为1
+    * 标准错误输出（stderr）：文件描述符为2
+    * 其他已打开的文件：文件描述符从3开始依次递增
+    */
 #if HAVE_FILENO
     if(verify_file_perms_ownership(args_save_file, fileno(args_file_ptr)) != 1)
 #else
@@ -967,6 +1403,7 @@ run_last_args(fko_cli_options_t *options, const char * const args_save_file)
 
     /* Reset the options index so we can run through them again.
     */
+   //重置选项索引，以便我们可以再次运行它们。
     optind = 0;
 
     config_init(options, argc_new, argv_new);
@@ -977,6 +1414,9 @@ run_last_args(fko_cli_options_t *options, const char * const args_save_file)
 
     return 1;
 }
+
+
+//将保存路径放在系统默认的home或者win的用户名下的fwknop.run文件中
 
 static int
 get_save_file(char *args_save_file)
@@ -999,6 +1439,26 @@ get_save_file(char *args_save_file)
 }
 
 /* Save our command line arguments
+*/
+/**
+ 这是一个用C语言编写的函数，用于将命令行参数保存到文件中。
+ 该函数接受命令行参数的数量argc、命令行参数数组**argv和保存参数文件路径的
+ 字符串const char * const args_save_file作为输入。
+
+函数首先初始化一些变量，并尝试以写入方式打开参数保存文件。如果无法打开文件，则输出错误信息并返回0。
+
+然后，函数使用一个循环将每个命令行参数连接成一个字符串，并将其存储在args_str数组中。
+如果参数字符串的长度超过了最大长度限制，则输出错误信息并关闭文件，然后返回0。
+
+接着，函数在参数字符串的末尾添加一个换行符，并将参数字符串写入参数保存文件。
+如果写入的字节数与预期的字节数不一致，则输出警告信息。
+
+最后，函数关闭文件，并返回1表示保存成功。
+
+请注意，该函数依赖于其他函数和头文件的定义，包括log_msg函数、open函数、close函数、strlcat函数和write函数。
+此外，函数还使用了自定义的宏定义LOG_VERBOSITY_ERROR、LOG_VERBOSITY_WARNING、MAX_LINE_LEN和MAX_PATH_LEN。
+
+ * 
 */
 static int
 save_args(int argc, char **argv, const char * const args_save_file)
@@ -1036,6 +1496,26 @@ save_args(int argc, char **argv, const char * const args_save_file)
 
 /* Set the SPA packet message type
 */
+/*
+ 这是一个用C语言编写的函数，用于设置消息类型。
+ 该函数接受一个fko_ctx_t类型的上下文ctx和一个fko_cli_options_t类型的结构体指针options作为输入。
+
+函数首先声明一个短整型变量message_type。
+
+然后，函数根据条件判断来确定消息类型。
+首先检查options->server_command[0]是否为空，如果不为空，则将消息类型设置为FKO_COMMAND_MSG。
+接着，检查options->nat_local是否为真，如果为真，则进一步检查options->fw_timeout是否大于等于零。
+如果是，则将消息类型设置为FKO_CLIENT_TIMEOUT_LOCAL_NAT_ACCESS_MSG，否则将消息类型设置为FKO_LOCAL_NAT_ACCESS_MSG。
+然后，检查options->nat_access_str[0]是否为空，如果不为空，则再次检查options->fw_timeout的值来确定消息类型。
+最后，如果以上条件都不满足，则根据options->fw_timeout的值将消息类型设置为相应的类型。
+
+最后，函数调用fko_set_spa_message_type函数，将上下文和消息类型作为参数，以设置消息类型，并返回该函数的返回值。
+
+请注意，该函数依赖于其他函数和头文件的定义，包括fko_ctx_t类型、fko_cli_options_t类型和 
+fko_set_spa_message_type函数的定义。此外，函数还使用了结构体指针options的成员变量 
+server_command、nat_local、nat_access_str和fw_timeout。
+ 
+*/
 static int
 set_message_type(fko_ctx_t ctx, fko_cli_options_t *options)
 {
@@ -1071,6 +1551,30 @@ set_message_type(fko_ctx_t ctx, fko_cli_options_t *options)
 }
 
 /* Prompt for and receive a user password.
+*/
+//提示并接收用户密码。
+/*
+    这段代码是一个函数get_keys，用于获取密钥和HMAC密钥。
+
+首先，它会先清空key和hmac_key数组，然后通过一系列条件判断来确定密钥来源和长度。
+
+    如果options结构体中的have_key字段为真，那么将options->key拷贝到key数组中，并获取密钥长度。
+    如果options结构体中的have_base64_key字段为真，那么将对options->key_base64进行Base64解码，
+    并将解码结果拷贝到key数组中，并获取密钥长度。
+    如果options结构体中的get_key_file字段不为空，那么从文件中读取密钥。
+    如果options结构体中的use_gpg字段为真，那么根据不同情况获取签名密钥。
+    其他情况下，从用户输入中获取加密密钥。
+
+接着，如果options结构体中的have_hmac_key字段为真，那么将options->hmac_key拷贝到hmac_key数组中，并获取HMAC密钥长度。
+如果options结构体中的have_hmac_base64_key字段为真，
+那么将对options->hmac_key_base64进行Base64解码，
+并将解码结果拷贝到hmac_key数组中，并获取HMAC密钥长度。
+如果options结构体中的use_hmac字段为真，那么根据不同情况获取HMAC密钥。
+
+最后，如果使用了HMAC密钥，会检查密钥长度是否合法，并确保加密密钥和HMAC密钥不相同。
+然后，设置SPA（Secure Packet Acceleration）的HMAC类型。
+
+函数返回1表示成功获取密钥，返回0表示获取失败
 */
 static int
 get_keys(fko_ctx_t ctx, fko_cli_options_t *options,
@@ -1241,12 +1745,41 @@ get_keys(fko_ctx_t ctx, fko_cli_options_t *options,
 
 /* Display an FKO error message.
 */
+/*
+这段代码定义了一个名为errmsg的函数，用于输出错误信息。
+
+函数有两个参数：msg和err。msg是一个字符串，用来描述错误信息，err是一个整数，表示错误代码。
+
+函数内部调用了log_msg函数来输出错误信息。使用log_msg函数，并传入LOG_VERBOSITY_ERROR作为日志级别，
+以及格式化字符串作为日志内容。
+
+格式化字符串中包含了MY_NAME，它表示程序的名称。然后依次输出msg、err和fko_errstr(err)的值。
+其中，fko_errstr(err)是一个用于根据错误码获取错误描述的函数。
+
+这个函数的作用是将错误信息格式化后输出到日志中。
+
+*/
 void
 errmsg(const char *msg, const int err) {
     log_msg(LOG_VERBOSITY_ERROR, "%s: %s: Error %i - %s",
         MY_NAME, msg, err, fko_errstr(err));
 }
 
+/*
+这段代码定义了一个名为zero_buf_wrapper的函数，用于将缓冲区中的数据清零。
+
+函数有两个参数：buf和len，分别表示待清零的缓冲区指针和缓冲区长度。
+
+首先，函数会进行输入参数的检查。如果buf为空指针或者len为0，则直接返回，不进行清零操作。
+
+接下来，调用了zero_buf函数来将缓冲区中的数据清零。如果清零操作返回的错误码为FKO_ERROR_ZERO_OUT_DATA，
+则说明清零操作失败，此时会输出相应的错误信息到日志中。
+
+最后，函数返回，结束执行。
+
+这个函数的作用是通过调用zero_buf函数来将缓冲区中的敏感数据清零，并在清零失败时输出错误信息到日志中。
+
+*/
 static void
 zero_buf_wrapper(char *buf, int len)
 {
@@ -1261,6 +1794,29 @@ zero_buf_wrapper(char *buf, int len)
     return;
 }
 
+/*
+2023/7/20 10:41:09
+
+这段代码是一个条件编译块，用于在编译时判断是否启用了libfiu库，并定义了一个名为enable_fault_injections的函数。
+
+首先，通过检查预处理宏HAVE_LIBFIU来确定是否启用了libfiu库。如果启用了该库，则进入条件编译块。
+
+在函数内部，首先定义了一个整数类型的变量rv并将其初始化为1。
+
+接着，通过判断opts->fault_injection_tag的值是否为空字符串来确定是否设置了故障注入标签。
+如果设置了标签，则输出相应的日志信息。
+
+然后，调用fiu_init函数来初始化libfiu库。如果初始化失败，则输出警告日志，并将rv的值设为0。
+
+接下来，调用fiu_enable函数来设置故障注入标签的开启状态。如果设置失败，则输出警告日志，并将rv的值设为0。
+
+最后，函数返回rv，表示是否成功启用故障注入功能。
+
+该函数的作用是在启用了libfiu库的情况下，根据配置中的故障注入标签来进行故障注入。
+首先初始化libfiu库，然后根据标签开启相应的故障注入功能，并在设置失败时输出警告日志。
+函数返回值表示是否成功启用了故障注入。
+
+*/
 #if HAVE_LIBFIU
 static int
 enable_fault_injections(fko_cli_options_t * const opts)
@@ -1288,7 +1844,32 @@ enable_fault_injections(fko_cli_options_t * const opts)
 }
 #endif
 
+
+/*
+2023/7/20 10:42:33
+
+这段代码定义了一个名为clean_exit的函数，用于在程序退出时进行清理工作。
+
+在函数内部，首先通过条件编译块判断是否启用了libfiu库。
+如果启用了该库，并且设置了故障注入标签，则调用fiu_disable函数来禁用该标签的故障注入功能。
+
+接着，调用fko_destroy函数销毁传入的上下文对象ctx，如果返回值为FKO_ERROR_ZERO_OUT_DATA，
+则输出错误日志表示无法将敏感数据缓冲区清零。
+
+然后，调用free_configs函数来释放由opts指针指向的配置数据的内存。
+
+接下来，调用zero_buf_wrapper函数将密钥缓冲区和HMAC密钥缓冲区清零。之后，将密钥长度和HMAC密钥长度都设置为0。
+
+最后，使用exit函数退出程序，并传入指定的退出状态码exit_status。
+
+该函数的作用是在程序退出时进行必要的清理工作。根据条件判断是否启用了libfiu库，
+并根据配置中的故障注入标签禁用相应的故障注入功能。然后，销毁上下文对象、释放内存、清零敏感数据缓冲区，
+最后退出程序并返回指定的退出状态码。
+
+*/
+
 /* free up memory and exit
+*  释放内存并退出程序。
 */
 static void
 clean_exit(fko_ctx_t ctx, fko_cli_options_t *opts,

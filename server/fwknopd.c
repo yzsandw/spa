@@ -46,47 +46,47 @@
 
 /* Prototypes
 */
-//检查目录文件
+//2023.7.19 zxj 检查给定的目录路径是否有效，以及是否存在，如果不存在则尝试创建目录。该函数的主要作用是确保目录路径的有效性，并在需要的情况下创建目录
 static int check_dir_path(const char * const path,
         const char * const path_name, const unsigned char use_basename);
-//创建目录文件
+//2023.7.19 zxj 创建目录文件
 static int make_dir_path(const char * const path);
-//将进程转变为守护进程 ？？？
+//2023.7.19 zxj 将进程转变为守护进程
 static void daemonize_process(fko_srv_options_t * const opts);
 
-// 停止运行的fwknopd进程
+//2023.7.19 zxj 停止运行的fwknopd进程
 static int stop_fwknopd(fko_srv_options_t * const opts);
-// 获取fwknopd进程的状态
+//2023.7.19 zxj 获取fwknopd进程的状态
 static int status_fwknopd(fko_srv_options_t * const opts);
 
-//重启fwknopd进程
+//2023.7.19 zxj 重启fwknopd进程
 static int restart_fwknopd(fko_srv_options_t * const opts);
 
-//将进程的PID写入PID文件 PID即进程ID
+//2023.7.19 zxj 将进程的PID写入PID文件 PID即进程ID
 static int write_pid_file(fko_srv_options_t *opts);
 
-//处理收到的信号
+//2023.7.19 zxj 处理收到的信号
 static int handle_signals(fko_srv_options_t *opts);
 
-//设置PID相关的配置
+//2023.7.19 zxj 设置PID相关的配置
 static void setup_pid(fko_srv_options_t *opts);
 
-// 根据配置文件中的设置初始化重放缓存
+//2023.7.19 zxj 根据配置文件中的设置初始化重放缓存
 static void init_digest_cache(fko_srv_options_t *opts);
 
-//设置本地化语言环境
+//2023.7.19 zxj 设置本地化语言环境
 static void set_locale(fko_srv_options_t *opts);
-//获取正在运行fwknop进程的PID
+//2023.7.19 zxj 获取正在运行fwknop进程的PID
 static pid_t get_running_pid(const fko_srv_options_t *opts);
 #if AFL_FUZZING
-//从文件中读取加密的SPA数据包，并对其进行解码和处理。
+//2023.7.19 zxj 从文件中读取加密的SPA数据包，并对其进行解码和处理，AFL是一个知名的模糊测试工具，用于发现软件程序中的漏洞和错误
 static void afl_enc_pkt_from_file(fko_srv_options_t *opts);
-//从标准输入中读取SPA数据包，并进行解码和处理
+//2023.7.19 zxj 从标准输入中读取SPA数据包，并进行解码和处理
 static void afl_pkt_from_stdin(fko_srv_options_t *opts);
 #endif
 
 #if HAVE_LIBFIU
-//启用故障注入
+//2023.7.19 zxj 启用故障注入
 static void enable_fault_injections(fko_srv_options_t * const opts);
 #endif
 
@@ -95,7 +95,7 @@ static void enable_fault_injections(fko_srv_options_t * const opts);
 #define AFL_DUMP_CTX_SIZE 4096
 #endif
 
-//进入一个无限循环，在循环中处理各种命令行选项和信号。
+//2023.7.19 zxj 进入一个无限循环，在循环中处理各种命令行选项和信号。
 int
 main(int argc, char **argv)
 {
@@ -105,11 +105,16 @@ main(int argc, char **argv)
     while(1)
     {
         /* Handle command line
-        */
-        config_init(&opts, argc, argv);
+         * 处理命令行
+        */ 
+        config_init(&opts, argc, argv);//2023.7.19 zxj 用来处理输入的命令
 
 #if HAVE_LIBFIU
         /* Set any fault injection points early
+         * 2023.7.19 zxj 启用故障注入
+         * libfiu 是一个用于注入故障（Fault Injection）的库，它允许在程序运行时模拟各种错误和异常情况，
+         * 以测试程序的鲁棒性和容错性。通过在代码中插入 libfiu 提供的相关宏和函数，
+         * 可以在特定条件下人为地引发错误，从而验证程序对错误处理的能力。
         */
         enable_fault_injections(&opts);
 #endif
@@ -117,36 +122,46 @@ main(int argc, char **argv)
         /* Process any options that do their thing and exit.
         */
 
-        /* Kill the currently running fwknopd process?
+        /* Kill the currently running fwknopd process
+         * 2023.7.19 zxj 终止当前正在运行的fwknopd进程
         */
         if(opts.kill == 1)
             clean_exit(&opts, NO_FW_CLEANUP, stop_fwknopd(&opts));
 
         /* Status of the currently running fwknopd process?
+         * 2023.7.19 zxj 当前运行的fwknopd进程的状态
         */
         if(opts.status == 1)
             clean_exit(&opts, NO_FW_CLEANUP, status_fwknopd(&opts));
 
         /* Restart the currently running fwknopd process?
+         * 2023.7.19 zxj 重启进程
         */
         if(opts.restart == 1)
             clean_exit(&opts, NO_FW_CLEANUP, restart_fwknopd(&opts));
 
         /* Initialize logging.
+         * 2023.7.19 zxj 初始化日志
         */
         init_logging(&opts);
 
         /* Update the verbosity level for the log module */
+        /*更新日志模块的详细级别*/
         log_set_verbosity(LOG_DEFAULT_VERBOSITY + opts.verbose);
 
 #if HAVE_LOCALE_H
         /* Set the locale if specified.
+        检查是否存在名为 locale.h 的头文件。
+        locale.h 是C语言标准库提供的头文件，用于支持本地化（Localization）功能。
+        本地化是指将程序适应特定地区或语言的需求，包括日期、时间、货币、数字格式等各种文化相关的设置。
         */
+        
         set_locale(&opts);
-#endif
+#endif 
 
         /* Make sure we have a valid run dir and path leading to digest file
          * in case it configured to be somewhere other than the run dir.
+         * 确保我们有一个有效的运行目录和指向摘要文件的路径，以防它被配置为运行目录以外的其他地方。
         */
         if(!opts.afl_fuzzing
                 && ! check_dir_path((const char *)opts.config[CONF_FWKNOP_RUN_DIR], "Run", 0))
@@ -154,6 +169,7 @@ main(int argc, char **argv)
         /* Initialize our signal handlers. You can check the return value for
          * the number of signals that were *not* set.  Those that were not set
          * will be listed in the log/stderr output.
+         * 初始化信号处理程序。您可以检查返回值，查看“未”设置的信号数量。未设置的将在log/stderr输出中列出。
         */
         if(set_sig_handlers() > 0) {
             log_msg(LOG_ERR, "Errors encountered when setting signal handlers.");
@@ -165,6 +181,10 @@ main(int argc, char **argv)
          * any chains yet. This allows us to dump the current firewall rules
          * via fw_rules_dump() in --fw-list mode before changing around any rules
          * of an existing fwknopd process.
+         * 根据 fwknopd.conf 文件初始化防火墙规则处理程序，但对于 iptables 防火墙，
+         * 暂时不刷新任何规则或创建任何链。这使得我们可以在 --fw-list 模式下通过 fw_rules_dump() 打印当前防火墙规则，
+         * 而不会改变任何现有 fwknopd 进程的规则。
+
         */
         if(fw_config_init(&opts) != 1)
             clean_exit(&opts, NO_FW_CLEANUP, EXIT_FAILURE);
@@ -182,6 +202,12 @@ main(int argc, char **argv)
             clean_exit(&opts, FW_CLEANUP, EXIT_SUCCESS);
         }
 
+
+        /*
+         * 检查是否有指定的文件夹路径（CONF_ACCESS_FOLDER 参数），如果有，
+         则对该文件夹路径进行处理（可能是读取其中的内容或进行其他操作）。
+         如果处理过程中出现错误，程序将通过 clean_exit 函数退出，并返回错误状态
+        */
         if (opts.config[CONF_ACCESS_FOLDER] != NULL) //If we have an access folder, process it
         {
             if (parse_access_folder(&opts, opts.config[CONF_ACCESS_FOLDER], &depth) != EXIT_SUCCESS)
@@ -190,6 +216,7 @@ main(int argc, char **argv)
             }
         }
         /* Process the access.conf file, but only if no access.conf folder was specified.
+         * 处理 access.conf 文件，但前提是未指定 access.conf 文件夹
         */
         else if (parse_access_file(&opts, opts.config[CONF_ACCESS_FILE], &depth) != EXIT_SUCCESS)
         {
@@ -197,6 +224,7 @@ main(int argc, char **argv)
         }
 
         /* We must have at least one valid access stanza at this point
+         * 确保access.config文件中的访问配置块有有效的模块 
         */
         if(! valid_access_stanzas(opts.acc_stanzas))
         {
@@ -206,6 +234,7 @@ main(int argc, char **argv)
 
         /* Show config (including access.conf vars) and exit dump config was
          * wanted.
+         * 2023.7.19 zxj 打印配置信息
         */
         if(opts.dump_config == 1)
         {
@@ -215,6 +244,7 @@ main(int argc, char **argv)
         }
 
         /* Now is the right time to bail if we're just parsing the configs
+         * 如果我们只是在解析配置，现在是时候退出了
         */
         if(opts.exit_after_parse_config)
         {
@@ -224,8 +254,10 @@ main(int argc, char **argv)
 
         /* Acquire pid, become a daemon or run in the foreground, write pid
          * to pid file.
+         * 获取pid，成为守护进程或在前台运行，将pid写入pid文件
         */
-        if(! opts.exit_parse_digest_cache)
+       
+        if(! opts.exit_parse_digest_cache)//2023.7.19 zxj 解析和验证摘要缓存并退出，初始化缓存摘要
             setup_pid(&opts);
 
         if(opts.verbose > 1 && opts.foreground)
@@ -237,6 +269,7 @@ main(int argc, char **argv)
         /* Initialize the digest cache for replay attack detection (either
          * with dbm support or with the default simple cache file strategy)
          * if so configured.
+         * 初始化摘要缓存以进行重放攻击检测(使用dbm支持或使用默认的简单缓存文件策略)
         */
         init_digest_cache(&opts);
 
@@ -246,14 +279,21 @@ main(int argc, char **argv)
             clean_exit(&opts, NO_FW_CLEANUP, EXIT_SUCCESS);
         }
 
-#if AFL_FUZZING
+#if AFL_FUZZING //2023.7.19 zxj 如果定义了AFL_FUZZING，即要是用AFL_FUZZING工具
         /* SPA data from STDIN. */
-        if(opts.afl_fuzzing)
+        if(opts.afl_fuzzing) //2023.7.19 zxj 这是一个标志位，用于指示服务器是否运行在 AFL Fuzzing 模式下
         {
+            /*2023.7.19 zxj 
+             *如果在配置中指定了 AFL Fuzzing 的数据包文件路径，
+             *则调用 afl_enc_pkt_from_file 函数处理该文件中的数据包。这个函数会从文件中读取数据包内容，并进行相应处理
+            */
             if(opts.config[CONF_AFL_PKT_FILE] != 0x0)
             {
                 afl_enc_pkt_from_file(&opts);
             }
+            /*
+             * 2023.7.19 zxj 函数处理从标准输入（stdin）读取的数据包内容。这个函数会从标准输入中读取数据包并进行相应处理
+            */
             else
             {
                 afl_pkt_from_stdin(&opts);
@@ -263,12 +303,14 @@ main(int argc, char **argv)
 
         /* Prepare the firewall - i.e. flush any old rules and (for iptables)
          * create fwknop chains.
+         * 2023.7.19 zxj 准备防火墙——例如，清除旧规则并(对于iptables)创建fwknop链
         */
         if(!opts.test && opts.enable_fw && (fw_initialize(&opts) != 1))
             clean_exit(&opts, FW_CLEANUP, EXIT_FAILURE);
 
 #if USE_LIBNETFILTER_QUEUE
         /* If we are to acquire SPA data via a libnetfilter_queue, start it up here.
+         * 如果我们要通过libnetfilter_queue获取SPA数据，请在这里启动它
         */
         if(opts.enable_nfq_capture ||
                 strncasecmp(opts.config[CONF_ENABLE_NFQ_CAPTURE], "Y", 1) == 0)
@@ -278,6 +320,7 @@ main(int argc, char **argv)
         else
 #endif
         /* If we are to acquire SPA data via a UDP socket, start it up here.
+         * 如果要通过UDP套接字获取SPA数据，请在这里启动它
         */
         if(opts.enable_udp_server ||
                 strncasecmp(opts.config[CONF_ENABLE_UDP_SERVER], "Y", 1) == 0)
@@ -300,6 +343,10 @@ main(int argc, char **argv)
          * server can be run even when fwknopd links against libpcap as well,
          * but there is no reason to link against it if SPA packets are
          * always going to be acquired via a UDP socket.
+         * 如果设置了TCP服务器选项，在这里启动它。注意，在这种模式下，fwknopd仍然通过libpcap获取SPA数据包。
+         * 如果你想只使用UDP而不依赖libpcap，那么需要用——enable-udp-server来编译fwknop。
+         * 请注意，即使在fwknopd链接libpcap时，UDP服务器也可以运行，
+         * 但是如果SPA数据包总是通过UDP套接字获取，则没有理由链接libpcap。
         */
         if(strncasecmp(opts.config[CONF_ENABLE_TCP_SERVER], "Y", 1) == 0)
         {
@@ -312,6 +359,7 @@ main(int argc, char **argv)
 
 #if USE_LIBPCAP
         /* Intiate pcap capture mode...
+         * 2023.7.19 zxj 检查是否启用了 UDP 服务器，并且配置文件中未设置为禁用 UDP 服务器。如果满足条件，将启动 pcap_capture 函数
         */
         if(!opts.enable_udp_server
             && strncasecmp(opts.config[CONF_ENABLE_UDP_SERVER], "N", 1) == 0)
@@ -327,6 +375,7 @@ main(int argc, char **argv)
 
         /* Deal with any signals that we've received and break out
          * of the loop for any terminating signals
+         * 处理我们收到的所有信号并跳出循环，等待终止信号
         */
         if(handle_signals(&opts) == 1)
             break;
@@ -348,15 +397,15 @@ main(int argc, char **argv)
          *            investigate and fix this. For now, this works
          *            (it is kludgy, but does no harm afaik).
         */
-        kill(opts.tcp_server_pid, SIGKILL);
+        kill(opts.tcp_server_pid, SIGKILL);//2023.7.19 zxj 强制杀死 TCP 服务器进程，这是一个后备措施，在 SIGTERM 信号无效时使用
     }
 
     clean_exit(&opts, FW_CLEANUP, EXIT_SUCCESS);
 
-    return(EXIT_SUCCESS);  /* This never gets called */
+    return(EXIT_SUCCESS);  /* This never gets called 2023.7.19 zxj 不会执行，因为前面的 clean_exit 函数已经退出了程序*/
 }
 
-//设置本地化语言环境
+//2023.7.19 zxj 用于设置 fwknopd 服务器的区域设置（locale）。区域设置包括语言、日期时间格式、货币等本地化相关信息
 static void set_locale(fko_srv_options_t *opts)
 {
     char               *locale;
@@ -389,8 +438,8 @@ static void set_locale(fko_srv_options_t *opts)
     return;
 }
 
-#if AFL_FUZZING
-//从文件中读取加密的SPA数据包，并对其进行解密和处理。
+#if AFL_FUZZING//2023.7.19 zxj 用 AFL（American Fuzzy Lop）进行模糊测试（Fuzz Testing）时的处理逻辑
+//2023.7.19 zxj 从文件中读取加密的SPA数据包，并对其进行解密和处理。
 static void afl_enc_pkt_from_file(fko_srv_options_t *opts)
 {
     FILE                *fp = NULL;
@@ -414,7 +463,7 @@ static void afl_enc_pkt_from_file(fko_srv_options_t *opts)
                 break;
         }
         fclose(fp);
-		//fko_new函数用于初始化fwknop上下文 ？？？
+		//fko_new函数用于初始化fwknop上下文
         fko_new(&decrypt_ctx);
 		
 		//fko_afl_set_spa_data函数将读取到的数据包设置为加密数据
@@ -493,7 +542,7 @@ static void afl_pkt_from_stdin(fko_srv_options_t *opts)
             res = fko_decode_spa_data(decode_ctx);
 		//将fwknop上下文的状态转储到dump_buf中
         if(res == FKO_SUCCESS)
-            res = dump_ctx_to_buffer(decode_ctx, dump_buf, sizeof(dump_buf));
+            res = dump_ctx_to_buffer(decode_ctx, dump_buf, sizeof(dump_buf));//dump_context_to_buffer
 		//计入日志
         if(res == FKO_SUCCESS)
             log_msg(LOG_INFO, "%s", dump_buf);
@@ -519,7 +568,11 @@ static void afl_pkt_from_stdin(fko_srv_options_t *opts)
 }
 #endif
 
-// 根据配置文件中的设置初始化重放缓存
+// 2023.7.19 zxj 用于初始化消息摘要缓存。它根据配置文件中的选项来决定是否打开消息摘要的持久化功能。
+/* 2023.7.20 zxj
+   这个函数用于初始化消息摘要缓存，以便 fwknop 服务器可以在接收到客户端消息摘要后进行验证，
+   并记录客户端发送的消息摘要，以便后续进行防火墙规则的动态更新。
+*/
 static void init_digest_cache(fko_srv_options_t *opts)
 {
     int     rp_cache_count;
@@ -543,6 +596,8 @@ static void init_digest_cache(fko_srv_options_t *opts)
             /* Destination points to heap memory, and is guaranteed to be
              * at least two bytes large via validate_options(),
              * DEF_ENABLE_DIGEST_PERSISTENCE, and set_config_entry()
+             * 目标指向堆内存，并且通过validate_options()保证至少有两个大字节，
+             * DEF_ENABLE_DIGEST_PERSISTENCE和set_config_entry()
             */
             strlcpy(opts->config[CONF_ENABLE_DIGEST_PERSISTENCE], "N", 2);
         }
@@ -550,7 +605,7 @@ static void init_digest_cache(fko_srv_options_t *opts)
         if(opts->verbose)
             log_msg(LOG_ERR,
                 "Using Digest Cache: '%s' (entry count = %i)",
-#if USE_FILE_CACHE
+#if USE_FILE_CACHE //2023.7.19 zxj 如果用了自己的文件CACHE
                 opts->config[CONF_DIGEST_FILE], rp_cache_count
 #else
                 opts->config[CONF_DIGEST_DB_FILE], rp_cache_count
@@ -573,12 +628,16 @@ static void setup_pid(fko_srv_options_t *opts)
     /* If we are a new process (just being started), proceed with normal
      * start-up. Otherwise, we are here as a result of a signal sent to an
      * existing process and we want to restart.
+     * 如果我们是一个新进程(刚刚启动)，继续正常启动。否则，我们在这里是由于一个信号发送到一个现有的进程，我们想要重新启动。
     */
     //存在正在运行的线程
     if(get_running_pid(opts) != getpid())
     {
         /* If foreground mode is not set, then fork off and become a daemon.
         * Otherwise, attempt to get the pid file lock and go on.
+        * 2023.7.19 zxj
+        * 它调用 get_running_pid 函数获取正在运行的 fwknopd 进程的 PID。
+        * 如果当前进程的 PID 与正在运行的进程的 PID 不相同，意味着当前进程是一个新启动的进程，不是由信号导致的重启
         */
         //判断在配置中设置了后台模式
         if(opts->foreground == 0)
@@ -589,9 +648,9 @@ static void setup_pid(fko_srv_options_t *opts)
         else
         {
         	/*
-        	write_pid_file函数将当前进程的PID写入PID文件
-        	如果PID文件已存在，并且成功读取到旧的PID值，那么old_pid将被设置为旧的PID值
-        	不存在或者无法读取旧的PID值，返回值为-1
+        	 *2023.7.19 zxj 
+             *如果 foreground 设置为 1，表示后台模式启用，则尝试获取 PID 文件的锁，并将当前进程的 PID 写入 PID 文件。
+             *如果 PID 文件已经存在，并且成功读取到旧的 PID 值，说明已经有一个 fwknopd 进程在运行，输出相应的错误信息并退出程序
         	*/
             old_pid = write_pid_file(opts);
             if(old_pid > 0)
@@ -672,6 +731,7 @@ static int status_fwknopd(fko_srv_options_t * const opts)
     return EXIT_FAILURE;
 }
 
+//用于处理接收到的信号。该函数检查 got_signal 变量是否为真，如果为真，表示收到了一个信号。根据不同的信号类型，函数采取不同的行动
 static int handle_signals(fko_srv_options_t *opts)
 {
     int      last_sig = 0, rv = 1;
@@ -751,6 +811,7 @@ static int stop_fwknopd(fko_srv_options_t * const opts)
         else
         {
             /* give a bit of time for process shutdown and check again
+             * 给停机时间，然后再次检查
             */
             for (sleep_num = 0; sleep_num < 4; sleep_num++) {
                 is_err = kill(old_pid, 0);
@@ -806,10 +867,10 @@ static int stop_fwknopd(fko_srv_options_t * const opts)
     确保指定的目录存在。如果没有，要么创建它，要么结束。
     返回值
 */
-static int
+static int     //参数分别是 目录路径 目录描述 是否只使用基本名称
 check_dir_path(const char * const filepath, const char * const fp_desc, const unsigned char use_basename)
 {
-	//参数分别是 目录路径 目录描述 是否只使用基本名称
+	
     struct stat     st;
     int             res = 0;
     char            tmp_path[MAX_PATH_LEN];
@@ -832,8 +893,10 @@ check_dir_path(const char * const filepath, const char * const fp_desc, const un
 
     /* If this is a file path that we want to use only the basename, strip
      * the trailing filename here.
+     * 如果这是一个我们希望只使用基本名称的文件路径，则去掉这里的尾随文件名。
     */
     //如果使用的是基本名称且filepath中存在PATH_SEP(也即'/')
+    //#define PATH_SEP      '/'
     if(use_basename && ((ndx = strrchr(filepath, PATH_SEP)) != NULL))
 		//将filename截断至分割符前并复制给tmp_path
         strlcpy(tmp_path, filepath, (ndx-filepath)+1);
@@ -915,6 +978,8 @@ make_dir_path(const char * const run_dir)
     strlcpy(tmp_path, run_dir, sizeof(tmp_path));
 
     /* Strip any trailing dir sep char.
+     * 这样，函数就能去除字符串末尾的指定字符 chop。如果传入的字符串为空或长度为 1，
+     * 或者字符串末尾不包含指定字符 chop，则函数不进行任何处理。函数没有返回值，直接修改了传入的字符串 str
     */
     chop_char(tmp_path, PATH_SEP);
 
@@ -928,6 +993,8 @@ make_dir_path(const char * const run_dir)
              * If it does not exist, attempt to create it. If it does, and
              * it is a directory, go on. Otherwise, any other error cause it
              * to bail.
+             * 启动路径的这一部分，看看它是否是一个有效的目录。如果不存在，尝试创建它。
+             * 如果是，并且是一个目录，继续。否则，任何其他错误都会导致它退出。
             */
             if(stat(tmp_path, &st) != 0)
             {
@@ -969,6 +1036,7 @@ make_dir_path(const char * const run_dir)
 
 /* Become a daemon: fork(), start a new session, chdir "/",
  * and close unneeded standard filehandles.
+ * 成为一个守护进程:fork()，启动一个新会话，chdir "/"，并关闭不需要的标准文件句柄。
 */
 static void
 daemonize_process(fko_srv_options_t * const opts)
@@ -976,10 +1044,12 @@ daemonize_process(fko_srv_options_t * const opts)
     pid_t pid, old_pid;
 
     /* Reset the our umask
+     * 2023.7.19 zxj
+     * 将文件模式创建掩码重置为 0。文件模式创建掩码控制新创建文件的默认权限。将其设置为 0，守护进程将拥有对其创建的文件的完全权限
     */
     umask(0);
 
-	//通过fork()创建一个子进程并让其成为新会话的首进程
+	//通过fork()创建一个子进程并让其成为新会话的首进程,子进程将从此处继续执行，而父进程将立即退出
     if ((pid = fork()) < 0)
     {
         perror("Unable to fork: ");
@@ -993,10 +1063,14 @@ daemonize_process(fko_srv_options_t * const opts)
     /* Child process from here on out */
 
     /* Start a new session
+     * 2023.7.19 zxj 子进程通过调用 setsid() 成为新会话的首进程。这使得进程与终端分离，成为独立的会话领导者
     */
     setsid();
 
     /* Create the PID file (or be blocked by an existing one).
+     * 2023.7.19 zxj
+     * 函数将守护进程的进程 ID（PID）写入 PID 文件。此 PID 文件用于防止多个实例的守护进程同时运行。
+     * 如果 PID 文件已存在，函数会检查文件中的 PID 是否仍在运行。如果是，则打印错误消息并以失败状态退出。
     */
     old_pid = write_pid_file(opts);
     if(old_pid > 0)
@@ -1013,6 +1087,7 @@ daemonize_process(fko_srv_options_t * const opts)
     }
 
     /* Chdir to the root of the filesystem
+     * 函数将守护进程的当前工作目录更改为根目录 /。这确保守护进程不再使用任何目录，允许必要时卸载文件系统
     */
     if ((chdir("/")) < 0) {
         perror("Could not chdir() to /: ");
@@ -1020,6 +1095,7 @@ daemonize_process(fko_srv_options_t * const opts)
     }
 
     /* Close un-needed file handles
+     * 这些行关闭标准输入、标准输出和标准错误文件描述符。这样做是因为守护进程不再需要与终端交互
     */
     close(STDIN_FILENO);
     close(STDOUT_FILENO);
@@ -1174,12 +1250,16 @@ enable_fault_injections(fko_srv_options_t * const opts)
         if(opts->verbose)
             log_msg(LOG_INFO, "Enable fault injection tag: %s",
                     opts->config[CONF_FAULT_INJECTION_TAG]);
-        if(fiu_init(0) != 0)
+        if(fiu_init(0) != 0)//2023.7.19 zxj 调用 fiu_init 函数初始化故障注入库。如果初始化失败，说明故障注入库没有正确初始化，会输出错误信息，并以失败状态退出程序
         {
             fprintf(stderr, "[*] Could not enable fault injection tag: %s\n",
                     opts->config[CONF_FAULT_INJECTION_TAG]);
             clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
         }
+        /*2023.7.19 zxj
+         * 启用指定标签的故障注入。fiu_enable 函数将 opts->config[CONF_FAULT_INJECTION_TAG] 所指定的故障注入标签设为启用状态。
+         * 如果启用失败，也会输出错误信息，并以失败状态退出程序
+        */
         if (fiu_enable(opts->config[CONF_FAULT_INJECTION_TAG], 1, NULL, 0) != 0)
         {
             fprintf(stderr, "[*] Could not enable fault injection tag: %s\n",

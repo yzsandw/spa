@@ -125,6 +125,7 @@ fko_encode_spa_data(fko_ctx_t ctx)
 
     /* Put it together a piece at a time, starting with the rand val.
     */
+   //随机值
     strlcpy(tbuf, ctx->rand_val, FKO_ENCODE_TMP_BUF_SIZE);
 
     /* Add the base64-encoded username.
@@ -168,7 +169,7 @@ fko_encode_spa_data(fko_ctx_t ctx)
     offset = strlen(tbuf);
     snprintf(((char*)tbuf+offset), FKO_ENCODE_TMP_BUF_SIZE - offset,
             ":%i:", ctx->message_type);
-
+ 
     /* Add the base64-encoded SPA message.
     */
    //将spa message进行base64编码，附加到tbuf后

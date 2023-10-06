@@ -42,7 +42,6 @@ static char   cmd_buf[CMD_BUFSIZE];
 static char   err_buf[CMD_BUFSIZE];
 static char   cmd_out[STANDARD_CMD_OUT_BUFSIZE];
 
-//初始化缓冲区
 static void
 zero_cmd_buffers(void)
 {
@@ -54,33 +53,18 @@ zero_cmd_buffers(void)
 /* Print all firewall rules currently instantiated by the running fwknopd
  * daemon to stdout.
 */
-//打印运行中的fwknopd守护进程的所有防火墙规则
 int
 fw_dump_rules(const fko_srv_options_t * const opts)
 {
     int     res, got_err = 0, pid_status = 0;
 
-	//把数据放入输出缓冲区
     fprintf(stdout, "Listing fwknopd pf rules...\n");
-	//将缓冲区的内容输出到屏幕上
     fflush(stdout);
 
     zero_cmd_buffers();
 
     /* Create the list command for active rules
-    为各个规则创建列表命令(就是说操作各个规则可以通过命令行实现)
     */
-    
-    //将含有'pf'的命令格式化到cmd_buf缓冲区中
-    /*
-    	snprintf函数的参数：
-    	cmd_buf是目标缓冲区，用于存储格式化的字符串
-    	CMD_BUFSIZE-1是目标缓冲区的大小，减1是为了留出空间放置终止符
-    	PF_LIST_ANCHOR_RULES_ARGS是一个预定义的宏，表示包含特定字符串的规则
-    	opts->fw_config->fw_command是防火墙中的执行命令
-    	anchor表示fwknop锚点的名称，锚点可以视为一种容器或命名空间，用于组织和管理一组特定的规则
-    	将命令转换为fw_command -a %s -s Anchor的形式
-	*/
     snprintf(cmd_buf, CMD_BUFSIZE-1, "%s " PF_LIST_ANCHOR_RULES_ARGS,
         opts->fw_config->fw_command,
         opts->fw_config->anchor
@@ -91,11 +75,9 @@ fw_dump_rules(const fko_srv_options_t * const opts)
 
     /* exclude stderr because ALTQ may not be available
     */
-    //执行cmd_buf中的命令，通过 run_extcmd 函数调用命令并获取其执行结果。
     res = run_extcmd(cmd_buf, NULL, 0, NO_STDERR, NO_TIMEOUT, &pid_status, opts);
 
     /* Expect full success on this */
-	//执行时报错了，打印报错信息
     if(! EXTCMD_IS_SUCCESS(res))
     {
         log_msg(LOG_ERR, "Error %i from cmd:'%s': %s", res, cmd_buf, err_buf);
@@ -108,7 +90,6 @@ fw_dump_rules(const fko_srv_options_t * const opts)
 /* Check to see if the fwknop anchor is linked into the main policy.  If not,
  * any rules added/deleted by fwknopd will have no effect on real traffic.
 */
-//检查fwknop是否链接到主策略中，否则，fwknopd 添加/删除的任何规则都不会对实际流量产生影响。
 static int
 anchor_active(const fko_srv_options_t *opts)
 {
@@ -117,20 +98,17 @@ anchor_active(const fko_srv_options_t *opts)
 
     /* Build our anchor search string
     */
-    //同样的snprintf函数，将锚点的名字复制给anchor_search_str
     snprintf(anchor_search_str, MAX_PF_ANCHOR_SEARCH_LEN-1, "%s\n",
         opts->fw_config->anchor);
 
     zero_cmd_buffers();
 
-	//调用snprintf函数，转化命令为：fw_command -s Anchor
     snprintf(cmd_buf, CMD_BUFSIZE-1, "%s " PF_ANCHOR_CHECK_ARGS,
         opts->fw_config->fw_command
     );
 
     /* Check to see if the anchor exists and is linked into the main policy
     */
-    //执行命令，检查锚点存在且被链接
     if(search_extcmd(cmd_buf, WANT_STDERR, NO_TIMEOUT,
             anchor_search_str, &pid_status, opts) > 0)
         return 1;
@@ -138,7 +116,6 @@ anchor_active(const fko_srv_options_t *opts)
     return 0;
 }
 
-//删除所有fwknop锚点中的规则
 static void
 delete_all_anchor_rules(const fko_srv_options_t *opts)
 {
@@ -146,25 +123,21 @@ delete_all_anchor_rules(const fko_srv_options_t *opts)
 
     zero_cmd_buffers();
 
-	//规则化为fwc.fw_command -a fwc.anchor -F all，fwc.fw_command表示防火墙命令的路径和名称，fwc.anchor表示fwknop锚点的名称
     snprintf(cmd_buf, CMD_BUFSIZE-1, "%s " PF_DEL_ALL_ANCHOR_RULES,
         fwc.fw_command,
         fwc.anchor
     );
 
-	//执行命令
     res = run_extcmd(cmd_buf, err_buf, CMD_BUFSIZE,
                 WANT_STDERR, NO_TIMEOUT, &pid_status, opts);
 
     /* Expect full success on this */
-	//抛出异常
     if(! EXTCMD_IS_SUCCESS(res))
         log_msg(LOG_ERR, "Error %i from cmd:'%s': %s", res, cmd_buf, err_buf);
 
     return;
 }
 
-//初始化防火墙配置，并将配置信息存储在fwc结构体中。
 int
 fw_config_init(fko_srv_options_t * const opts)
 {
@@ -172,16 +145,12 @@ fw_config_init(fko_srv_options_t * const opts)
 
     /* Set our firewall exe command path
     */
-
-	//将防火墙命令赋值给fwc.fw_command
     strlcpy(fwc.fw_command, opts->config[CONF_FIREWALL_EXE], sizeof(fwc.fw_command));
 
     /* Set the PF anchor name
     */
-    //赋值锚点名称给fwc
     strlcpy(fwc.anchor, opts->config[CONF_PF_ANCHOR_NAME], sizeof(fwc.anchor));
-
-	//检查是否启用目标规则
+    
     if(strncasecmp(opts->config[CONF_ENABLE_DESTINATION_RULE], "Y", 1)==0)
     {
         fwc.use_destination = 1;
@@ -189,18 +158,15 @@ fw_config_init(fko_srv_options_t * const opts)
 
     /* Let us find it via our opts struct as well.
     */
-    //同时让opts有个也指向fwc的指针，便于查找
     opts->fw_config = &fwc;
 
     return 1;
 }
 
-//初始化防火墙配置，并删除fwknop锚点中的所有现有规则
 int
 fw_initialize(const fko_srv_options_t * const opts)
 {
 
-	//检查fwknop是否存在
     if (! anchor_active(opts))
     {
         log_msg(LOG_WARNING,
@@ -210,13 +176,11 @@ fw_initialize(const fko_srv_options_t * const opts)
 
     /* Delete any existing rules in the fwknop anchor
     */
-    //删除fwknop中所有规则
     delete_all_anchor_rules(opts);
 
     return 1;
 }
 
-//清除fwknop锚点中的所有规则
 int
 fw_cleanup(const fko_srv_options_t * const opts)
 {
@@ -228,56 +192,45 @@ fw_cleanup(const fko_srv_options_t * const opts)
 
 /* Rule Processing - Create an access request...
 */
-
-//处理单包认证请求，根据请求中的协议/端口信息，在防火墙规则中添加相应的规则
 int
 process_spa_request(const fko_srv_options_t * const opts,
         const acc_stanza_t * const acc, spa_data_t * const spadat)
 {
-    char             new_rule[MAX_PF_NEW_RULE_LEN] = {0}; //存储命令字符串的缓冲区
-    char             write_cmd[CMD_BUFSIZE] = {0}; //存储命令字符串的缓冲区
+    char             new_rule[MAX_PF_NEW_RULE_LEN] = {0};
+    char             write_cmd[CMD_BUFSIZE] = {0};
 
-    acc_port_list_t *port_list = NULL; //指向访问控制协议/端口列表的指针
-    acc_port_list_t *ple; //遍历该列表的指针
+    acc_port_list_t *port_list = NULL;
+    acc_port_list_t *ple;
 
     int             res = 0, pid_status = 0;
-    time_t          now; //当前时间的时间戳
-    unsigned int    exp_ts; //过期时间的时间戳
+    time_t          now;
+    unsigned int    exp_ts;
 
     /* Parse and expand our access message.
     */
-    //将访问消息中的协议/端口列表解析为链表形式，存储在port_list中
     expand_acc_port_list(&port_list, spadat->spa_message_remain);
 
     /* Start at the top of the proto-port list...
     */
-    //ple指向链表头
     ple = port_list;
 
     /* Set our expire time value.
     */
-    //获取现在的时间
     time(&now);
-	//超时时间等于现在的时间+时间区间
     exp_ts = now + spadat->fw_access_timeout;
 
     /* For straight access requests, we currently support multiple proto/port
      * request.
     */
-    //FKO_ACCESS_MSG表示直接访问请求，FKO_CLIENT_TIMEOUT_ACCESS_MSG表示带有客户端超时的直接访问请求消息
     if(spadat->message_type == FKO_ACCESS_MSG
       || spadat->message_type == FKO_CLIENT_TIMEOUT_ACCESS_MSG)
     {
         /* Create an access command for each proto/port for the source ip.
-        为源 IP 的每个原型/端口创建一个访问命令
         */
-        //遍历列表
         while(ple != NULL)
         {
-        	//初始化缓冲区
             zero_cmd_buffers();
 
-			//将cmd_buf格式化为fw_command -a anchor -s rules命令
             snprintf(cmd_buf, CMD_BUFSIZE-1, "%s " PF_LIST_ANCHOR_RULES_ARGS,
                 opts->fw_config->fw_command,
                 opts->fw_config->anchor
@@ -285,21 +238,12 @@ process_spa_request(const fko_srv_options_t * const opts,
 
             /* Cache the current anchor rule set
             */
-            //缓存当前规则集
             res = run_extcmd(cmd_buf, cmd_out, STANDARD_CMD_OUT_BUFSIZE,
                         WANT_STDERR, NO_TIMEOUT, &pid_status, opts);
 
             /* Build the new rule string
             */
             memset(new_rule, 0x0, MAX_PF_NEW_RULE_LEN);
-			/*
-				设置new_rule为 pass in quick proto %u from %s to %s port %u keep state label形式
-				%u：表示协议（如TCP或UDP）的数字值。
-				%s：表示源IP地址。
-				%s：表示目标IP地址。
-				%u：表示端口号。
-				此命令表示生成防火墙规则，该规则允许指定的协议、源IP地址、目标IP地址和端口号的流量通过防火墙。
-			*/
             snprintf(new_rule, MAX_PF_NEW_RULE_LEN-1, PF_ADD_RULE_ARGS "\n",
                 ple->proto,
                 spadat->use_src_ip,
@@ -312,24 +256,19 @@ process_spa_request(const fko_srv_options_t * const opts,
             {
                 /* We add the rule to the running policy
                 */
-                //将新规则附加给cmd_out
                 strlcat(cmd_out, new_rule, STANDARD_CMD_OUT_BUFSIZE);
 
                 memset(write_cmd, 0x0, CMD_BUFSIZE);
 
-				//将write_cmd设置为%s -a %s -f -的形式
                 snprintf(write_cmd, CMD_BUFSIZE-1, "%s " PF_WRITE_ANCHOR_RULES_ARGS,
                     opts->fw_config->fw_command,
                     opts->fw_config->anchor
                 );
 
-				//执行命令，结果存在res中
                 res = run_extcmd_write(write_cmd, cmd_out, &pid_status, opts);
 
-				//执行成功
                 if(EXTCMD_IS_SUCCESS(res))
                 {
-                	//打印出日志信息
                     log_msg(LOG_INFO, "Added Rule for %s, %s expires at %u",
                         spadat->use_src_ip,
                         spadat->spa_message_remain,
@@ -340,16 +279,13 @@ process_spa_request(const fko_srv_options_t * const opts,
 
                     /* Reset the next expected expire time for this chain if it
                      * is warranted.
-                     如果超时，更新此链的下一个预期到期时间。
                     */
                     if(fwc.next_expire < now || exp_ts < fwc.next_expire)
                         fwc.next_expire = exp_ts;
                 }
-				//报错打印信息
                 else
                 {
                     log_msg(LOG_WARNING, "Could not write rule to pf anchor");
-					//？
                     free_acc_port_list(port_list);
                     return(-1);
                 }
@@ -363,7 +299,6 @@ process_spa_request(const fko_srv_options_t * const opts,
                  * limit because of STANDARD_CMD_OUT_BUFSIZE is quite a number
                  * of anchor rules.
                 */
-                //规则集满了
                 log_msg(LOG_WARNING, "Max anchor rules reached, try again later.");
                 free_acc_port_list(port_list);
                 return 0;
@@ -377,7 +312,6 @@ process_spa_request(const fko_srv_options_t * const opts,
     {
         /* No other SPA request modes are supported yet.
         */
-        //不支持其他 SPA 请求模式
         if(spadat->message_type == FKO_LOCAL_NAT_ACCESS_MSG
           || spadat->message_type == FKO_CLIENT_TIMEOUT_LOCAL_NAT_ACCESS_MSG)
         {
@@ -400,17 +334,16 @@ process_spa_request(const fko_srv_options_t * const opts,
 /* Iterate over the configure firewall access chains and purge expired
  * firewall rules.
 */
-//遍历配置的防火墙访问链，并清除已过期的防火墙规则
 void
 check_firewall_rules(const fko_srv_options_t * const opts,
         const int chk_rm_all)
 {
-    char            exp_str[12] = {0}; //存储过期时间的字符串
-    char            anchor_rules_copy[STANDARD_CMD_OUT_BUFSIZE] = {0}; //当前防火墙规则的字符串副本
-    char            write_cmd[CMD_BUFSIZE] = {0}; //构建写入防火墙规则的命令
+    char            exp_str[12] = {0};
+    char            anchor_rules_copy[STANDARD_CMD_OUT_BUFSIZE] = {0};
+    char            write_cmd[CMD_BUFSIZE] = {0};
     char           *ndx, *tmp_mark, *tmp_ndx, *newline_tmp_ndx;
 
-    time_t          now, rule_exp, min_exp=0; //现在的时间 规则的过期时间 最早的过期时间
+    time_t          now, rule_exp, min_exp=0;
     int             i=0, res=0, anchor_ndx=0, is_delete=0, pid_status=0;
 
     /* If we have not yet reached our expected next expire
@@ -421,7 +354,6 @@ check_firewall_rules(const fko_srv_options_t * const opts,
 
     time(&now);
 
-	//查看时间是否过了最大预期时间
     if (fwc.next_expire > now)
         return;
 
@@ -430,13 +362,11 @@ check_firewall_rules(const fko_srv_options_t * const opts,
     /* There should be a rule to delete.  Get the current list of
      * rules and delete the ones that are expired.
     */
-    //获取当前防火墙规则列表
     snprintf(cmd_buf, CMD_BUFSIZE-1, "%s " PF_LIST_ANCHOR_RULES_ARGS,
         opts->fw_config->fw_command,
         opts->fw_config->anchor
     );
 
-	//通过运行外部命令获取当前防火墙规则列表，并将结果存储在cmd_out变量中
     res = run_extcmd(cmd_buf, cmd_out, STANDARD_CMD_OUT_BUFSIZE,
                 WANT_STDERR, NO_TIMEOUT, &pid_status, opts);
     chop_newline(cmd_out);
@@ -449,9 +379,8 @@ check_firewall_rules(const fko_srv_options_t * const opts,
 
     /* Find the first _exp_ string (if any).
     */
-    //在cmd_out中查找第一个过期规则的注释字符串"exp"，返回指向该字符串的指针ndx
     ndx = strstr(cmd_out, EXPIRE_COMMENT_PREFIX);
-	
+
     if(ndx == NULL)
     {
         /* we did not find an expected rule.
@@ -466,39 +395,30 @@ check_firewall_rules(const fko_srv_options_t * const opts,
 
     /* Walk the list and process rules as needed.
     */
-    //如果找到了"exp"字符串，则检查每个规则并判断是否过期
     while (ndx != NULL)
     {
         /* Jump forward and extract the timestamp
         */
-        //每次向前检查，指针+长度
         ndx += strlen(EXPIRE_COMMENT_PREFIX);
 
         /* remember this spot for when we look for the next
          * rule.
         */
-        //暂存指针
         tmp_mark = ndx;
-		//将现在指向的字符串存在exp_str中
+
         strlcpy(exp_str, ndx, sizeof(exp_str));
-		//删除空格
         chop_spaces(exp_str);
         chop_char(exp_str, 0x22); /* there is a trailing quote */
-
-		//检查是否有十进制的字符
         if(!is_digits(exp_str))
         {
             /* go to the next rule if it exists
             */
-            //strstr往后搜索是否含有子字符串，也就是是否还含有"exp"，如果有返回第一次出现目标子字符串的位置的指针，没有返回NULL
             ndx = strstr(tmp_mark, EXPIRE_COMMENT_PREFIX);
             continue;
         }
 
-		//将字符串类型的时间戳 exp_str转换为time_t类型的时间值，赋值给rule_exp，表示当前规则的过期时间
         rule_exp = (time_t)atoll(exp_str);
 
-		//如果现在已经过了设置的规则过期时间，也就是规则过期了，规则数--，is_delete设置为1，表示需要被删除
         if(rule_exp <= now)
         {
             /* We are going to delete this rule, and because we rebuild the
@@ -512,7 +432,6 @@ check_firewall_rules(const fko_srv_options_t * const opts,
 
             is_delete = 1;
         }
-		//还没过期
         else
         {
             /* The rule has not expired, so copy it into the anchor string that
@@ -523,9 +442,7 @@ check_firewall_rules(const fko_srv_options_t * const opts,
             /* back up to the previous newline or the beginning of the rules
              * output string.
             */
-            //备份到上一个换行符或规则的开头
             tmp_ndx = ndx;
-			
             while(--tmp_ndx > cmd_out)
             {
                 if(*tmp_ndx == '\n')
@@ -538,21 +455,18 @@ check_firewall_rules(const fko_srv_options_t * const opts,
             /* may sure the rule begins with the string "pass", and make sure
              * it ends with a newline.  Bail if either test fails.
             */
-            //检查是否以"pass"开头，以pass开头或长度小于pass直接退出
             if (strlen(tmp_ndx) <= strlen("pass")
                     || strncmp(tmp_ndx, "pass", strlen("pass")) != 0)
                 break;
 
             newline_tmp_ndx = tmp_ndx;
 
-			//定位规则字符串中的换行符，以确保将整个规则复制到anchor_rules_copy字符串中
             while (*newline_tmp_ndx != '\n' && *newline_tmp_ndx != '\0')
                 newline_tmp_ndx++;
 
             /* copy the whole rule to the next newline (includes the expiration
                time).
             */
-            //将该规则复制到anchor_rules_copy字符串中，并更新anchor_ndx(规则的长度)的值
             while (*tmp_ndx != '\n' && *tmp_ndx != '\0'
                 && anchor_ndx < STANDARD_CMD_OUT_BUFSIZE)
             {
@@ -565,7 +479,6 @@ check_firewall_rules(const fko_srv_options_t * const opts,
 
             /* Track the minimum future rule expire time.
             */
-            //跟踪最早的过期时间值，存储在min_exp中
             if(rule_exp > now)
 	         min_exp = (min_exp && (min_exp < rule_exp)) ? min_exp : rule_exp;
         }
@@ -576,14 +489,12 @@ check_firewall_rules(const fko_srv_options_t * const opts,
         ndx = strstr(tmp_mark, EXPIRE_COMMENT_PREFIX);
     }
 
-	//规则需要删除
     if (is_delete)
     {
         /* We re-instantiate the anchor rules with the new rules string that
          * has the rule(s) deleted.  If there isn't at least one "pass" rule,
          * then we just flush the anchor.
         */
-        //当前防火墙规则为"pass"
         if (strlen(anchor_rules_copy) > strlen("pass")
             && strncmp(anchor_rules_copy, "pass", strlen("pass")) == 0)
         {
@@ -611,10 +522,8 @@ check_firewall_rules(const fko_srv_options_t * const opts,
     /* Set the next pending expire time accordingly. 0 if there are no
      * more rules, or whatever the next expected (min_exp) time will be.
     */
-    //更新下一个过期时间，如果没有规则了，设置下一个过期时间为0
     if(fwc.active_rules < 1)
         fwc.next_expire = 0;
-	//存在规则且存在min_exp值，则将最早的过期时间值赋给fwc.next_expire
     else if(min_exp)
         fwc.next_expire = min_exp;
 

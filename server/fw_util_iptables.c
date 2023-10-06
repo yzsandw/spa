@@ -1146,109 +1146,97 @@ fw_cleanup(const fko_srv_options_t * const opts)
     return(0);
 }
 
-//添加防火墙规则
 static int
 create_rule(const fko_srv_options_t * const opts,
         const char * const fw_chain, const char * const fw_rule)
-{//参数分别为获取服务器选项的锚点，要添加规则的防火墙链，要添加的规则内容
+{
     int res = 0;
 
-	//初始化缓冲区
     zero_cmd_buffers();
 
-	//是否输入了Y
     if (strncasecmp(opts->config[CONF_ENABLE_RULE_PREPEND], "Y", 1) == 0) {
-		//将命令格式化赋值给cmd_buf
         snprintf(cmd_buf, CMD_BUFSIZE-1, "%s -I %s %s",
                 opts->fw_config->fw_command, fw_chain, fw_rule);
     } else {
         snprintf(cmd_buf, CMD_BUFSIZE-1, "%s -A %s %s",
                 opts->fw_config->fw_command, fw_chain, fw_rule);
     }
-	//执行指令将规则添加
     res = run_extcmd(cmd_buf, err_buf, CMD_BUFSIZE, WANT_STDERR,
                 NO_TIMEOUT, &pid_status, opts);
-	//移除末尾换行
     chop_newline(err_buf);
 
     log_msg(LOG_DEBUG, "create_rule() CMD: '%s' (res: %d, err: %s)",
         cmd_buf, res, err_buf);
 
     if(EXTCMD_IS_SUCCESS(res))
-    {//成功添加
+    {
         log_msg(LOG_DEBUG, "create_rule() Rule: '%s' added to %s",
                 fw_rule, fw_chain);
         res = 1;
     }
     else
-		//记录报错信息
         log_msg(LOG_ERR, "create_rule() Error %i from cmd:'%s': %s",
                 res, cmd_buf, err_buf);
 
     return res;
 }
 
-//iptables规则的管理和创建
 static void
 ipt_rule(const fko_srv_options_t * const opts,
-        const char * const complete_rule_buf, //需要制定的规则
-        const char * const fw_rule_macro, //防火墙规则的模板 类似于-a %s -i这种
-        const char * const srcip, //源IP地址
-        const char * const dstip, //目标IP地址
-        const unsigned int proto, //协议类型（例如TCP或UDP）
-        const unsigned int port, //端口号
-        const char * const nat_ip, //nat的ip地址
-        const unsigned int nat_port, //nat的端口号
-        struct fw_chain * const chain, //防火墙链
-        const unsigned int exp_ts, //规则的过期时间
-        const time_t now, //现在的时间
-        const char * const msg, //消息
-        const char * const access_msg) //访问信息
+        const char * const complete_rule_buf,
+        const char * const fw_rule_macro,
+        const char * const srcip,
+        const char * const dstip,
+        const unsigned int proto,
+        const unsigned int port,
+        const char * const nat_ip,
+        const unsigned int nat_port,
+        struct fw_chain * const chain,
+        const unsigned int exp_ts,
+        const time_t now,
+        const char * const msg,
+        const char * const access_msg)
 {
     char rule_buf[CMD_BUFSIZE] = {0};
 
-	//如果complete_rule_buf缓冲区有有意义的数值，将其赋值给rule_buf缓冲区
     if(complete_rule_buf != NULL && complete_rule_buf[0] != 0x0)
     {
         strlcpy(rule_buf, complete_rule_buf, CMD_BUFSIZE-1);
     }
     else
-    {//否则就按照格式化来赋值给rule_buf
+    {
         memset(rule_buf, 0, CMD_BUFSIZE);
 
-		//将这七个参数按照格式化的形式传给rule_buf
         snprintf(rule_buf, CMD_BUFSIZE-1, fw_rule_macro,
             chain->table,
-            proto, //协议类型
-            srcip, //源ip
-            dstip, //目的ip
-            port, //端口号
-            exp_ts, //过期时间
-            chain->target //规则链的目标
+            proto,
+            srcip,
+            dstip,
+            port,
+            exp_ts,
+            chain->target
         );
     }
 
     /* Check to make sure that the chain and jump rule exist
     */
-    //检查防火墙链和跳转规则还存在
     mk_chain(opts, chain->type);
 
     if(rule_exists(opts, chain, rule_buf, proto, srcip,
                 dstip, port, nat_ip, nat_port, exp_ts) == 0)
-    {//如果不存在
+    {
         if(create_rule(opts, chain->to_chain, rule_buf))
-        {//创建规则成功
+        {
             log_msg(LOG_INFO, "Added %s rule to %s for %s -> %s %s, expires at %u",
                 msg, chain->to_chain, srcip, (dstip == NULL) ? IPT_ANY_IP : dstip,
                 access_msg, exp_ts
             );
 
-            chain->active_rules++; //链上规则数++
+            chain->active_rules++;
 
             /* Reset the next expected expire time for this chain if it
             * is warranted.
             */
-            //更新到下一个过期时间
             if(chain->next_expire < now || exp_ts < chain->next_expire)
                 chain->next_expire = exp_ts;
         }
@@ -1257,7 +1245,6 @@ ipt_rule(const fko_srv_options_t * const opts,
     return;
 }
 
-//创建和管理用于转发访问的iptables规则
 static void forward_access_rule(const fko_srv_options_t * const opts,
         const acc_stanza_t * const acc,
         struct fw_chain * const fwd_chain,
@@ -1276,11 +1263,9 @@ static void forward_access_rule(const fko_srv_options_t * const opts,
             acc->forward_all, nat_ip, nat_port);
 
     memset(rule_buf, 0, CMD_BUFSIZE);
-	//是否所有端口都需要转发
     if(acc->forward_all)
     {
 
-		//构建一个适用于转发所有端口和协议的规则字符串
         snprintf(rule_buf, CMD_BUFSIZE-1, IPT_FWD_ALL_RULE_ARGS,
             fwd_chain->table,
             spadat->use_src_ip,
@@ -1290,14 +1275,12 @@ static void forward_access_rule(const fko_srv_options_t * const opts,
 
         /* Make a global ACCEPT rule for all ports/protocols
         */
-        //将规则添加到所有的端口和协议类型中
         ipt_rule(opts, rule_buf, NULL, spadat->use_src_ip,
             NULL, ANY_PROTO, ANY_PORT, NULL, NAT_ANY_PORT,
             fwd_chain, exp_ts, now, "FORWARD ALL", "*/*");
     }
     else
     {
-    	//根据协议类型和端口构建转发规则
         snprintf(rule_buf, CMD_BUFSIZE-1, IPT_FWD_RULE_ARGS,
             fwd_chain->table,
             fst_proto,
@@ -1308,7 +1291,6 @@ static void forward_access_rule(const fko_srv_options_t * const opts,
         );
         /* Make the FORWARD access rule
         */
-        //指定转发规则
         ipt_rule(opts, rule_buf, NULL, spadat->use_src_ip,
             NULL, fst_proto, nat_port, NULL, NAT_ANY_PORT,
             fwd_chain, exp_ts, now, "FORWARD", spadat->spa_message_remain);
@@ -1316,16 +1298,15 @@ static void forward_access_rule(const fko_srv_options_t * const opts,
     return;
 }
 
-//设置iptables的DNAT规则
 static void dnat_rule(const fko_srv_options_t * const opts,
         const acc_stanza_t * const acc,
-        struct fw_chain * const dnat_chain, //dnat的链式结构
-        const char * const nat_ip, //网络IP
-        const unsigned int nat_port, //网络端口
-        const unsigned int fst_proto, //首选协议
-        const unsigned int fst_port, //首选端口
-        spa_data_t * const spadat, //单包授权的网络地址
-        const unsigned int exp_ts, //过期时间
+        struct fw_chain * const dnat_chain,
+        const char * const nat_ip,
+        const unsigned int nat_port,
+        const unsigned int fst_proto,
+        const unsigned int fst_port,
+        spa_data_t * const spadat,
+        const unsigned int exp_ts,
         const time_t now)
 {
     char   rule_buf[CMD_BUFSIZE] = {0};
@@ -1333,45 +1314,41 @@ static void dnat_rule(const fko_srv_options_t * const opts,
     log_msg(LOG_DEBUG, "dnat_rule() forward_all: %d, nat_ip: %s, nat_port: %d",
             acc->forward_all, nat_ip, nat_port);
 
-    if(acc->forward_all) //检查是否开启了forward的全部功能
-    { //acc->forward_all存在，对所有端口和协议进行DNAT转发
+    if(acc->forward_all)
+    {
         memset(rule_buf, 0, CMD_BUFSIZE);
 
-		//格式化制定DNAT规则的命令
         snprintf(rule_buf, CMD_BUFSIZE-1, IPT_DNAT_ALL_RULE_ARGS,
-            dnat_chain->table, //iptables表的名称
-            spadat->use_src_ip, //源IP地址或地址范围
-            (fwc.use_destination ? spadat->pkt_destination_ip : IPT_ANY_IP), //实际的目标IP地址或地址范围
-            exp_ts, //超时时间
-            dnat_chain->target, //要执行的动作
-            nat_ip //要修改的IP
+            dnat_chain->table,
+            spadat->use_src_ip,
+            (fwc.use_destination ? spadat->pkt_destination_ip : IPT_ANY_IP),
+            exp_ts,
+            dnat_chain->target,
+            nat_ip
         );
 
         /* Make a global DNAT rule for all ports/protocols
         */
-        //制定iptables规则
         ipt_rule(opts, rule_buf, NULL, spadat->use_src_ip,
             NULL, ANY_PROTO, ANY_PORT, NULL, NAT_ANY_PORT,
             dnat_chain, exp_ts, now, "DNAT ALL", "*/*");
     }
     else
-    { //未开启forward的全部功能
+    {
         memset(rule_buf, 0, CMD_BUFSIZE);
 
-		//格式化制定DNAT规则的命令
         snprintf(rule_buf, CMD_BUFSIZE-1, IPT_DNAT_RULE_ARGS,
-            dnat_chain->table, //指定要操作的表
-            fst_proto, //制定协议类型
-            spadat->use_src_ip, //指定源 IP 地址或地址范围
-            (fwc.use_destination ? spadat->pkt_destination_ip : IPT_ANY_IP), //指定目标 IP 地址或地址范围
-            fst_port, //指定目标端口号
-            exp_ts, //超时时间
-            dnat_chain->target, 
-            nat_ip, //指定需要修改的ip地址和端口号
+            dnat_chain->table,
+            fst_proto,
+            spadat->use_src_ip,
+            (fwc.use_destination ? spadat->pkt_destination_ip : IPT_ANY_IP),
+            fst_port,
+            exp_ts,
+            dnat_chain->target,
+            nat_ip,
             nat_port
         );
 
-		//制定iptables规则
         ipt_rule(opts, rule_buf, NULL, spadat->use_src_ip,
             (fwc.use_destination ? spadat->pkt_destination_ip : IPT_ANY_IP),
             fst_proto, fst_port, nat_ip, nat_port, dnat_chain, exp_ts, now,
@@ -1380,15 +1357,14 @@ static void dnat_rule(const fko_srv_options_t * const opts,
     return;
 }
 
-//定义源网络地址转换规则
 static void snat_rule(const fko_srv_options_t * const opts,
         const acc_stanza_t * const acc,
-        const char * const nat_ip, //源IP
-        const unsigned int nat_port, //源端口
-        const unsigned int fst_proto, //首选协议
-        const unsigned int fst_port, //首选端口
+        const char * const nat_ip,
+        const unsigned int nat_port,
+        const unsigned int fst_proto,
+        const unsigned int fst_port,
         spa_data_t * const spadat,
-        const unsigned int exp_ts, //过期时间
+        const unsigned int exp_ts,
         const time_t now)
 {
     char     rule_buf[CMD_BUFSIZE] = {0};
@@ -1402,58 +1378,58 @@ static void snat_rule(const fko_srv_options_t * const opts,
             acc->force_masquerade);
 
     if(acc->forward_all)
-    { //如果进行全部转发
+    {
         /* Default to MASQUERADE */
-        snat_chain = &(opts->fw_config->chain[IPT_MASQUERADE_ACCESS]); //将snat_chain指向默认的MASQUERADE规则链
-        snprintf(snat_target, SNAT_TARGET_BUFSIZE-1, " "); //初始化为空格
+        snat_chain = &(opts->fw_config->chain[IPT_MASQUERADE_ACCESS]);
+        snprintf(snat_target, SNAT_TARGET_BUFSIZE-1, " ");
 
         /* Add SNAT or MASQUERADE rules.
         */
         if(acc->force_snat && acc->force_snat_ip != NULL && is_valid_ipv4_addr(acc->force_snat_ip, strlen(acc->force_snat_ip)))
-        { //检查是否启用强制SNAT并且是否满足强制SNAT的条件
+        {
             /* Using static SNAT */
-            snat_chain = &(opts->fw_config->chain[IPT_SNAT_ACCESS]); //将snat_chain指向SNAT规则链
+            snat_chain = &(opts->fw_config->chain[IPT_SNAT_ACCESS]);
             snprintf(snat_target, SNAT_TARGET_BUFSIZE-1,
-                "--to-source %s", acc->force_snat_ip); //将源数据包的源IP地址修改为force_snat_ip
+                "--to-source %s", acc->force_snat_ip);
         }
         else if((opts->config[CONF_SNAT_TRANSLATE_IP] != NULL)
             && is_valid_ipv4_addr(opts->config[CONF_SNAT_TRANSLATE_IP], strlen(opts->config[CONF_SNAT_TRANSLATE_IP])))
-        { //如果配置中存在SNAT转换IP地址
+        {
             /* Using static SNAT */
-            snat_chain = &(opts->fw_config->chain[IPT_SNAT_ACCESS]);//将snat_chain指向SNAT规则链
+            snat_chain = &(opts->fw_config->chain[IPT_SNAT_ACCESS]);
             snprintf(snat_target, SNAT_TARGET_BUFSIZE-1,
-                "--to-source %s", opts->config[CONF_SNAT_TRANSLATE_IP]);//将源数据包的源IP地址修改为opts->config[CONF_SNAT_TRANSLATE_IP]
+                "--to-source %s", opts->config[CONF_SNAT_TRANSLATE_IP]);
         }
 
         memset(rule_buf, 0, CMD_BUFSIZE);
 
         snprintf(rule_buf, CMD_BUFSIZE-1, IPT_SNAT_ALL_RULE_ARGS,
-            snat_chain->table, //指定操作的表
-            spadat->use_src_ip, //替换为实际的源 IP 地址或地址范围
+            snat_chain->table,
+            spadat->use_src_ip,
             exp_ts,
-            snat_chain->target, //匹配条件
-            snat_target //匹配动作
-        ); //格式化需要配置的SNAT命令
+            snat_chain->target,
+            snat_target
+        );
 
         ipt_rule(opts, rule_buf, NULL, spadat->use_src_ip,
             NULL, ANY_PROTO, ANY_PORT, NULL, NAT_ANY_PORT,
-            snat_chain, exp_ts, now, "SNAT ALL", "*/*"); //管理规则
+            snat_chain, exp_ts, now, "SNAT ALL", "*/*");
     }
     else
-    { //不需要配置全局
+    {
         /* Add SNAT or MASQUERADE rules.
         */
         if(acc->force_snat && acc->force_snat_ip != NULL && is_valid_ipv4_addr(acc->force_snat_ip, strlen(acc->force_snat_ip)))
-        { //存在指定的强制 SNAT IP 地址
+        {
             /* Using static SNAT */
-            snat_chain = &(opts->fw_config->chain[IPT_SNAT_ACCESS]); //使用IPT_SNAT_ACCESS链
+            snat_chain = &(opts->fw_config->chain[IPT_SNAT_ACCESS]);
             snprintf(snat_target, SNAT_TARGET_BUFSIZE-1,
                 "--to-source %s", acc->force_snat_ip);
         }
         else if(acc->force_snat && acc->force_masquerade)
-        { //存在 SNAT 转换 IP 地址
+        {
             /* Using MASQUERADE */
-            snat_chain = &(opts->fw_config->chain[IPT_MASQUERADE_ACCESS]); //使用MASQUERADE链
+            snat_chain = &(opts->fw_config->chain[IPT_MASQUERADE_ACCESS]);
             snprintf(snat_target, SNAT_TARGET_BUFSIZE-1,
                 "--to-ports %i", fst_port);
         }
@@ -1485,7 +1461,6 @@ static void snat_rule(const fko_srv_options_t * const opts,
             snat_target
         );
 
-		//构建规则
         ipt_rule(opts, rule_buf, NULL, spadat->use_src_ip,
                 NULL, fst_proto, nat_port, nat_ip, nat_port,
                 snat_chain, exp_ts, now, "SNAT",
@@ -1498,8 +1473,6 @@ static void snat_rule(const fko_srv_options_t * const opts,
 
 /* Rule Processing - Create an access request...
 */
-
-//处理spa请求
 int
 process_spa_request(const fko_srv_options_t * const opts,
         const acc_stanza_t * const acc, spa_data_t * const spadat)
@@ -1842,7 +1815,6 @@ rm_expired_rules(const fko_srv_options_t * const opts,
 /* Iterate over the configure firewall access chains and purge expired
  * firewall rules.
 */
-//检查并删除已过期的 iptables 规则
 void
 check_firewall_rules(const fko_srv_options_t * const opts,
         const int chk_rm_all)
@@ -1859,7 +1831,6 @@ check_firewall_rules(const fko_srv_options_t * const opts,
 
     /* Iterate over each chain and look for active rules to delete.
     */
-    //遍历规则输出缓冲区中的每一行
     for(i=0; i < NUM_FWKNOP_ACCESS_TYPES; i++)
     {
         /* If there are no active rules or we have not yet
@@ -1926,7 +1897,6 @@ check_firewall_rules(const fko_srv_options_t * const opts,
     return;
 }
 
-//验证 iptables 链配置字符串的有效性
 int
 validate_ipt_chain_conf(const char * const chain_str)
 {
