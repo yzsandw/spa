@@ -1,36 +1,13 @@
 /**
  * \file server/fwknopd_errors.h
  *
- * \brief Header file for fwknopd_errors.c.
+ * \brief fwknopd_errors.c的头文件。
  */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #ifndef FWKNOPD_ERRORS_H
 #define FWKNOPD_ERRORS_H
 
-/* SPA message handling status codes
+/* SPA消息处理状态代码
 */
 enum {
     SPA_MSG_SUCCESS = 0,
@@ -50,7 +27,7 @@ enum {
     SPA_MSG_ERROR
 };
 
-/* Firewall rule processing error codes
+/* 防火墙规则处理错误代码
 */
 enum {
     FW_RULE_SUCCESS = 0,
@@ -59,27 +36,24 @@ enum {
     FW_RULE_UNKNOWN_ERROR
 };
 
-/* Macro for determining if an error code is a spa_msg handler error
- * and/or a firewall rule processing error.
+/* 用于确定错误代码是spa_msg处理程序错误和/或防火墙规则处理错误的宏。
 */
 #define IS_SPA_MSG_ERROR(x) (x & 0x1000)
 #define IS_FW_RULE_ERROR(x) (x & 0x2000)
 #define IS_FWKNOPD_ERROR(x) (IS_SPA_MSG_ERROR(x) | IS_FW_RULE_ERROR(x))
 
-/* Function prototypes
+/* 功能原型
 */
 
 /**
- * \brief takes a numeric error code and returns the readable string
- *
- * \param err_code The integer error code to convert
- *
- * \return returns a pointer to the error string
+*\brief 获取一个数字错误代码并返回可读字符串
+*\param err_code要转换的整数错误代码
+*\return 返回一个指向错误字符串的指针
  */
 const char* get_errstr(const int err_code);
 
 /**
- * \brief print all server errors (from server/fwknopd_errors.c) to stdout
+ * \brief 将所有服务器错误（从server/fwknopd_errors.c）打印到stdout
  */
 void dump_server_errors(void);
 

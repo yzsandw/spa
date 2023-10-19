@@ -4,29 +4,6 @@
  * \brief Header file for fwknopd access.c.
  */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- ******************************************************************************
-*/
 #ifndef ACCESS_H
 #define ACCESS_H
 
@@ -36,67 +13,60 @@
 /**
  * \def ACCESS_BUF_LEN
  *
- * \brief Allow strings as large as 123.123.123.123/255.255.255.255
+ * \brief 允许大小为123.123.123.123/255.255.255.255的字符串
  */
 #define ACCESS_BUF_LEN  33
 
 /**
  * \def MAX_DEPTH
  *
- * \brief Recursion depth
+ * \brief 递归深度
  *
- * We won't recurse more than 3 deep.  Access.conf can include a file
- * that includes a file, but that's the limit.
+ * 不会递归超过3个深度.
 */
 #define MAX_DEPTH 3
 
-/* Function Prototypes
+/* 函数原型
 */
 
 /**
- * \brief Loads an access.conf file
+ * \brief 加载access.conf文件
  *
- * Also handles includes by calling itself recursively, only recurses 3 levels deep
  *
- * \param opts Pointer to the fko_srv_options_t struct to populate
- * \param access_filename Pointer to the filename to load
- * \param depth Pointer to the current depth.  This starts at 0 and is incremented for each recursion
+ * \param opts指向要填充的fko_srv_options_t结构的指针
+ * \param ccess_filename指向要加载的文件名的指针
+ * \param depth指向当前深度的指针。这从0开始，每次递归都会递增
  *
- * \return Returns an error status, or EXIT_SUCCESS
+ * \return return返回错误状态，或EXIT_SUCCESS
  *
  */
 int parse_access_file(fko_srv_options_t *opts, char *access_filename, int *depth);
 
 /**
- * \brief Loads access.conf files in a folder
+ * \brief 加载文件夹中的access.conf文件
  *
- * This function does not recurse into subfolders, but calls parse_access_file
- * for each contained file.  This function does not increment the depth int.
- *
- * \param opts Pointer to the fko_srv_options_t struct to populate
- * \param access_folder Pointer to the folder name to process
- * \param depth Pointer to the current depth.
- *
- * \return Returns an error status, or EXIT_SUCCESS
+ *此函数不会递归到子文件夹中，而是调用parse_access_file
+ *对于每个包含的文件。此函数不会增加深度int。
  *
  */
 int parse_access_folder(fko_srv_options_t *opts, char *access_folder, int *depth);
 
 /**
- * \brief Basic validation for a access stanzas
+ * \brief 访问节的基本验证
  *
- * This is a basic check to ensure there is at least one access stanza
- * with the "source" variable populated, and this function is only
- * called after all access.conf files are processed. This allows
- * %include_folder processing to proceed against directories that
- * have files that are not access.conf files. Additional stronger
- * validations are done in acc_data_is_valid(), but this function
- * is only called when a "SOURCE" variable has been parsed out of
- * the file.
+ *这是一个基本检查，以确保至少有一个访问节
+ *填充了“source”变量，并且此函数仅
+ *在处理完所有access.conf文件后调用。这允许
+ *%include_folder处理以继续处理
+ *具有无法访问的.conf文件。附加更强
+ *验证是在acc_data_is_valid（）中完成的，但此函数
+ *仅当从中解析出“SOURCE”变量时调用
+
+ *文件。
  *
- * \param acc Pointer to the acc_stanza_t struct that holds the access stanza
+ * \param acc指向保存访问节的acc_stanza_t结构的指针
  *
- * \return Returns an error status, or EXIT_SUCCESS
+ * \return 返回错误状态或EXIT_SUCCESS
  *
  */
 int valid_access_stanzas(acc_stanza_t *acc);
@@ -104,14 +74,12 @@ int valid_access_stanzas(acc_stanza_t *acc);
 /**
  * \brief Compares address lists
  *
- * This function walks a linked list looking for a matching IP address.
- * Primarily intended to find a matching access stanza for an
- * incoming SPA packet.
+ *此函数在链表中查找匹配的IP地址。
+ *主要用于为传入的SPA数据包。
  *
- * \param source_list pointer to linked list to walk
- * \param ip Address to compare
+ * \param 要比较的ip地址
  *
- * \return Returns true on a match
+ * \return 在匹配时返回true
  *
  */
 int compare_addr_list(acc_int_list_t *source_list, const uint32_t ip);
@@ -119,57 +87,56 @@ int compare_addr_list(acc_int_list_t *source_list, const uint32_t ip);
 /**
  * \brief Check for a proto-port string
  *
- * Take a proto/port string (or multiple comma-separated strings) and check
- * them against the list for the given access stanza.
+ *取一个proto/port字符串（或多个逗号分隔的字符串）并检查
+ *将它们与给定访问节的列表进行比较。
  *
- * \param acc Pointer to the acc_stanza_t struct that holds the access stanzas
- * \param port_str pointer to the port string to look for
+ *\param acc指向保存访问节的acc_stanza_t结构的指针
+ *\param port_str指向要查找的端口字符串的指针
  *
- * \return Returns true if allowed
+ * \return return如果允许则返回true
  *
  */
 int acc_check_port_access(acc_stanza_t *acc, char *port_str);
 
 /**
- * \brief Dumps the current configuration to stdout
+ * \brief 将当前配置转储到stdout
  *
- * \param opts pointer to the server options struct
+ * \param opts指向服务器选项结构的指针
  *
  */
 void dump_access_list(const fko_srv_options_t *opts);
 
 /**
- * \brief Expands a proto/port string to a list of access proto-port struct.
+ * \brief 将proto/port字符串扩展为访问proto-port结构的列表。
  *
- * This takes a single string of comma separated proto/port values and separates
- * them into a linked list
+ *这采用逗号分隔的proto/port值的单个字符串，并将它们添加到链接列表中
  *
- * \param plist Double pointer to the acc_port_list_t to hold the proto/ports
- * \param plist_str Pointer to the list of proto/port values
+ * \param plist指向acc_port_list_t的双指针，用于保存proto/ports
+ * \param plist_str指向proto/port值列表的指针
  *
- * \return Returns true if successful
+ * \return 如果成功则返回true
  *
  */
 int expand_acc_port_list(acc_port_list_t **plist, char *plist_str);
 
 /**
- * \brief Sets do_acc_stanza_init to true, which enables free_acc_stanzas()
+ * \brief 将do_acc_stanza_init设置为true，这将启用free_acc_stancas（）
  *
  */
 void enable_acc_stanzas_init(void);
 
 /**
- * \brief Free memory for all access stanzas
+ * \brief 所有访问节的可用内存
  *
- * \param opts Pointer to fko_srv_options_t that contains the access stanza chain to free
+ * \param opts指向fko_srv_options_t的指针，该指针包含要释放的访问节链
  *
  */
 void free_acc_stanzas(fko_srv_options_t *opts);
 
 /**
- * \brief free a port list
+ * \brief 释放端口列表
  *
- * \param plist Pointer to acc_port_list_t to free
+ * \param plist指向acc_port_list_t以释放指针
  *
  */
 void free_acc_port_list(acc_port_list_t *plist);

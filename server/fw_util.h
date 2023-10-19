@@ -1,38 +1,15 @@
 /**
  * \file server/fw_util.h
  *
- * \brief Header file for fw_util.c.
+ * \brief fw_util.c的头文件
  */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #ifndef FW_UTIL_H
 #define FW_UTIL_H
 
 #define CMD_BUFSIZE                 256
 #define MAX_FW_COMMAND_ARGS_LEN     256
-#define CMD_LOOP_TRIES              10   /* for repeated command executions */
+#define CMD_LOOP_TRIES              10   /* 用于重复执行命令 */
 
 #define STANDARD_CMD_OUT_BUFSIZE    4096
 
@@ -56,11 +33,9 @@
   #include <time.h>
 #endif
 
-/* Function prototypes.
+/* 功能原型。
  *
- * Note: These are the public functions for managing firewall rules.
- *       They should be implemented in each of the corresponding
- *       fw_util_<fw-type>.c files.
+*注意：这些是用于管理防火墙规则的公共功能。它们应该在每个相应的fw_util_<fw-type>.c文件中实现
 */
 int fw_config_init(fko_srv_options_t * const opts);
 int fw_initialize(const fko_srv_options_t * const opts);

@@ -1,32 +1,9 @@
 /**
  * \file server/fwknopd.h
  *
- * \brief Header file for fwknopd server program.
+ * \brief fwknopd服务器程序的头文件。
  */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #ifndef FWKNOPD_H
 #define FWKNOPD_H
 
@@ -39,14 +16,12 @@
   #include <locale.h>
 #endif
 
-/* If the flock flags are not defined at this point, we take the liberty
- * of defining them here.
-*/
+
 #ifndef LOCK_SH
   /**
    * \def LOCK_SH
    *
-   * \brief Shared file lock
+   * \brief 共享文件锁定
    */
   #define   LOCK_SH        0x01
 #endif
@@ -54,7 +29,7 @@
   /**
    * \def LOCK_EX
    *
-   * \brief Exclusive file lock
+   * \brief 独占文件锁定
    */
   #define   LOCK_EX        0x02
 #endif
@@ -62,7 +37,7 @@
   /**
    * \def LOCK_NB
    *
-   * \brief Do not block when locking
+   * \brief 锁定时不要阻塞
    */
   #define   LOCK_NB        0x04
 #endif
@@ -70,7 +45,7 @@
   /**
    * \def LOCK_UN
    *
-   * \brief Unlock file
+   * \brief 解锁文件
    */
   #define   LOCK_UN        0x08
 #endif
@@ -78,7 +53,7 @@
   /**
    * \def PID_BUFLEN
    *
-   * \brief Buffer length for PID
+   * \brief PID的缓冲区长度
    */
 #define PID_BUFLEN 8
 

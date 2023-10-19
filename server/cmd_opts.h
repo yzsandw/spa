@@ -4,36 +4,11 @@
  * \brief Header file for fwknopd command line options.
  */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- ******************************************************************************
-*/
 #ifndef CMD_OPTS_H
 #define CMD_OPTS_H
 
-/* The config entry indexes are defined in the fwknopd_common.h, and now we
- * create a config entry name map as well (too lazy to make a hash table).
+/* 配置条目索引是在fwknopd_common.h中定义的，现在创建了一个配置条目名称映射
  *
- * Note: It is very important this list matches the enum in fwknopd_common.h
  *
 */
 static char *config_map[NUMBER_OF_CONFIG_ENTRIES] = {
@@ -151,8 +126,6 @@ static char *config_map[NUMBER_OF_CONFIG_ENTRIES] = {
 };
 
 
-/** Long options values (for those that may not have a short option).
-*/
 enum {
     FW_LIST         = 0x200,
     FW_LIST_ALL,
@@ -179,16 +152,14 @@ enum {
     NOOP /* Just to be a marker for the end */
 };
 
-/* Our getopt_long options string.
-*/
+
 #if USE_LIBNETFILTER_QUEUE
   #define GETOPTS_OPTION_STRING "Aa:c:C:d:Dfhi:Kl:nO:p:P:Rr:StUvV"
 #else
   #define GETOPTS_OPTION_STRING "Aa:c:C:d:Dfhi:Kl:O:p:P:Rr:StUvV"
 #endif
 
-/* Our program command-line options...
-*/
+
 static struct option cmd_opts[] =
 {
     {"access-file",             1, NULL, 'a'},

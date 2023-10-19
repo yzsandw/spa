@@ -1,39 +1,16 @@
 /**
  * \file server/fw_util_iptables.h
  *
- * \brief Header file for fw_util_iptables.c.
+ * \brief fw_util_iptables.c的头文件
  */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #ifndef FW_UTIL_IPTABLES_H
 #define FW_UTIL_IPTABLES_H
 
 #define SNAT_TARGET_BUFSIZE         64
 
 #if HAVE_EXECVP
-  #define SH_REDIR "" /* the shell is not used when execvp() is available */
+  #define SH_REDIR "" 
 #else
   #define SH_REDIR " 2>&1"
 #endif

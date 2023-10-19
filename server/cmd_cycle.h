@@ -1,32 +1,9 @@
 /**
  * \file server/cmd_cycle.h
  *
- * \brief Function prototypes for managing command cycles as defined via
- *          access.conf stanzas (CMD_CYCLE_OPEN and CMD_CYCLE_CLOSE).
+ * \brief 用于管理vi access.conf节（CMD_CYCLE_OPEN和CMD_CYCLE_CLOSE）中定义的命令周期的函数原型。
  */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
-*/
 
 #ifndef CMD_CYCLE_H
 #define CMD_CYCLE_H
@@ -34,11 +11,11 @@
 #define CMD_CYCLE_BUFSIZE 256
 
 /**
- * \brief Main driver for open/close command cycles
+ * \brief 打开/关闭命令循环的主驱动器
  *
- * This function is called when a valid SPA packet is received that matches
- * a stanza containing a command cycle.
  *
+ * 当接收到与包含命令周期的节匹配的有效SPA数据包时，将调用此函数。
+ * 
  * \param opts
  * \param acc
  * \param spadat
@@ -50,9 +27,8 @@ int cmd_cycle_open(fko_srv_options_t *opts, acc_stanza_t *acc,
         spa_data_t *spadat, const int stanza_num, int *res);
 
 /**
- * \brief Launches the command cycle close command
+ * \brief 启动命令循环关闭命令
  *
- * TODO: finish me
  *
  * \param opts
  *
@@ -60,9 +36,8 @@ int cmd_cycle_open(fko_srv_options_t *opts, acc_stanza_t *acc,
 void cmd_cycle_close(fko_srv_options_t *opts);
 
 /**
- * \brief frees the command cycle list
+ * \brief 释放命令周期列表
  *
- * TODO: Finish me
  *
  * \param opts
  *
