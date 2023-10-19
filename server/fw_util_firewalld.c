@@ -30,7 +30,7 @@
 
 #include "fwknopd_common.h"
 
-#ifdef FIREWALL_FIREWALLD
+#if FIREWALL_FIREWALLD
 
 #include "fw_util.h"
 #include "utils.h"

@@ -1,32 +1,9 @@
 /**
  * \file server/extcmd.c
  *
- * \brief Routines for executing and processing external commands.
+ * \brief 用于执行和处理外部命令的例程。
  */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #include "fwknopd_common.h"
 #include "extcmd.h"
 #include "log_msg.h"
@@ -40,10 +17,10 @@
 #endif
 
 /*
-static sig_atomic_t got_sigalrm; 
+静态sig_atomic_t got_sigarm；
 */
 
-/* Takes a file descriptor and makes it non-blocking.
+/* 获取文件描述符并使其成为非阻塞的。
 static int
 set_nonblock(int fd)
 {
@@ -95,9 +72,7 @@ copy_or_search(char *so_read_buf, char *so_buf, const size_t so_buf_sz,
 
     if(substr_search != NULL) /* we are looking for a substring */
     {
-        /* Search the current line in so_read_buf instead of
-         * so_buf (which may contain a partial line at the
-         * end at this point).
+        /* 在so_read_buf中搜索当前行，而不是在so_buf（此时末尾可能包含部分行）中搜索。
          */
         if(!IS_EMPTY_LINE(so_read_buf[0])
                 && strstr(so_read_buf, substr_search) != NULL)
@@ -109,11 +84,9 @@ copy_or_search(char *so_read_buf, char *so_buf, const size_t so_buf_sz,
     return;
 }
 
-/* Run an external command returning exit status, and optionally filling
- * provided buffer with STDOUT output up to the size provided.
+/* 运行一个返回退出状态的外部命令，并可以选择用STDOUT输出填充提供的缓冲区，直到提供的大小为止。
  *
- * Note: XXX: We are not using the timeout parameter at present. We still need
- *       to implement a reliable timeout mechanism.
+ * 注：我们目前没有使用timeout参数。我们仍然需要实现可靠的超时机制。
 */
 static int
 _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
@@ -136,15 +109,14 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
 #endif
 
 #if AFL_FUZZING
-    /* Don't allow command execution in AFL fuzzing mode
+    /* 不允许在AFL模糊模式下执行命令
     */
     return 0;
 #endif
 
     *pid_status = 0;
 
-    /* Even without execvp() we examine the command for basic validity
-     * in term of number of args
+    /* 即使没有execvp（），我们也会根据参数的数量来检查命令的基本有效性
     */
     memset(argv_new, 0x0, sizeof(argv_new));
 
@@ -156,8 +128,7 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
     }
 
 #if !HAVE_EXECVP
-    /* if we are not using execvp() then free up argv_new unconditionally
-     * since was used only for validation
+    /* 如果我们不使用execvp（），则无条件释放argvnew，因为它仅用于验证
     */
     free_argv(argv_new, &argc_new);
 #endif
@@ -192,7 +163,7 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
                 close(STDERR_FILENO);
         }
 
-        /* Take care of gid/uid settings before running the command.
+        /* 在运行该命令之前，请注意gid/uid设置。
         */
         if(gid > 0)
             if(setgid(gid) < 0)
@@ -202,16 +173,15 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
             if(setuid(uid) < 0)
                 exit(EXTCMD_SETUID_ERROR);
 
-        /* don't use env
+        /* 不要使用env
         */
         es = execvp(argv_new[0], argv_new);
 
         if(es == -1)
             log_msg(LOG_ERR, "run_extcmd(): execvp() failed: %s", strerror(errno));
 
-        /* We only make it here if there was a problem with execvp(),
-         * so exit() here either way to not leave another fwknopd process
-         * running after fork().
+        /* 只有当execvp（）出现问题时，我们才会在这里执行，
+        *  所以在这里exit（）是为了不让另一个fwknopd进程在fork（）之后运行。
         */
         exit(es);
     }
@@ -222,7 +192,7 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
         return EXTCMD_FORK_ERROR;
     }
 
-    /* Only the parent process makes it here
+    /* 只有父进程才能到达此处
     */
     if(so_buf != NULL || substr_search != NULL)
     {
@@ -244,7 +214,7 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
             }
             fclose(output);
 
-            /* Make sure we only have complete lines
+            /* 确保我们只有完整的线路
             */
             if(!(cflag & ALLOW_PARTIAL_LINES))
                 truncate_partial_line(so_buf);
@@ -269,8 +239,7 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
 
     if(so_buf == NULL && substr_search == NULL)
     {
-        /* Since we do not have to capture output, we will fork here (which we
-         * * would have to do anyway if we are running as another user as well).
+        /* 由于我们不必捕获输出，我们将在这里分叉（如果我们也以另一个用户的身份运行，我们无论如何都必须这样做）
          * */
         pid = fork();
         if(pid == -1)
@@ -280,12 +249,11 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
         }
         else if (pid == 0)
         {
-            /* We are the child */
 
             if(chdir("/") != 0)
                 exit(EXTCMD_CHDIR_ERROR);
 
-            /* Take care of gid/uid settings before running the command.
+            /* 在运行该命令之前，请注意gid/uid设置。
             */
             if(gid > 0)
                 if(setgid(gid) < 0)
@@ -298,14 +266,13 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
             *pid_status = system(cmd);
             exit(*pid_status);
         }
-        /* Retval is forced to 0 as we don't care about the exit status of
-         * the child (for now)
+        /* Retval被强制为0，因为我们不关心子进程的退出状态（目前）
         */
         retval = EXTCMD_SUCCESS_ALL_OUTPUT;
     }
     else
     {
-        /* Looking for output use popen and fill the buffer to its limit.
+        /* 寻找输出使用popen和填充缓冲区的限制。
          */
         output = popen(cmd, "r");
         if(output == NULL)
@@ -330,7 +297,7 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
             }
             pclose(output);
 
-            /* Make sure we only have complete lines
+            /* 确保我们只有完整的线路
             */
             if(!(cflag & ALLOW_PARTIAL_LINES))
                 truncate_partial_line(so_buf);
@@ -341,8 +308,7 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
 
     if(substr_search != NULL)
     {
-        /* The semantics of the return value changes in search mode to the line
-         * number where the substring match was found, or zero if it wasn't found
+        /* 返回值的语义在搜索模式中更改为找到子字符串匹配的行号，如果没有找到，则为零
         */
         if(found_str)
             retval = line_ctr;
@@ -353,9 +319,8 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
     {
         if(WIFEXITED(*pid_status))
         {
-            /* Even if the child exited with an error condition, if we make it here
-             * then the child exited normally as far as the OS is concerned (i.e. didn't
-             * crash or get hit with a signal)
+            /*即使子进程在出现错误的情况下退出，如果我们在这里成功，
+            * 那么就操作系统而言，子进程也会正常退出（即没有崩溃或被信号击中）
             */
             retval = EXTCMD_SUCCESS_ALL_OUTPUT;
         }
@@ -372,10 +337,9 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
 }
 
 
-#if 0 /* --DSS the original method that did not work on some systems */
+#if 0 /* --DSS—在某些系统上不起作用的原始方法 */
 
-    /* Create the pipes we will use for getting stdout and stderr
-     * from the child process.
+    /* 创建用于从子进程获取stdout和stderr的管道。
     */
     if(pipe(so) != 0)
         return(EXTCMD_PIPE_ERROR);
@@ -383,7 +347,7 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
     if(pipe(se) != 0)
         return(EXTCMD_PIPE_ERROR);
 
-    /* Fork off a child process to run the command and provide its outputs.
+    /* 派生一个子进程来运行命令并提供其输出。
     */
     pid = fork();
     if(pid == -1)
@@ -392,11 +356,10 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
     }
     else if (pid == 0)
     {
-        /* We are the child, so we dup stdout and stderr to our respective
-         * write-end of the pipes, close stdin and the read-end of the pipes
-         * (since we don't need them here).  Then use system() to run the
-         * command and exit with the exit status of that command so we can
-         * grab it from the waitpid call in the parent.
+        /* 我们是子进程，所以我们将stdout和stderr分别复制到管道的写入端，
+        *关闭管道的stdin和读取端（因为这里不需要它们）。
+        *然后使用system（）运行该命令，并使用该命令的退出状态退出，
+        *这样我们就可以从父级中的waitpid调用中获取它。
         */
         close(fileno(stdin));
         dup2(so[1], fileno(stdout));
@@ -404,8 +367,7 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
         close(so[0]);
         close(se[0]);
 
-        /* If user is not null, then we setuid to that user before running the
-         * command.
+        /* 如果user不为null，那么我们在运行命令之前将uid设置为该用户。
         */
         if(uid > 0)
         {
@@ -415,26 +377,22 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
             }
         }
 
-        /* --DSS XXX: Would it be more efficient to use one of the exec()
-         *            calls (i.e. 'return(execvp(ext_cmd, &argv[1]));')?
-         *            For now, we use system() and exit with the external
-         *            command exit status.
+        /* --DSS 现在，我们使用system（）并使用外部命令exit状态退出
         */
         exit(WEXITSTATUS(system(cmd)));
     }
 
-    /* Parent from here */
 
-    /* Give the exit status an initial value of -1.
+    /* 将退出状态的初始值设置为-1。
     */
     *status = -1;
 
-    /* Close the write-end of the pipes (we are only reading).
+    /* 关闭管道的写入端（我们只是在读）。
     */
     close(so[1]);
     close(se[1]);
 
-    /* Set our pipes to non-blocking
+    /* 将我们的管道设置为无堵塞
     */
     set_nonblock(so[0]);
     set_nonblock(se[0]);
@@ -442,7 +400,7 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
     tv.tv_sec = EXTCMD_DEF_TIMEOUT;
     tv.tv_usec = 0;
 
-    /* Initialize and setup our file descriptor sets for select.
+    /* 初始化并设置我们的文件描述符集以进行选择。
     */
     FD_ZERO(&rfds);
     FD_ZERO(&efds);
@@ -451,13 +409,12 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
     FD_SET(so[0], &efds);
     FD_SET(se[0], &efds);
 
-    /* Start with fully clear buffers.
+    /* 从完全清除缓冲区开始。
     */
     memset(so_buf, 0x0, so_buf_sz);
     memset(se_buf, 0x0, se_buf_sz);
 
-    /* Read both stdout and stderr piped from the child until we get eof,
-     * fill the buffers, or error out.
+    /* 从子级读取stdout和stderr，直到我们得到eof、填充缓冲区或出错为止。
     */
     while(so_buf_remaining > 0 || se_buf_remaining > 0)
     {
@@ -465,7 +422,7 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
 
         if(selval == -1)
         {
-            /* Select error - so kill the child and bail.
+            /* 选择错误-所以杀死子进程并释放
             */
             kill(pid, SIGTERM);
             retval |= EXTCMD_SELECT_ERROR;
@@ -474,21 +431,20 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
 
         if(selval == 0)
         {
-            /* Timeout - so kill the child and bail
+            /* 超时-所以杀死子进程并释放
             */
             kill(pid, SIGTERM);
             retval |= EXTCMD_EXECUTION_TIMEOUT;
             break;
         }
 
-        /* The stdout pipe...
-        */
+
         bytes_read = read(so[0], so_read_buf, IO_READ_BUF_LEN);
         if(so_buf_remaining > 0)
         {
             if(bytes_read > 0)
             {
-                /* We have data, so process it...
+                /* 我们有数据，所以处理它。
                 */
                 if(bytes_read > so_buf_remaining)
                 {
@@ -502,9 +458,8 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
             }
             else if(bytes_read < 0)
             {
-                /* Anything other than EAGAIN or EWOULDBLOCK is conisdered
-                 * error enough to bail.  We are done here so we force the
-                 * buf_remaining value to 0.
+                /*EAGAIN或EWOULDBLOCK以外的任何东西都被认为是错误的，
+                * 我们在这里完成了释放，所以我们强制将buf_remaining设置为0。
                 */
                 if(errno != EAGAIN && errno != EWOULDBLOCK)
                 {
@@ -514,8 +469,7 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
             }
             else
             {
-                /* Bytes read was 0 which indicate end of file. So we are
-                 * done.
+                /* 读取的字节数为0，表示文件结束。
                 */
                 so_buf_remaining = 0;
             }
@@ -523,15 +477,14 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
         else
             break;
 
-        /* The stderr pipe...
+        /* stderr管道
         */
         bytes_read = read(se[0], se_read_buf, IO_READ_BUF_LEN);
         if(se_buf_remaining > 0)
         {
             if(bytes_read > 0)
             {
-                /* We have data, so process it...
-                */
+
                 if(bytes_read > se_buf_remaining)
                 {
                     bytes_read = se_buf_remaining;
@@ -544,10 +497,7 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
             }
             else if(bytes_read < 0)
             {
-                /* Anything other than EAGAIN or EWOULDBLOCK is conisdered
-                 * error enough to bail.  We are done here so we force the
-                 * buf_remaining value to 0.
-                */
+
                 if(errno != EAGAIN && errno != EWOULDBLOCK)
                 {
                     retval |= EXTCMD_STDERR_READ_ERROR;
@@ -556,9 +506,7 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
             }
             else
             {
-                /* Bytes read was 0 which indicate end of file. So we are
-                 * done.
-                */
+
                 se_buf_remaining = 0;
             }
         }
@@ -569,14 +517,14 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
     close(so[0]);
     close(se[0]);
 
-    /* Wait for the external command to finish and capture its exit status.
+    /* 等待外部命令完成并捕获其退出状态。
     */
     waitpid(pid, status, 0);
 
     if(*status != 0)
         retval != EXTCMD_EXECUTION_ERROR;
 
-    /* Return the our status of this operation command.
+    /* 返回此操作命令的状态。
     */
     return(retval);
 }
@@ -602,8 +550,7 @@ int _run_extcmd_write(const char *cmd, const char *cmd_write, int *pid_status,
 
     *pid_status = 0;
 
-    /* Even without execvp() we examine the command for basic validity
-     * in term of number of args
+    /* 即使没有execvp（），我们也会根据参数的数量来检查命令的基本有效性
     */
     memset(argv_new, 0x0, sizeof(argv_new));
 
@@ -615,8 +562,7 @@ int _run_extcmd_write(const char *cmd, const char *cmd_write, int *pid_status,
     }
 
 #if !HAVE_EXECVP
-    /* if we are not using execvp() then free up argv_new unconditionally
-     * since was used only for validation
+    /* 如果我们不使用execvp（），则无条件释放argvnew，因为它仅用于验证
     */
     free_argv(argv_new, &argc_new);
 #endif
@@ -642,7 +588,7 @@ int _run_extcmd_write(const char *cmd, const char *cmd_write, int *pid_status,
         close(pipe_fd[1]);
         dup2(pipe_fd[0], STDIN_FILENO);
 
-        /* don't use env
+        /* 不要使用env
         */
         execvp(argv_new[0], argv_new);
     }
@@ -686,7 +632,7 @@ int _run_extcmd_write(const char *cmd, const char *cmd_write, int *pid_status,
     return retval;
 }
 
-/* _run_extcmd() wrapper, run an external command.
+/* _run_extcmd（）包装器，运行一个外部命令。
 */
 int
 run_extcmd(const char *cmd, char *so_buf, const size_t so_buf_sz,
@@ -697,7 +643,7 @@ run_extcmd(const char *cmd, char *so_buf, const size_t so_buf_sz,
             want_stderr, timeout, NULL, pid_status, opts);
 }
 
-/* _run_extcmd() wrapper, run an external command as the specified user.
+/*_run_extcmd（）包装器，以指定用户身份运行外部命令。
 */
 int
 run_extcmd_as(uid_t uid, gid_t gid, const char *cmd,char *so_buf,
@@ -708,7 +654,7 @@ run_extcmd_as(uid_t uid, gid_t gid, const char *cmd,char *so_buf,
             want_stderr, timeout, NULL, pid_status, opts);
 }
 
-/* _run_extcmd() wrapper, search command output for a substring.
+/* _run_extcmd（）包装器，搜索子字符串的命令输出。
 */
 int
 search_extcmd(const char *cmd, const int want_stderr, const int timeout,
@@ -719,8 +665,7 @@ search_extcmd(const char *cmd, const int want_stderr, const int timeout,
             timeout, substr_search, pid_status, opts);
 }
 
-/* _run_extcmd() wrapper, search command output for a substring and return
- * the matching line.
+/* _run_extcmd（）包装器，搜索子字符串的命令输出并返回匹配行。
 */
 int
 search_extcmd_getline(const char *cmd, char *so_buf, const size_t so_buf_sz,
@@ -732,7 +677,7 @@ search_extcmd_getline(const char *cmd, char *so_buf, const size_t so_buf_sz,
             pid_status, opts);
 }
 
-/* _run_extcmd_write() wrapper, run a command which is expecting input via stdin
+/* _run_extcmd_write（）包装器，运行期望通过stdin输入的命令
 */
 int run_extcmd_write(const char *cmd, const char *cmd_write, int *pid_status,
         const fko_srv_options_t * const opts)

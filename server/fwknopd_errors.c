@@ -1,36 +1,14 @@
 /**
  * \file server/fwknopd_errors.c
  *
- * \brief Error message functions for fwknopd
+ * \brief fwknopd的错误消息函数
  */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
+
 #include "fwknopd_common.h"
 #include "fwknopd_errors.h"
 
-/* Return a string describing the meaning of the given error code.
+/* 返回一个描述给定错误代码含义的字符串
 */
 static const char*
 fwknopd_errstr(const int err_code)
@@ -92,9 +70,7 @@ fwknopd_errstr(const int err_code)
     return("Undefined/unknown fwknopd Error");
 }
 
-/* Attempt to determine the error code type and send the appropriate
- * response. Basically assume it is a libfko error if it is not an fwknopd
- * error code.
+/* 尝试确定错误代码类型并发送相应的响应。基本上，如果它不是fwknopd错误代码，就假定它是libfko的错误。
 */
 const char*
 get_errstr(const int err_code)
@@ -105,7 +81,7 @@ get_errstr(const int err_code)
     return(fwknopd_errstr(err_code));
 }
 
-/* print all server errors (from server/fwknopd_errors.c) to stdout
+/* 打印所有服务器错误（来自server/fwknopd_errors.c）到标准输出 
 */
 void
 dump_server_errors(void)

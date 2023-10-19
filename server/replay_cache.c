@@ -1,40 +1,16 @@
 /**
  * \file server/replay_cache.c
  *
- * \brief Cache packets for replay attack detection
+ * \brief 缓存数据包以检测重放攻击
  *
- *          Provides the functions to check for possible replay attacks
- *          by using a cache of previously seen digests.  This cache is a
- *          simple file by default, but can be made to use a dbm solution
- *          (ndbm or gdbm in ndbm compatibility mode) file to store the digest
- *          of a previously received SPA packets.
+ *          提供检查可能的重放攻击的函数，
+ *          通过使用先前看到的摘要的缓存。 
+ *          默认情况下，此缓存是一个简单的文件，
+ *          但可以配置成使用dbm解决方案（ndbm或以ndbm兼容模式的gdbm文件）
+ *          来存储先前接收到的SPA数据包的摘要。
  */
-// 一种检查可能的重放攻击的功能，通过使用先前看到的摘要的缓存来实现。
-// 默认情况下，这个缓存是一个简单的文件，但也可以使用dbm解决方案
-// （如ndbm或以ndbm兼容模式的gdbm文件）来存储先前接收到的SPA数据包的摘要。
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
+
+
 #include "replay_cache.h"
 #include "log_msg.h"
 #include "fwknopd_errors.h"
@@ -82,7 +58,7 @@
 #define DATE_LEN 18
 #define MAX_DIGEST_SIZE 64
 
-/* Rotate the digest file by simply renaming it.
+/* 通过重命名来轮换摘要文件。
 */
 static void
 rotate_digest_cache_file(fko_srv_options_t *opts)
@@ -107,7 +83,7 @@ rotate_digest_cache_file(fko_srv_options_t *opts)
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
 
-    /* The new filename is just the original with a trailing '-old'.
+    /* 新文件名只是原文件名后加上 '-old'。
     */
 #if USE_FILE_CACHE
     strlcpy(new_file, opts->config[CONF_DIGEST_FILE],
@@ -152,22 +128,22 @@ replay_warning(fko_srv_options_t *opts, digest_cache_info_t *digest_info)
     char        first[DATE_LEN] = {0}, last[DATE_LEN] = {0};
 #endif
 
-    /* Convert the IPs to a human readable form
+    /* 将IP地址转换为人类可读的形式。
     */
     inet_ntop(AF_INET, &(opts->spa_pkt.packet_src_ip),
         src_ip, INET_ADDRSTRLEN);
     inet_ntop(AF_INET, &(digest_info->src_ip), orig_src_ip, INET_ADDRSTRLEN);
 
 #if ! USE_FILE_CACHE
-    /* Mark the last_replay time.
+    /* 标记最后的重放时间。
     */
     digest_info->last_replay = time(NULL);
 
-    /* Increment the replay count and check to see if it is the first one.
+    /* 增加重放次数并检查是否是第一次。
     */
     if(++(digest_info->replay_count) == 1)
     {
-        /* This is the first replay so make it the same as last_replay
+        /* 这是第一次重放，所以将其设置为与最后一次重放相同
         */
         digest_info->first_replay = digest_info->last_replay;
     }
@@ -225,12 +201,11 @@ replay_file_cache_init(fko_srv_options_t *opts)
 
     struct digest_cache_list *digest_elm = NULL;
 
-    /* if the file exists, import the previous SPA digests into
-     * the cache list
+    /* 如果文件存在，将之前的SPA摘要导入到缓存列表中。
     */
     if (access(opts->config[CONF_DIGEST_FILE], F_OK) == 0)
     {
-        /* Check permissions
+        /* 检查权限
         */
         if (access(opts->config[CONF_DIGEST_FILE], R_OK|W_OK) != 0)
         {
@@ -241,8 +216,7 @@ replay_file_cache_init(fko_srv_options_t *opts)
     }
     else
     {
-        /* the file does not exist yet, so it will be created when the first
-         * successful SPA packet digest is written to disk
+        /* 若文件尚不存在，即第一个成功的SPA数据包摘要被写入磁盘时创建该文件。
         */
         digest_file_fd = open(opts->config[CONF_DIGEST_FILE],
                 O_WRONLY|O_CREAT|O_EXCL, S_IRUSR|S_IWUSR);
@@ -267,7 +241,7 @@ replay_file_cache_init(fko_srv_options_t *opts)
         }
     }
 
-    /* File exists, and we have access - create in-memory digest cache
+    /* 文件存在，并且我们有访问权限 - 创建内存中的摘要缓存。
     */
     if ((digest_file_ptr = fopen(opts->config[CONF_DIGEST_FILE], "r")) == NULL)
     {
@@ -286,9 +260,10 @@ replay_file_cache_init(fko_srv_options_t *opts)
         return(-1);
     }
 
-    /* Line format:
+    /* 行格式：
+     * <摘要> <协议> <源IP> <源端口> <目标IP> <目标端口> <时间>
      * <digest> <proto> <src_ip> <src_port> <dst_ip> <dst_port> <time>
-     * Example:
+     * 示例：
      * 7XgadOyqv0tF5xG8uhg2iIrheeNKglCWKmxQDgYP1dY 17 127.0.0.1 40305 127.0.0.1 62201 1313283481
     */
     while ((fgets(line_buf, MAX_LINE_LEN, digest_file_ptr)) != NULL)
@@ -301,6 +276,7 @@ replay_file_cache_init(fko_srv_options_t *opts)
 
         /* Initialize a digest cache list element, and add it into the list if
          * valid.
+         * 初始化一个摘要缓存列表元素，并将其添加到列表中，如果有效。
         */
         if ((digest_elm = calloc(1, sizeof(struct digest_cache_list))) == NULL)
         {
@@ -367,10 +343,9 @@ replay_file_cache_init(fko_srv_options_t *opts)
     return(digest_ctr);
 }
 
-#else /* USE_FILE_CACHE */
+#else /* 使用文件缓存。 */
 
-/* Check for the existence of the replay dbm file, and create it if it does
- * not exist.  Returns the number of db entries or -1 on error.
+/* 检查重放DBM文件是否存在，如果不存在则创建它。返回DB条目的数量，或在出现错误时返回-1。
 */
 static int
 replay_db_cache_init(fko_srv_options_t *opts)
@@ -428,9 +403,9 @@ replay_db_cache_init(fko_srv_options_t *opts)
     MY_DBM_CLOSE(rpdb);
 
     return(db_count);
-#endif /* NO_DIGEST_CACHE */
+#endif /* 使用文件缓存*/
 }
-#endif /* USE_FILE_CACHE */
+#endif /* 没有摘要缓存 */
 
 #if USE_FILE_CACHE
 static int
@@ -442,7 +417,7 @@ is_replay_file_cache(fko_srv_options_t *opts, char *digest)
 
     digest_len = strlen(digest);
 
-    /* Check the cache for the SPA packet digest
+    /* 检查SPA数据包摘要的缓存。
     */
     for (digest_list_ptr = opts->digest_cache;
             digest_list_ptr != NULL;
@@ -494,12 +469,12 @@ add_replay_file_cache(fko_srv_options_t *opts, char *digest)
     digest_elm->cache_info.dst_port = opts->spa_pkt.packet_dst_port;
     digest_elm->cache_info.created = time(NULL);
 
-    /* First, add the digest at the head of the in-memory list
+    /* 首先，将摘要添加到内存列表的开头
     */
     digest_elm->next = opts->digest_cache;
     opts->digest_cache = digest_elm;
 
-    /* Now, write the digest to disk
+    /* 现在，将摘要写入磁盘。
     */
     if ((digest_file_ptr = fopen(opts->config[CONF_DIGEST_FILE], "a")) == NULL)
     {
@@ -525,7 +500,7 @@ add_replay_file_cache(fko_srv_options_t *opts, char *digest)
 
     return(SPA_MSG_SUCCESS);
 }
-#endif /* USE_FILE_CACHE */
+#endif /* 使用文件缓存。 */
 
 #if !USE_FILE_CACHE
 static int
@@ -549,7 +524,7 @@ is_replay_dbm_cache(fko_srv_options_t *opts, char *digest)
     db_key.dptr = digest;
     db_key.dsize = digest_len;
 
-    /* Check the db for the key
+    /* 检查数据库中是否存在这个键
     */
 #ifdef HAVE_LIBGDBM
     rpdb = gdbm_open(
@@ -571,8 +546,7 @@ is_replay_dbm_cache(fko_srv_options_t *opts, char *digest)
 
     db_ent = MY_DBM_FETCH(rpdb, db_key);
 
-    /* If the datum is not null, we have a match.  Otherwise, we add
-    * this entry to the cache.
+    /* 如果数据不为null，我们有一个匹配。否则，我们将此条目添加到缓存中
     */
     if(db_ent.dptr != NULL)
     {
@@ -595,7 +569,7 @@ is_replay_dbm_cache(fko_srv_options_t *opts, char *digest)
     MY_DBM_CLOSE(rpdb);
 
     return(res);
-#endif /* NO_DIGEST_CACHE */
+#endif /*  没有摘要缓存 */
 }
 
 static int
@@ -621,7 +595,7 @@ add_replay_dbm_cache(fko_srv_options_t *opts, char *digest)
     db_key.dptr = digest;
     db_key.dsize = digest_len;
 
-    /* Check the db for the key
+    /* 检查数据库中是否存在这个键
     */
 #ifdef HAVE_LIBGDBM
     rpdb = gdbm_open(
@@ -643,11 +617,11 @@ add_replay_dbm_cache(fko_srv_options_t *opts, char *digest)
 
     db_ent = MY_DBM_FETCH(rpdb, db_key);
 
-    /* If the datum is null, we have a new entry.
+    /* 如果数据为null，表示有一个新条目
     */
     if(db_ent.dptr == NULL)
     {
-        /* This is a new SPA packet that needs to be added to the cache.
+        /* 这是一个需要添加到缓存中的新SPA数据包
         */
         dc_info.src_ip   = opts->spa_pkt.packet_src_ip;
         dc_info.dst_ip   = opts->spa_pkt.packet_dst_ip;
@@ -677,12 +651,12 @@ add_replay_dbm_cache(fko_srv_options_t *opts, char *digest)
     MY_DBM_CLOSE(rpdb);
 
     return(res);
-#endif /* NO_DIGEST_CACHE */
+#endif /* 没有摘要缓存 */
 }
-#endif /* USE_FILE_CACHE */
+#endif /* 使用文件缓存 */
 
 #if USE_FILE_CACHE
-/* Free replay list memory
+/* 释放重放列表的内存
 */
 void
 free_replay_list(fko_srv_options_t *opts)
@@ -725,7 +699,7 @@ replay_cache_init(fko_srv_options_t *opts)
     return(-1);
 #else
 
-    /* If rotation was specified, do it.
+    /* 如果指定了轮换，执行它
     */
     if(opts->rotate_digest_cache)
         rotate_digest_cache_file(opts);
@@ -736,7 +710,7 @@ replay_cache_init(fko_srv_options_t *opts)
     return replay_db_cache_init(opts);
 #endif
 
-#endif /* NO_DIGEST_CACHE */
+#endif /* 没有摘要缓存 */
 }
 
 int
@@ -757,11 +731,10 @@ add_replay(fko_srv_options_t *opts, char *digest)
 #else
     return add_replay_dbm_cache(opts, digest);
 #endif
-#endif /* NO_DIGEST_CACHE */
+#endif /* 没有摘要缓存 */
 }
 
-/* Take an fko context, pull the digest and use it as the key to check the
- * replay db (digest cache).
+/* 获取一个fko上下文，提取摘要并将其用作用于检查重放数据库（摘要缓存）的键。
 */
 int
 is_replay(fko_srv_options_t *opts, char *digest)
@@ -775,7 +748,7 @@ is_replay(fko_srv_options_t *opts, char *digest)
 #else
     return is_replay_dbm_cache(opts, digest);
 #endif
-#endif /* NO_DIGEST_CACHE */
+#endif /* 没有摘要缓存 */
 }
 
 /***EOF***/

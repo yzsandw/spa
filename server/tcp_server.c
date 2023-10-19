@@ -1,33 +1,9 @@
 /**
  * \file server/tcp_server.c
  *
- * \brief Spawns off a dummy tcp server for fwknopd.  Its purpose is
- *          to accept a tcp connection, then drop it after the first packet.
+ * \brief 为fwknopd生成虚拟tcp服务器。其目的是接受tcp连接，然后在第一个数据包之后丢弃它。
  */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #include "fwknopd_common.h"
 #include "tcp_server.h"
 #include "log_msg.h"
@@ -47,8 +23,7 @@
 #include <fcntl.h>
 #include <sys/select.h>
 
-/* Fork off and run a "dummy" TCP server. The return value is the PID of
- * the child process or -1 if there is a fork error.
+/* 分叉并运行“虚拟”TCP服务器。返回值是子进程的PID，如果存在分叉错误，则返回-1。
 */
 int
 run_tcp_server(fko_srv_options_t *opts)
@@ -67,12 +42,11 @@ run_tcp_server(fko_srv_options_t *opts)
             opts->tcpserv_port);
 
 #if !CODE_COVERAGE
-    /* Fork off a child process to run the command and provide its outputs.
+    /* 分叉子进程以运行命令并提供其输出。
     */
     pid = fork();
 
-    /* Non-zero pid means we are the parent or there was a fork error.
-     * in either case we simply return that value to the caller.
+    /* 非零pid表示我们是父级，或者存在分叉错误。在任何一种情况下，我们都只是将该值返回给调用者。
     */
     if (pid != 0)
     {
@@ -80,19 +54,17 @@ run_tcp_server(fko_srv_options_t *opts)
         return(pid);
     }
 
-    /* Get our parent PID so we can periodically check for it. We want to
-     * know when it goes away so we can too.
+    /* 获取父PID，以便我们可以定期检查它。我们想知道它何时消失，因此我们也可以。
     */
     ppid = getppid();
 
-    /* We are the child.  The first thing to do is close our copy of the
-     * parent PID file so we don't end up holding the lock if the parent
-     * suffers a sudden death that doesn't take us out too.
+    /* 我们是孩子。要做的第一件事是关闭父PID文件的副本，这样，
+    *  如果父PID文件突然死亡，我们就不会持有锁，而这也不会让我们退出。
     */
     close(opts->lock_fd);
 #endif
 
-    /* Now, let's make a TCP server
+    /* 制作一个TCP服务器
     */
     if ((s_sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
     {
@@ -101,7 +73,7 @@ run_tcp_server(fko_srv_options_t *opts)
         return -1;
     }
 
-    /* So that we can re-bind to it without TIME_WAIT problems
+    /* 因此，我们可以在没有TIME_WAIT问题的情况下重新绑定到它
     */
     if(setsockopt(s_sock, SOL_SOCKET, SO_REUSEADDR, &reuse_addr, sizeof(reuse_addr)) == -1)
     {
@@ -111,8 +83,7 @@ run_tcp_server(fko_srv_options_t *opts)
         return -1;
     }
 
-    /* Make our main socket non-blocking so we don't have to be stuck on
-     * listening for incoming connections.
+    /* 使主套接字无阻塞，这样我们就不必一直在侦听传入的连接。
     */
     if((sfd_flags = fcntl(s_sock, F_GETFL, 0)) < 0)
     {
@@ -134,28 +105,27 @@ run_tcp_server(fko_srv_options_t *opts)
     }
 #endif
 
-    /* Construct local address structure */
+    /* 构建本地地址结构 */
     memset(&saddr, 0, sizeof(saddr));
-    saddr.sin_family      = AF_INET;           /* Internet address family */
-    saddr.sin_addr.s_addr = htonl(INADDR_ANY); /* Any incoming interface */
-    saddr.sin_port        = htons(opts->tcpserv_port);  /* Local port */
+    saddr.sin_family      = AF_INET;           /* Internet地址系列 */
+    saddr.sin_addr.s_addr = htonl(INADDR_ANY); /* 任何传入接口 */
+    saddr.sin_port        = htons(opts->tcpserv_port);  /* 本地端口 */
 
-    /* Bind to the local address */
+    /* 绑定到本地地址 */
     if (bind(s_sock, (struct sockaddr *) &saddr, sizeof(saddr)) < 0)
     {
         log_msg(LOG_ERR, "run_tcp_server: bind() failed: %s",
             strerror(errno));
         close(s_sock);
 
-    /* In the case of code coverage, don't die on bind() fail, as netcat may be running  */
+    /* 在代码覆盖率的情况下，不要在bind（）失败时死亡，因为netcat可能正在运行 */
 #if CODE_COVERAGE
         return 0;
 #endif
         return -1;
     }
 
-    /* Mark the socket so it will listen for incoming connections
-     * (but only one at a time)
+    /* 标记套接字，使其侦听传入连接（但一次只能侦听一个）
     */
     if (listen(s_sock, 1) < 0)
     {
@@ -167,18 +137,17 @@ run_tcp_server(fko_srv_options_t *opts)
 
     FD_ZERO(&sfd_set);
 
-    /* Now loop and accept and drop connections after the first packet or a
-     * short timeout.
+    /* 现在在第一个数据包后或短时间内循环并接受和断开连接
     */
     while(1)
     {
         clen = sizeof(caddr);
 
-        /* Initialize and setup the socket for select.
+        /* 初始化并设置用于选择的套接字。
         */
         FD_SET(s_sock, &sfd_set);
 
-        /* Set our select timeout to 200 ms.
+        /* 将选择超时设置为200毫秒。
         */
         tv.tv_sec = 0;
         tv.tv_usec = 200000;
@@ -187,8 +156,7 @@ run_tcp_server(fko_srv_options_t *opts)
 
         if(selval == -1)
         {
-            /* Select error - so kill the child and bail.
-            */
+ 
             log_msg(LOG_ERR, "run_tcp_server: select error socket: %s",
                 strerror(errno));
             rv = -1;
@@ -198,9 +166,7 @@ run_tcp_server(fko_srv_options_t *opts)
 #if !CODE_COVERAGE
         if(selval == 0)
         {
-            /* Timeout - So we check to make sure our parent is still there by simply
-             *           using kill(ppid, 0) and checking the return value.
-            */
+
             if(kill(ppid, 0) != 0 && errno == ESRCH)
             {
                 rv = -1;
@@ -213,7 +179,7 @@ run_tcp_server(fko_srv_options_t *opts)
         if(! FD_ISSET(s_sock, &sfd_set))
             continue;
 
-        /* Wait for a client to connect
+        /* 等待客户端连接
         */
         if((c_sock = accept(s_sock, (struct sockaddr *) &caddr, (socklen_t *)&clen)) < 0)
         {
@@ -230,12 +196,6 @@ run_tcp_server(fko_srv_options_t *opts)
             log_msg(LOG_INFO, "tcp_server: Got TCP connection from %s.", sipbuf);
         }
 
-        /* Though hacky and clunky, we just sleep for a second then
-         * close the socket.  No need to read or write anything.  This
-         * just gives the client a sufficient window to send their
-         * request on this socket. In any case the socket is closed
-         * after that time.
-        */
         usleep(1000000);
         shutdown(c_sock, SHUT_RDWR);
         close(c_sock);
@@ -243,7 +203,7 @@ run_tcp_server(fko_srv_options_t *opts)
 #if CODE_COVERAGE
         break;
 #endif
-    } /* infinite while loop */
+    } /* 无限while循环 */
 
     close(s_sock);
     return rv;

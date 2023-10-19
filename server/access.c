@@ -1,32 +1,9 @@
 /**
  * \file server/access.c
  *
- * \brief Access.conf file processing for fwknop server.
+ * \brief fwknop服务的Access.conf文件处理
  */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- ******************************************************************************
-*/
 #if HAVE_SYS_SOCKET_H
   #include <sys/socket.h>
 #endif
@@ -52,16 +29,14 @@
 #endif /* LCOV_EXCL_STOP */
 
 /**
- * \brief include keys file包含密钥文件
+ * \brief 包含密钥文件
  *
- * This function loads only the crypto keys from a given file.
- * It inserts these keys into the active access stanza.
- * 此函数仅从给定文件中加载加密密钥。
- * 它将这些密钥插入到活动的访问配置段中。
+ * 此函数仅从给定文件加载加密密钥。
+ * 它将这些键插入到活动访问节中。
  *
- * \param curr_acc pointer to the current access stanza指向当前访问配置段的指针
- * \param access_filename Pointer to the file containing the keys指向包含密钥的文件的指针
- * \param opts fko_srv_options_t Server options struct服务器选项结构
+ * \param curr_acc 指向当前访问节的指针
+ * \param access_filename 指向包含密钥的文件的指针
+ * \param opts fko_srv_options_t 服务器选项结构
  *
  */
 int
@@ -75,7 +50,7 @@ void enable_acc_stanzas_init(void)
     return;
 }
 
-/* Add an access string entry
+/* 添加一个访问字符串条目
 */
 static void
 add_acc_string(char **var, const char *val, FILE *file_ptr,
@@ -104,7 +79,7 @@ add_acc_string(char **var, const char *val, FILE *file_ptr,
     return;
 }
 
-/* Add an access user entry
+/* 添加一个访问用户表项
 */
 static void
 add_acc_user(char **user_var, uid_t *uid_var, struct passwd **upw,
@@ -131,7 +106,7 @@ add_acc_user(char **user_var, uid_t *uid_var, struct passwd **upw,
     return;
 }
 
-/* Add an access group entry
+/* 添加访问组项
 */
 static void
 add_acc_group(char **group_var, gid_t *gid_var,
@@ -158,7 +133,7 @@ add_acc_group(char **group_var, gid_t *gid_var,
     return;
 }
 
-/* Decode base64 encoded string into access entry
+/* 将 Base64 编码字符串解码为访问条目
 */
 static void
 add_acc_b64_string(char **var, int *len, const char *val, FILE *file_ptr,
@@ -199,7 +174,7 @@ add_acc_b64_string(char **var, int *len, const char *val, FILE *file_ptr,
     return;
 }
 
-/* Add an access bool entry (unsigned char of 1 or 0)
+/* 添加访问布尔项（1或0的无符号字符）
 */
 static unsigned char
 add_acc_bool(unsigned char *var, const char *val)
@@ -207,7 +182,7 @@ add_acc_bool(unsigned char *var, const char *val)
     return(*var = (strncasecmp(val, "Y", 1) == 0) ? 1 : 0);
 }
 
-/* Add expiration time - convert date to epoch seconds
+/* 添加过期时间-将日期转换为epoch seconds
 */
 static int
 add_acc_expire_time(fko_srv_options_t *opts, time_t *access_expire_time, const char *val)
@@ -242,7 +217,7 @@ add_acc_expire_time(fko_srv_options_t *opts, time_t *access_expire_time, const c
     return 1;
 }
 
-/* Add expiration time via epoch seconds defined in access.conf
+/* 通过access.conf中定义的epoch seconds添加过期时间
 */
 static void
 add_acc_expire_time_epoch(fko_srv_options_t *opts,
@@ -344,8 +319,8 @@ add_acc_force_snat(fko_srv_options_t *opts, acc_stanza_t *curr_acc,
 
 #endif
 
-/* Take an IP or Subnet/Mask and convert it to mask for later
- * comparisons of incoming source IPs against this mask.
+/* 获取IP或子网/掩码，并将其转换为掩码供以后使。
+ * 传入源IP与此掩码的比较。
 */
 static int
 add_int_ent(acc_int_list_t **ilist, const char *ip)
@@ -369,7 +344,7 @@ add_int_ent(acc_int_list_t **ilist, const char *ip)
         exit(EXIT_FAILURE);
     }
 
-    /* Convert the IP data into the appropriate IP + (optional) mask
+    /* 将IP数据转换为适当的IP+（可选）掩码
     */
     if(strcasecmp(ip, "ANY") == 0)
     {
@@ -378,8 +353,7 @@ add_int_ent(acc_int_list_t **ilist, const char *ip)
     }
     else
     {
-        /* See if we have a subnet component.  If so pull out the IP and
-         * mask values, then create the final mask value.
+        /* 看看我们是否有子网组件。如果是这样，则拉出IP和掩码值，然后创建最终的掩码值
         */
         if((ndx = strchr(ip, '/')) != NULL)
         {
@@ -471,7 +445,7 @@ add_int_ent(acc_int_list_t **ilist, const char *ip)
             return 0;
         }
 
-        /* Store our mask converted from CIDR to a 32-bit value.
+        /* 将 CIDR（Classless Inter-Domain Routing）转换为一个32位的数值，并存储起来
         */
         if(mask == 32)
             new_sle->mask = 0xFFFFFFFF;
@@ -480,14 +454,12 @@ add_int_ent(acc_int_list_t **ilist, const char *ip)
         else
             new_sle->mask = mask;
 
-        /* Store our masked address for comparisons with future incoming
-         * packets.
+        /* 存储我们的屏蔽地址，以便与以后传入的数据包进行比较
         */
         new_sle->maddr = ntohl(in.s_addr) & new_sle->mask;
     }
 
-    /* If this is not the first entry, we walk our pointer to the
-     * end of the list.
+    /* 如果这不是第一个条目，则将指针移到列表的末尾
     */
     if(*ilist == NULL)
     {
@@ -507,7 +479,7 @@ add_int_ent(acc_int_list_t **ilist, const char *ip)
     return 1;
 }
 
-/* Expand the access SOURCE string to a list of masks.
+/* 将访问源字符串展开为掩码列表
 */
 static int
 expand_acc_int_list(acc_int_list_t **ilist, char *ip)
@@ -540,7 +512,7 @@ expand_acc_int_list(acc_int_list_t **ilist, char *ip)
         }
     }
 
-    /* Skip over any leading whitespace (once again for the last in the list).
+    /* 跳过任何前导空格（再次为列表中的最后一个）
     */
     while(isspace((int)(unsigned char)*start))
         start++;
@@ -562,7 +534,7 @@ parse_proto_and_port(char *pstr, int *proto, int *port)
     char    proto_str[ACCESS_BUF_LEN] = {0};
     int     is_err;
 
-    /* Parse the string into its components.
+    /* 将字符串解析为其组件
     */
     if((ndx = strchr(pstr, '/')) == NULL)
     {
@@ -604,8 +576,8 @@ parse_proto_and_port(char *pstr, int *proto, int *port)
     return(0);
 }
 
-/* Take a proto/port string and convert it to appropriate integer values
- * for comparisons of incoming SPA requests.
+/* 获取proto/port字符串并将其转换为适当的整数值
+ *用于比较传入的SPA请求。
 */
 static int
 add_port_list_ent(acc_port_list_t **plist, char *port_str)
@@ -614,8 +586,7 @@ add_port_list_ent(acc_port_list_t **plist, char *port_str)
 
     acc_port_list_t     *last_plist, *new_plist, *tmp_plist;
 
-    /* Parse the string into its components and continue only if there
-     * are no problems with the incoming string.
+    /* 将字符串解析为其组件，并仅在传入字符串没有问题时继续
     */
     if(parse_proto_and_port(port_str, &proto_int, &port) != 0)
         return 0;
@@ -628,8 +599,7 @@ add_port_list_ent(acc_port_list_t **plist, char *port_str)
         exit(EXIT_FAILURE);
     }
 
-    /* If this is not the first entry, we walk our pointer to the
-     * end of the list.
+    /* 如果这不是第一个条目，则将指针移到列表的末尾。
     */
     if(*plist == NULL)
     {
@@ -652,7 +622,7 @@ add_port_list_ent(acc_port_list_t **plist, char *port_str)
     return 1;
 }
 
-/* Add a string list entry to the given acc_string_list.
+/* 将字符串列表条目添加到给定的acc_string_list
 */
 static int
 add_string_list_ent(acc_string_list_t **stlist, const char *str_str)
@@ -667,8 +637,7 @@ add_string_list_ent(acc_string_list_t **stlist, const char *str_str)
         return FATAL_ERR;
     }
 
-    /* If this is not the first entry, we walk our pointer to the
-     * end of the list.
+    /* 如果这不是第一个条目，则将指针移到列表的末尾。
     */
     if(*stlist == NULL)
     {
@@ -700,7 +669,7 @@ add_string_list_ent(acc_string_list_t **stlist, const char *str_str)
     return SUCCESS;
 }
 
-/* Expand a proto/port access string to a list of access proto-port struct.
+/* 将协议/端口访问字符串展开为访问协议端口结构的列表
 */
 int
 expand_acc_port_list(acc_port_list_t **plist, char *plist_str)
@@ -714,7 +683,7 @@ expand_acc_port_list(acc_port_list_t **plist, char *plist_str)
     {
         if(*ndx == ',')
         {
-            /* Skip over any leading whitespace.
+            /* 跳过任何前导空格
             */
             while(isspace((int)(unsigned char)*start))
                 start++;
@@ -731,7 +700,7 @@ expand_acc_port_list(acc_port_list_t **plist, char *plist_str)
         }
     }
 
-    /* Skip over any leading whitespace (once again for the last in the list).
+    /* 跳过任何前导空格（再次为列表中的最后一个）
     */
     while(isspace((int)(unsigned char)*start))
         start++;
@@ -747,7 +716,7 @@ expand_acc_port_list(acc_port_list_t **plist, char *plist_str)
     return 1;
 }
 
-/* Expand a comma-separated string into a simple acc_string_list.
+/* 将逗号分隔的字符串展开为简单的acc_string_list。
 */
 static int
 expand_acc_string_list(acc_string_list_t **stlist, char *stlist_str)
@@ -761,7 +730,7 @@ expand_acc_string_list(acc_string_list_t **stlist, char *stlist_str)
     {
         if(*ndx == ',')
         {
-            /* Skip over any leading whitespace.
+            /* 跳过任何前导空格
             */
             while(isspace((int)(unsigned char)*start))
                 start++;
@@ -777,7 +746,7 @@ expand_acc_string_list(acc_string_list_t **stlist, char *stlist_str)
         }
     }
 
-    /* Skip over any leading whitespace (once again for the last in the list).
+    /* 跳过任何前导空格（再次为列表中的最后一个）
     */
     while(isspace((int)(unsigned char)*start))
         start++;
@@ -793,7 +762,7 @@ expand_acc_string_list(acc_string_list_t **stlist, char *stlist_str)
     return SUCCESS;
 }
 
-/* Free the acc source_list
+/* 释放acc source_list
 */
 static void
 free_acc_int_list(acc_int_list_t *sle)
@@ -809,7 +778,7 @@ free_acc_int_list(acc_int_list_t *sle)
     }
 }
 
-/* Free a port_list
+/* 释放port_list
 */
 void
 free_acc_port_list(acc_port_list_t *ple)
@@ -825,7 +794,7 @@ free_acc_port_list(acc_port_list_t *ple)
     }
 }
 
-/* Free a string_list
+/* 释放一个string_list
 */
 static void
 free_acc_string_list(acc_string_list_t *stl)
@@ -853,11 +822,8 @@ zero_buf_wrapper(char *buf, int len)
     return;
 }
 
-/* Free any allocated content of an access stanza.
- *
- * NOTE: If a new access.conf parameter is created, and it is a string
- *       value, it also needs to be added to the list of items to check
- *       and free below.
+/* 释放访问节的任何已分配的内容
+ * 注意：如果创建了新的access.conf参数，并且它是一个字符串值，则还需要将其添加到项目列表中以在下面进行检查和释放
 */
 static void
 free_acc_stanza_data(acc_stanza_t *acc)
@@ -963,18 +929,18 @@ free_acc_stanza_data(acc_stanza_t *acc)
     return;
 }
 
-/* Expand any access entries that may be multi-value.
+/* 展开可能是多值的任何访问条目
 */
 static void
 expand_acc_ent_lists(fko_srv_options_t *opts)
 {
     acc_stanza_t   *acc = opts->acc_stanzas;
 
-    /* We need to do this for each stanza.
+    /* 需要每个小节都这样做
     */
     while(acc)
     {
-        /* Expand the source string to 32-bit integer IP + masks for each entry.
+        /* 将源字符串扩展为每个条目的32位整数IP+掩码
         */
         if(expand_acc_int_list(&(acc->source_list), acc->source) == 0)
         {
@@ -991,7 +957,7 @@ expand_acc_ent_lists(fko_srv_options_t *opts)
             }
         }
 
-        /* Now expand the open_ports string.
+        /* 现在展开open_ports字符串
         */
         if(acc->open_ports != NULL && strlen(acc->open_ports))
         {
@@ -1011,7 +977,7 @@ expand_acc_ent_lists(fko_srv_options_t *opts)
             }
         }
 
-        /* Expand the GPG_REMOTE_ID string.
+        /* 展开GPG_REMOTE_ID字符串
         */
         if(acc->gpg_remote_id != NULL && strlen(acc->gpg_remote_id))
         {
@@ -1023,7 +989,7 @@ expand_acc_ent_lists(fko_srv_options_t *opts)
             }
         }
 
-        /* Expand the GPG_FINGERPRINT_ID string.
+        /* 展开GPG_FINGERPRINT_ID字符串
         */
         if(acc->gpg_remote_fpr != NULL && strlen(acc->gpg_remote_fpr))
         {
@@ -1045,8 +1011,7 @@ free_acc_stanzas(fko_srv_options_t *opts)
 {
     acc_stanza_t    *acc, *last_acc;
 
-    /* Free any resources first (in case of reconfig). Assume non-NULL
-     * entry needs to be freed.
+    /* 首先释放所有资源（在重新配置的情况下）。假设需要释放非NULL条目
     */
     acc = opts->acc_stanzas;
 
@@ -1063,11 +1028,11 @@ free_acc_stanzas(fko_srv_options_t *opts)
 }
 
 /**
- * \brief Frees the final access stanza
+ * \brief 释放最终访问节
  *
- * This function walks the access stanza list and frees the last member
+ * 该函数遍历访问节列表并释放最后一个成员
  *
- * \param opts pointer to the server options struct
+ * \param opts 指向服务器选项结构的指针
  *
  */
 
@@ -1076,11 +1041,11 @@ free_last_acc_stanza(fko_srv_options_t *opts)
 {
     acc_stanza_t *tmp_root = opts->acc_stanzas;
 
-    //deal with edge cases first, like a null list
+    //首先处理边缘情况，如空列表
     if (tmp_root == NULL)
         return;
 
-    //check for only one element
+    //仅检查一个元素
     if (tmp_root->next == NULL)
     {
         free_acc_stanza_data(tmp_root);
@@ -1089,7 +1054,7 @@ free_last_acc_stanza(fko_srv_options_t *opts)
         return;
     }
 
-    //more than one element uses the general case
+    //当是多个元素时使用一般情况
     while (tmp_root->next->next != NULL)
     {
         tmp_root = tmp_root->next;
@@ -1101,8 +1066,7 @@ free_last_acc_stanza(fko_srv_options_t *opts)
     return;
 }
 
-/* Wrapper for free_acc_stanzas(), we may put additional initialization
- * code here.
+/* free_acc_stanzas（）的包装器，可以在这里放置额外的初始化代码。
 */
 static void
 acc_stanza_init(fko_srv_options_t *opts)
@@ -1111,12 +1075,11 @@ acc_stanza_init(fko_srv_options_t *opts)
     {
         log_msg(LOG_DEBUG, "Initialize access stanzas");
 
-        /* Free any resources first (in case of reconfig). Assume non-NULL
-         * entry needs to be freed.
+        /* 首先释放所有资源（在重新配置的情况下）。假设需要释放非NULL条目
         */
         free_acc_stanzas(opts);
 
-        /* Make sure to only initialize access stanzas once.
+        /* 确保仅初始化访问节一次。
         */
         do_acc_stanza_init = 0;
     }
@@ -1124,8 +1087,7 @@ acc_stanza_init(fko_srv_options_t *opts)
     return;
 }
 
-/* Add a new stanza bay allocating the required memory at the required
- * location, yada-yada-yada.
+/* 添加一个新的节区，在所需的位置分配所需的内存地点
 */
 static acc_stanza_t*
 acc_stanza_add(fko_srv_options_t *opts)
@@ -1142,8 +1104,7 @@ acc_stanza_add(fko_srv_options_t *opts)
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
 
-    /* If this is not the first acc entry, we walk our acc pointer to the
-     * end of the existing list.
+    /* 如果这不是第一个acc条目，则将acc指针移到现有列表的末尾
     */
     if(acc == NULL)
     {
@@ -1161,8 +1122,7 @@ acc_stanza_add(fko_srv_options_t *opts)
     return(new_acc);
 }
 
-/* Scan the access options for entries that have not been set, but need
- * a default value.
+/* 扫描尚未设置但需要默认值的条目的访问选项。
 */
 static void
 set_acc_defaults(fko_srv_options_t *opts)
@@ -1175,12 +1135,12 @@ set_acc_defaults(fko_srv_options_t *opts)
 
     while(acc)
     {
-        /* set default fw_access_timeout if necessary
+        /* 必要时设置默认fw_access_timeout
         */
         if(acc->fw_access_timeout < 1)
             acc->fw_access_timeout = DEF_FW_ACCESS_TIMEOUT;
 
-        /* set default max_fw_timeout if necessary
+        /*必要时设置默认max_fw_timeout
         */
         if(acc->max_fw_timeout < 1)
             acc->max_fw_timeout = DEF_MAX_FW_TIMEOUT;
@@ -1191,7 +1151,7 @@ set_acc_defaults(fko_srv_options_t *opts)
                 acc->source, i
             );
 
-        /* set default gpg keyring path if necessary
+        /* 必要时设置默认gpg密钥环路径
         */
         if(acc->gpg_decrypt_pw != NULL)
         {
@@ -1210,7 +1170,7 @@ set_acc_defaults(fko_srv_options_t *opts)
                 }
                 else
                 {
-                    /* Make this the default unless explicitly disabled
+                    /* 除非明确禁用，否则将其设为默认值
                     */
                     acc->gpg_require_sig = 1;
                 }
@@ -1226,8 +1186,7 @@ set_acc_defaults(fko_srv_options_t *opts)
                 }
             }
 
-            /* If signature checking is enabled, make sure we either have sig ID's or
-             * fingerprint ID's to check
+            /* 如果启用了签名检查，请确保我们有要检查的sig ID或指纹ID
             */
             if(! acc->gpg_disable_sig
                     && (acc->gpg_remote_id == NULL && acc->gpg_remote_fpr == NULL))
@@ -1243,8 +1202,7 @@ set_acc_defaults(fko_srv_options_t *opts)
         if(acc->encryption_mode == FKO_ENC_MODE_UNKNOWN)
             acc->encryption_mode = FKO_DEFAULT_ENC_MODE;
 
-        /* if we're using an HMAC key and the HMAC digest type was not
-         * set for HMAC_DIGEST_TYPE, then assume it's SHA256
+        /* 如果我们正在使用HMAC键，并且没有为HMAC_digest_type设置HMAC摘要类型，则假设它是SHA256
         */
 
         if(acc->hmac_type == FKO_HMAC_UNKNOWN
@@ -1259,7 +1217,7 @@ set_acc_defaults(fko_srv_options_t *opts)
     return;
 }
 
-/* Perform some sanity checks on an acc stanza data.
+/* 对acc节数据执行健全性检查。
 */
 static int
 acc_data_is_valid(fko_srv_options_t *opts,
@@ -1385,7 +1343,7 @@ acc_data_is_valid(fko_srv_options_t *opts,
             return(0);
         }
 
-        /* Allow the string "NONE" to short-circuit close command execution.
+        /* 允许字符串“NONE”使关闭命令执行短路。
         */
         if(strncmp(acc->cmd_cycle_close, "NONE", 4) == 0)
             acc->cmd_cycle_do_close = 0;
@@ -1428,7 +1386,7 @@ acc_data_is_valid(fko_srv_options_t *opts,
         }
     }
 
-    /* For any non-command cycle stanza, we enable global firewall handling
+    /* 对于任何非命令周期节，我们都启用全局防火墙处理
     */
     if(acc->cmd_cycle_open == NULL)
         opts->enable_fw = 1;
@@ -1449,22 +1407,22 @@ parse_access_folder(fko_srv_options_t *opts, char *access_folder, int *depth)
 
     dir_ptr = opendir(access_folder);
 
-    //grab the file names in the directory and loop through them
+    //获取目录中的文件名并循环它们
     if (dir_ptr == NULL)
     {
         log_msg(LOG_ERR, "[*] Access folder: '%s' could not be opened.", access_folder);
         return EXIT_FAILURE;
     }
     while ((dp = readdir(dir_ptr)) != NULL) {
-        extension = (strrchr(dp->d_name, '.')); // Capture just the extension
+        extension = (strrchr(dp->d_name, '.')); // 仅捕获扩展名
         if (extension && !strncmp(extension, ".conf", 5))
         {
-            if (strlen(access_folder) + 1 + strlen(dp->d_name) > MAX_PATH_LEN - 1) //Bail out rather than write past the end of include_file
+            if (strlen(access_folder) + 1 + strlen(dp->d_name) > MAX_PATH_LEN - 1) //退出，而不是写入超过include_file结尾的内容
             {
                 closedir(dir_ptr);
                 return EXIT_FAILURE;
             }
-            strlcpy(include_file, access_folder, sizeof(include_file)); //construct the full path
+            strlcpy(include_file, access_folder, sizeof(include_file)); //构造完整路径
             strlcat(include_file, "/", sizeof(include_file));
             strlcat(include_file, dp->d_name, sizeof(include_file));
             if (parse_access_file(opts, include_file, depth) == EXIT_FAILURE)
@@ -1478,7 +1436,7 @@ parse_access_folder(fko_srv_options_t *opts, char *access_folder, int *depth)
     return EXIT_SUCCESS;
 }
 
-/* Read and parse the access file, popluating the access data as we go.
+/* 读取并解析访问文件，在执行过程中填充访问数据。
 */
 int
 parse_access_file(fko_srv_options_t *opts, char *access_filename, int *depth)
@@ -1497,7 +1455,7 @@ parse_access_file(fko_srv_options_t *opts, char *access_filename, int *depth)
 
     acc_stanza_t   *curr_acc = NULL;
 
-    /* This allows us to limit include depth, and also tracks when we've returned to the root access.conf file.
+    /* 限制包含深度，并在返回到根access.conf文件时跟踪。
     */
     (*depth)++;
 
@@ -1522,20 +1480,18 @@ parse_access_file(fko_srv_options_t *opts, char *access_filename, int *depth)
 
     log_msg(LOG_DEBUG, "Opened access file: %s", access_filename);
 
-    /* Initialize the access list
+    /* 初始化访问列表
     */
     acc_stanza_init(opts);
 
-    /* Now walk through access file pulling the access entries into the
-     * current stanza.
+    /* 现在遍历访问文件，将访问条目拉入当前节。
     */
     while ((fgets(access_line_buf, MAX_LINE_LEN, file_ptr)) != NULL)
     {
         num_lines++;
         access_line_buf[MAX_LINE_LEN-1] = '\0';
 
-        /* Get past comments and empty lines (note: we only look at the
-         * first character.
+        /* 获取过去的注释和空行（注意：只查看第一个字符。）
         */
         if(IS_EMPTY_LINE(access_line_buf[0]))
             continue;
@@ -1550,19 +1506,18 @@ parse_access_file(fko_srv_options_t *opts, char *access_filename, int *depth)
             return EXIT_FAILURE;
         }
 
-        /* Remove any colon that may be on the end of the var
+        /* 删除可能位于var末尾的任何冒号
         */
         if((ndx = strrchr(var, ':')) != NULL)
             *ndx = '\0';
 
-        /* Even though sscanf should automatically add a terminating
-         * NULL byte, an assumption is made that the input arrays are
-         * big enough, so we'll force a terminating NULL byte regardless
+        /* 尽管sscanf应该自动添加一个终止NULL字节，
+         * 但假设输入数组足够大，因此我们将强制使用一个终止的NULL字节
         */
         var[MAX_LINE_LEN-1] = 0x0;
         val[MAX_LINE_LEN-1] = 0x0;
 
-        /* Remove any trailing whitespace from the value
+        /* 从值中删除任何尾随空格
         */
         chop_whitespace(val);
 
@@ -1572,10 +1527,9 @@ parse_access_file(fko_srv_options_t *opts, char *access_filename, int *depth)
                 access_filename, access_line_buf, var, val
             );
 
-        /* Process the entry.
+        /* 处理条目。
          *
-         * NOTE: If a new access.conf parameter is created.  It also needs
-         *       to be accounted for in the following if/if else construct.
+         * 注意：如果创建了新的access.conf参数。在下面的if/if-else构造中也需要考虑它。
         */
         if(CONF_VAR_IS(var, "%include"))
         {
@@ -1607,8 +1561,7 @@ parse_access_file(fko_srv_options_t *opts, char *access_filename, int *depth)
         }
         else if(CONF_VAR_IS(var, "SOURCE"))
         {
-            /* If this is not the first stanza, sanity check the previous
-             * stanza for the minimum required data.
+            /* 如果这不是第一节，则完整性检查前一节中所需的最小数据。
             */
             if(curr_acc != NULL) {
                 if(!acc_data_is_valid(opts, user_pw, sudo_user_pw, curr_acc))
@@ -1620,20 +1573,20 @@ parse_access_file(fko_srv_options_t *opts, char *access_filename, int *depth)
                 }
             }
 
-            /* Start new stanza.
+            /* 开始新的一节。
             */
             curr_acc = acc_stanza_add(opts);
             add_acc_string(&(curr_acc->source), val, file_ptr, opts);
         }
         else if (curr_acc == NULL)
         {
-            /* The stanza must start with the "SOURCE" variable
+            /*节必须以“SOURCE”变量开头
             */
             continue;
         }
-        else if(CONF_VAR_IS(var, "%include_keys")) //Only valid options from this file are those defining keys.
+        else if(CONF_VAR_IS(var, "%include_keys")) //只有该文件中的有效选项才是定义键的选项。
         {
-          // This directive is only valid within a SOURCE stanza
+          // 此指令仅在SOURCE节中有效
             log_msg(LOG_DEBUG, "[+] Processing include_keys directive for: '%s'", val);
             include_keys_file(curr_acc, val, opts);
             if(!acc_data_is_valid(opts, user_pw, sudo_user_pw, curr_acc))
@@ -1972,7 +1925,7 @@ parse_access_file(fko_srv_options_t *opts, char *access_filename, int *depth)
     if(*depth > 0)
         (*depth)--;
 
-    if(*depth == 0) //means we just closed the root access.conf
+    if(*depth == 0) //意味着我们刚刚关闭了根access.conf
     {
         if(curr_acc != NULL)
         {
@@ -1992,17 +1945,17 @@ parse_access_file(fko_srv_options_t *opts, char *access_filename, int *depth)
             return EXIT_FAILURE;
         }
 
-        /* Expand our the expandable fields into their respective data buckets.
+        /*将我们的可扩展字段扩展到各自的数据桶中。
         */
         expand_acc_ent_lists(opts);
 
-        /* Make sure default values are set where needed.
+        /* 确保在需要的地方设置了默认值。
         */
         set_acc_defaults(opts);
     }
-    else // this is an %included file
+    else // 这是一个包含%的文件
     {
-        /* If this file had a stanza, check the last one.
+        /* 如果这个文件有一个节，请检查最后一个节。
          *
          *
         */
@@ -2026,14 +1979,10 @@ int valid_access_stanzas(acc_stanza_t *acc)
     if(acc == NULL)
         return 0;
 
-    /* This is a basic check to ensure at least one access stanza
-     * with the "source" variable populated, and this function is only
-     * called after all access.conf files are processed. This allows
-     * %include_folder processing to proceed against directories that
-     * have files that are not access.conf files. Additional stronger
-     * validations are done in acc_data_is_valid(), but this function
-     * is only called when a "SOURCE" variable has been parsed out of
-     * the file.
+    /* 这是一个基本检查，以确保至少有一个填充了“source”变量的访问节，
+     * 并且只有在处理完所有access.conf文件后才会调用此函数。 
+     * 这允许%include_folder处理对包含非access.conf文件的文件的目录进行处理。 
+     * Aacc_data_is_valid（）中进行了其他更强的验证，但只有在从文件中解析出“SOURCE”变量时才会调用此函数
     */
     while(acc)
     {
@@ -2064,18 +2013,15 @@ compare_addr_list(acc_int_list_t *ip_list, const uint32_t ip)
 }
 
 /**
- * \brief Compares port lists
+ * \brief 比较端口列表
  *
- * Compare the contents of 2 port lists.  Return true on a match.
- * Match depends on the match_any flag.  if match_any is 1 then any
- * entry in the incoming data need only match one item to return true.
- * Otherwise all entries in the incoming data must have a corresponding
- * match in the access port_list.
+ * 比较2个端口列表的内容  当两者匹配时返回true。
+ * 匹配依赖于match_any标志.  如果match_any为1，那么传入数据中的任何条目只需要匹配一个项即可返回true。
+ * 否则，传入数据中的所有条目在访问port_list中都必须具有相应的匹配项。
  *
- * \param acc Pointer to the acc_stanza_t struct that holds the access stanzas
- * \param port_str pointer to the
+ * \param acc 指向保存访问节的acc_stanza_t结构的指针
  *
- * \return Returns true on a match
+ * \return 匹配时返回true
  *
  */
 static int
@@ -2106,10 +2052,9 @@ compare_port_list(acc_port_list_t *in, acc_port_list_t *ac, const int match_any)
     return(i_cnt == a_cnt);
 }
 
-/* Take a proto/port string (or multiple comma-separated strings) and check
- * them against the list for the given access stanza.
+/* 获取一个proto/port字符串（或多个逗号分隔的字符串），并将它们与给定访问节的列表进行核对。
  *
- * Return 1 if we are allowed
+ * 如果允许，返回1
 */
 int
 acc_check_port_access(acc_stanza_t *acc, char *port_str)
@@ -2126,8 +2071,7 @@ acc_check_port_access(acc_stanza_t *acc, char *port_str)
 
     start = port_str;
 
-    /* Create our own internal port_list from the incoming SPA data
-     * for comparison.
+    /* 根据传入的SPA数据创建我们自己的内部port_list以进行比较。
     */
     for(ndx = start; *ndx != '\0'; ndx++)
     {
@@ -2182,8 +2126,7 @@ acc_check_port_access(acc_stanza_t *acc, char *port_str)
         return(0);
     }
 
-    /* Start with restricted ports (if any).  Any match (even if only one
-     * entry) means not allowed.
+    /* 从受限端口（如果有）开始。任何匹配（即使只有一个条目）都表示不允许。
     */
     if((acc->rport_list != NULL) && (compare_port_list(in_pl, r_pl, 1)))
     {
@@ -2191,7 +2134,7 @@ acc_check_port_access(acc_stanza_t *acc, char *port_str)
         goto cleanup_and_bail;
     }
 
-    /* For open port list, all must match.
+    /* 对于打开的端口列表，所有端口都必须匹配。
     */
     if((acc->oport_list != NULL) && (!compare_port_list(in_pl, o_pl, 0)))
             res = 0;
@@ -2201,7 +2144,7 @@ cleanup_and_bail:
     return(res);
 }
 
-/* Dump the configuration
+/* 转储配置
 */
 void
 dump_access_list(const fko_srv_options_t *opts)
@@ -2253,7 +2196,7 @@ dump_access_list(const fko_srv_options_t *opts)
             "           FORCE_MASQUERADE:  %s\n"
             "               DISABLE_DNAT:  %s\n"
             "                FORWARD_ALL:  %s\n"
-            "              ACCESS_EXPIRE:  %s"  /* asctime() adds a newline */
+            "              ACCESS_EXPIRE:  %s"  /* asctime（）添加新行 */
             "               GPG_HOME_DIR:  %s\n"
             "                    GPG_EXE:  %s\n"
             "             GPG_DECRYPT_ID:  %s\n"
@@ -2341,8 +2284,7 @@ include_keys_file(acc_stanza_t *curr_acc, const char *access_filename, fko_srv_o
         num_lines++;
         access_line_buf[MAX_LINE_LEN-1] = '\0';
 
-        /* Get past comments and empty lines (note: we only look at the
-         * first character.
+        /* 获取过去的注释和空行（注意：我们只看第一个字符。
         */
         if(IS_EMPTY_LINE(access_line_buf[0]))
             continue;
@@ -2357,7 +2299,7 @@ include_keys_file(acc_stanza_t *curr_acc, const char *access_filename, fko_srv_o
             return EXIT_FAILURE;
         }
 
-        /* Remove the colon if present
+        /* 移除冒号（如果存在）
         */
         if((ndx = strrchr(var, ':')) != NULL)
             *ndx = '\0';
@@ -2489,18 +2431,18 @@ DECLARE_UTEST(compare_port_list, "check compare_port_list function")
     acc_port_list_t *in2_pl = NULL;
     acc_port_list_t *acc_pl = NULL;
 
-    /* Match any test */
+    /* 匹配任何测试 */
     free_acc_port_list(in1_pl);
     free_acc_port_list(acc_pl);
     expand_acc_port_list(&in1_pl, "udp/6002");
     expand_acc_port_list(&in2_pl, "udp/6002, udp/6003");
     expand_acc_port_list(&acc_pl, "udp/6002, udp/6003");
-    CU_ASSERT(compare_port_list(in1_pl, acc_pl, 1) == 1);	/* Only one match is needed from access port list - 1 */
-    CU_ASSERT(compare_port_list(in2_pl, acc_pl, 1) == 1);	/* Only match is needed from access port list - 2 */
-    CU_ASSERT(compare_port_list(in1_pl, acc_pl, 0) == 1);	/* All ports must match access port list - 1 */
-    CU_ASSERT(compare_port_list(in2_pl, acc_pl, 0) == 1);	/* All ports must match access port list - 2 */
-    CU_ASSERT(compare_port_list(acc_pl, in1_pl, 0) == 0);	/* All ports must match in1 port list - 1 */
-    CU_ASSERT(compare_port_list(acc_pl, in2_pl, 0) == 1);	/* All ports must match in2 port list - 2 */
+    CU_ASSERT(compare_port_list(in1_pl, acc_pl, 1) == 1);	/* 访问端口列表中只需要一个匹配项 - 1 */
+    CU_ASSERT(compare_port_list(in2_pl, acc_pl, 1) == 1);	/* 只需要访问端口列表中的匹配项 - 2 */
+    CU_ASSERT(compare_port_list(in1_pl, acc_pl, 0) == 1);	/* 所有端口必须与访问端口列表匹配 - 1 */
+    CU_ASSERT(compare_port_list(in2_pl, acc_pl, 0) == 1);	/* 所有端口必须与访问端口列表匹配 - 2 */
+    CU_ASSERT(compare_port_list(acc_pl, in1_pl, 0) == 0);	/* 所有端口必须在1端口列表中匹配 - 1 */
+    CU_ASSERT(compare_port_list(acc_pl, in2_pl, 0) == 1);	/* 所有端口必须在2端口列表中匹配 - 2 */
 }
 
 int register_ts_access(void)

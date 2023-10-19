@@ -1,32 +1,4 @@
-/**
- * \file server/pcap_capture.c
- *
- * \brief The pcap capture routines for fwknopd.
- */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 
 #if USE_LIBPCAP
   #include <pcap.h>
@@ -49,7 +21,7 @@
 
 #if USE_LIBPCAP
 
-/* The pcap capture routine.
+/* 
 pcap 抓包例程
 */
 int
@@ -72,8 +44,8 @@ pcap_capture(fko_srv_options_t *opts)
     time_t              now;
 #endif
 
-    /* Set promiscuous mode if ENABLE_PCAP_PROMISC is set to 'Y'.
-    */
+    
+   // 设置混杂模式 如果配置文件中设置了混杂模式 则设置为混杂模式
     if(strncasecmp(opts->config[CONF_ENABLE_PCAP_PROMISC], "Y", 1) == 0)
         promisc = 1;
 
@@ -110,8 +82,8 @@ pcap_capture(fko_srv_options_t *opts)
         }
     }
 
-    /* Set pcap filters, if any.
-    */
+    
+   // 设置过滤器
     if (opts->config[CONF_PCAP_FILTER][0] != '\0')
     {
         if(pcap_compile(pcap, &fp, opts->config[CONF_PCAP_FILTER], 1, 0) == -1)
@@ -135,8 +107,8 @@ pcap_capture(fko_srv_options_t *opts)
         pcap_freecode(&fp);
     }
 
-    /* Determine and set the data link encapsulation offset.
-    */
+    
+   // 设置数据链路偏移量
     switch(pcap_datalink(pcap)) {
         case DLT_EN10MB:
             opts->data_link_offset = 14;
@@ -160,8 +132,8 @@ pcap_capture(fko_srv_options_t *opts)
             break;
     }
 
-    /* We are only interested on seeing packets coming into the interface.
-    */
+    
+   // 设置数据包方向
     if ((opts->pcap_any_direction == 0)
             && (set_direction == 1) && (pcap_file_mode == 0)
             && (pcap_setdirection(pcap, PCAP_D_IN) < 0))
@@ -169,29 +141,28 @@ pcap_capture(fko_srv_options_t *opts)
             log_msg(LOG_WARNING, "[*] Warning: pcap error on setdirection: %s.",
                 pcap_geterr(pcap));
 
-    /* Set our pcap handle nonblocking mode.
-     *
-     * NOTE: This is simply set to 0 for now until we find a need
-     *       to actually use this mode (which when set on a FreeBSD
-     *       system, it silently breaks the packet capture).
-    */
-    if((pcap_file_mode == 0)
-            && (pcap_setnonblock(pcap, DEF_PCAP_NONBLOCK, errstr)) == -1)
-    {
-        log_msg(LOG_ERR, "[*] Error setting pcap nonblocking to %i: %s",
-            0, errstr
-        );
-        clean_exit(opts, FW_CLEANUP, EXIT_FAILURE);
-    }
+    /* 将我们的 pcap 句柄设置为非阻塞模式。
+ *
+ * 注意：目前仅设置为 0，直到我们找到实际需要使用此模式的情况（当在 FreeBSD 系统上设置时，它会默默地中断数据包捕获）。
+ */
 
-    log_msg(LOG_INFO, "Starting fwknopd main event loop.");
+if ((pcap_file_mode == 0) && (pcap_setnonblock(pcap, DEF_PCAP_NONBLOCK, errstr)) == -1)
+{
+    log_msg(LOG_ERR, "[*] 设置 pcap 非阻塞模式为 %i 时出错：%s",
+        0, errstr
+    );
+    clean_exit(opts, FW_CLEANUP, EXIT_FAILURE);
+}
 
-    /* Jump into our home-grown packet cature loop.
-    */
+log_msg(LOG_INFO, "开始 fwknopd 主事件循环。");
+
+/* 进入我们自己编写的数据包捕获循环。
+*/
+
     while(1)
     {
-        /* If we got a SIGCHLD and it was the tcp server, then handle it here.
-        */
+        
+        // 如果收到了 SIGCHLD 信号，并且它是 tcp 服务器，则在此处处理它。
         if(got_sigchld)
         {
             if(opts->tcp_server_pid > 0)
@@ -210,7 +181,8 @@ pcap_capture(fko_srv_options_t *opts)
 
                     opts->tcp_server_pid = 0;
 
-                    /* Attempt to restart tcp server ? */
+                    
+                    // 如果配置文件中设置了 tcp 服务器，则尝试重启 tcp 服务器
                     usleep(1000000);
                     run_tcp_server(opts);
                 }
@@ -228,17 +200,18 @@ pcap_capture(fko_srv_options_t *opts)
         res = pcap_dispatch(pcap, opts->pcap_dispatch_count,
             (pcap_handler)&process_packet, (unsigned char *)opts);
 
-        /* Count processed packets
-        */
+      
+       // 计算已处理的数据包数
         if(res > 0)
         {
             if(opts->foreground == 1 && opts->verbose > 2)
                 log_msg(LOG_DEBUG, "pcap_dispatch() processed: %d packets", res);
 
-            /* Count the set of processed packets (pcap_dispatch() return
-             * value) - we use this as a comparison for --packet-limit regardless
-             * of SPA packet validity at this point.
-            */
+            
+           /* 计算已处理的数据包数（pcap_dispatch() 返回值） - 我们使用这个值作为 --packet-limit 的比较值，而
+           不管此时 SPA 数据包的有效性如何。
+           * */
+
             opts->packet_ctr += res;
             if (opts->packet_ctr_limit && opts->packet_ctr >= opts->packet_ctr_limit)
             {
@@ -251,9 +224,8 @@ pcap_capture(fko_srv_options_t *opts)
                 pending_break = 1;
             }
         }
-        /* If there was an error, complain and go on (to an extent before
-         * giving up).
-        */
+        
+       // 如果出现错误，则进行投诉并继续（在放弃之前的某种程度上）。
         else if(res == -1)
         {
             if((strncasecmp(opts->config[CONF_EXIT_AT_INTF_DOWN], "Y", 1) == 0)
@@ -281,7 +253,8 @@ pcap_capture(fko_srv_options_t *opts)
         }
         else if(pending_break == 1 || res == -2)
         {
-            /* pcap_breakloop was called, so we bail. */
+            
+            // pcap_breakloop 被调用，所以我们放弃。
             log_msg(LOG_INFO, "Gracefully leaving the fwknopd event loop.");
             break;
         }
@@ -292,8 +265,8 @@ pcap_capture(fko_srv_options_t *opts)
         {
             if(opts->enable_fw)
             {
-                /* Check for any expired firewall rules and deal with them.
-                */
+                
+               // 检查防火墙规则是否过期
                 if(opts->rules_chk_threshold > 0)
                 {
                     opts->check_rules_ctr++;
@@ -307,15 +280,14 @@ pcap_capture(fko_srv_options_t *opts)
                 chk_rm_all = 0;
             }
 
-            /* See if any CMD_CYCLE_CLOSE commands need to be executed.
-            */
+           
+           // 检查是否需要执行任何 CMD_CYCLE_CLOSE 命令。
             cmd_cycle_close(opts);
         }
 
 #if FIREWALL_IPFW
-        /* Purge expired rules that no longer have any corresponding
-         * dynamic rules.
-        */
+        
+       // 清除过期的规则
         if(opts->fw_config->total_rules > 0)
         {
             time(&now);
@@ -335,6 +307,6 @@ pcap_capture(fko_srv_options_t *opts)
     return(0);
 }
 
-#endif /* USE_LIBPCAP */
+#endif 
 
-/***EOF***/
+

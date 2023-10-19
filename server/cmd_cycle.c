@@ -1,32 +1,9 @@
 /**
  * \file server/cmd_cycle.c
  *
- * \brief Fwknop routines for managing command cycles as defined via
- *          access.conf stanzas (CMD_CYCLE_OPEN and CMD_CYCLE_CLOSE).
+ * \brief Fwknop例程，用于管理通过access.conf节（CMD_CYCLE_OPEN和CMD_CYCLE_CLOSE）定义的命令周期。
  */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
-*/
 
 #include "fwknopd_common.h"
 #include "log_msg.h"
@@ -79,24 +56,20 @@ build_cmd(spa_data_t *spadat, const char * const cmd_cycle_str, int timer)
         return 0;
     }
 
-    /* We only look at the first port/proto combination for command
-     * open/close cycles even if the SPA message had multiple ports
-     * and protocols set.
+    /* 即使SPA消息设置了多个端口和协议，我们也只查看命令打开/关闭周期的第一个端口/原型组合。
     */
     snprintf(port_str, MAX_PORT_STR_LEN+1, "%d", port_list->port);
     snprintf(proto_str, MAX_PROTO_STR_LEN+1, "%d", port_list->proto);
 
     zero_cmd_buffers();
 
-    /* Look for the following variables for substitution:
-     * IP, SRC, PKT_SRC, DST, PORT, and PROTO
+    /* 查找以下替换变量：IP、SRC、PKT_SRC、DST、PORT和PROTO
     */
     for(i=0; i < strnlen(cmd_cycle_str, CMD_CYCLE_BUFSIZE); i++)
     {
         if(cmd_cycle_str[i] == '$')
         {
-            /* Found the start of a variable, now validate it and
-             * swap in the IP/port/proto.
+            /* 找到了一个变量的开头，现在验证它并在IP/port/proto中交换。
             */
             if(is_var("IP", (cmd_cycle_str+i+1)))
             {
@@ -105,7 +78,7 @@ build_cmd(spa_data_t *spadat, const char * const cmd_cycle_str, int timer)
                 i += strlen("IP");
                 buf_idx += strlen(spadat->use_src_ip);
             }
-            /* SRC is a synonym for IP
+            /* SRC是IP的同义词
             */
             else if(is_var("SRC", (cmd_cycle_str+i+1)))
             {
@@ -114,9 +87,7 @@ build_cmd(spa_data_t *spadat, const char * const cmd_cycle_str, int timer)
                 i += strlen("SRC");
                 buf_idx += strlen(spadat->use_src_ip);
             }
-            /* Special case for the SPA packet source IP in
-             * the IP header (i.e. not from the decrypted SPA
-             * payload) if the user really wants this.
+            /* 特殊情况下，如果用户真的想这样做，SPA包源IP在IP报头(即不是从解密SPA有效载荷)。
             */
             else if(is_var("PKT_SRC", (cmd_cycle_str+i+1)))
             {
@@ -182,15 +153,14 @@ static int
 cmd_open(fko_srv_options_t *opts, acc_stanza_t *acc,
         spa_data_t *spadat, const int stanza_num)
 {
-    /* CMD_CYCLE_OPEN: Build the open command by taking care of variable
-     * substitutions if necessary.
+    /* CMD_CYCLE_OPEN：必要时通过变量替换来构建打开命令
     */
     if(build_cmd(spadat, acc->cmd_cycle_open, acc->cmd_cycle_timer))
     {
         log_msg(LOG_INFO, "[%s] (stanza #%d) Running CMD_CYCLE_OPEN command: %s",
                 spadat->pkt_source_ip, stanza_num, cmd_buf);
 
-        /* Run the open command
+        /* 运行open命令
         */
         run_extcmd(cmd_buf, err_buf, CMD_CYCLE_BUFSIZE,
                 WANT_STDERR, NO_TIMEOUT, &pid_status, opts);
@@ -214,14 +184,11 @@ add_cmd_close(fko_srv_options_t *opts, acc_stanza_t *acc,
     time_t              now;
     int                 cmd_close_len = 0;
 
-    /* CMD_CYCLE_CLOSE: Build the close command, but don't execute it until
-     * the expiration timer has passed.
-     * CMD_CYCLE_CLOSE：构建关闭命令，但要等到到期计时器结束后才执行。
+    /* CMD_CYCLE_CLOSE：生成关闭命令，但在过期计时器过去之前不要执行它。
     */
     if(build_cmd(spadat, acc->cmd_cycle_close, acc->cmd_cycle_timer))
     {
-        /* Now the corresponding close command is now in cmd_buf
-         * for later execution when the timer expires.
+        /* 现在，相应的关闭命令现在位于cmd_buf中，以便在计时器到期时稍后执行
         */
         cmd_close_len = strnlen(cmd_buf, CMD_CYCLE_BUFSIZE-1)+1;
         log_msg(LOG_INFO,
@@ -239,8 +206,7 @@ add_cmd_close(fko_srv_options_t *opts, acc_stanza_t *acc,
         return 0;
     }
 
-    /* Add the corresponding close command - to be executed after the
-     * designated timer has expired.
+    /* 添加相应的关闭命令-在指定计时器到期后执行。
     */
     if((new_clist = calloc(1, sizeof(cmd_cycle_list_t))) == NULL)
     {
@@ -265,18 +231,18 @@ add_cmd_close(fko_srv_options_t *opts, acc_stanza_t *acc,
         last_clist->next = new_clist;
     }
 
-    /* Set the source IP
+    /* 设置源IP
     */
     strlcpy(new_clist->src_ip, spadat->use_src_ip,
             sizeof(new_clist->src_ip));
 
-    /* Set the expiration timer
+    /* 设置过期计时器
     */
     time(&now);
     new_clist->expire = now + (spadat->client_timeout == 0 ?
             acc->cmd_cycle_timer : spadat->client_timeout);
 
-    /* Set the close command
+    /* 设置关闭命令
     */
     if((new_clist->close_cmd = calloc(1, cmd_close_len)) == NULL)
     {
@@ -287,14 +253,14 @@ add_cmd_close(fko_srv_options_t *opts, acc_stanza_t *acc,
     }
     strlcpy(new_clist->close_cmd, cmd_buf, cmd_close_len);
 
-    /* Set the access.conf stanza number
+    /* 设置access.conf节编号
     */
     new_clist->stanza_num = stanza_num;
 
     return 1;
 }
 
-/* This is the main driver for open/close command cycles
+/* 这是打开/关闭命令循环的主要驱动程序
 */
 int
 cmd_cycle_open(fko_srv_options_t *opts, acc_stanza_t *acc,
@@ -322,7 +288,7 @@ free_cycle_list_node(cmd_cycle_list_t *list_node)
     return;
 }
 
-/* Run all close commands based on the expiration timer
+/* 根据过期计时器运行所有关闭命令
 */
 void
 cmd_cycle_close(fko_srv_options_t *opts)
@@ -335,7 +301,7 @@ cmd_cycle_close(fko_srv_options_t *opts)
 
     if(opts->cmd_cycle_list == NULL)
     {
-        return; /* No active command cycles */
+        return; /*没有激活的命令周期 */
     }
     else
     {
@@ -343,8 +309,7 @@ cmd_cycle_close(fko_srv_options_t *opts)
         {
             do_delete = 0;
 
-            /* Keep going through the command list for as long as
-             * there are commands to be executed (and expired).
+            /* 只要有要执行（和过期）的命令，就一直浏览命令列表。
             */
             for(curr = opts->cmd_cycle_list;
                     curr != NULL;
@@ -359,7 +324,7 @@ cmd_cycle_close(fko_srv_options_t *opts)
 
                     zero_cmd_buffers();
 
-                    /* Run the close command
+                    /* 运行关闭命令
                     */
                     run_extcmd(curr->close_cmd, err_buf, CMD_CYCLE_BUFSIZE,
                             WANT_STDERR, NO_TIMEOUT, &pid_status, opts);

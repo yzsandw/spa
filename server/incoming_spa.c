@@ -1,32 +1,4 @@
-/**
- * \file server/incoming_spa.c
- *
- * \brief Process an incoming SPA data packet for fwknopd.
- */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #include "fwknopd_common.h"
 #include "netinet_common.h"
 
@@ -46,8 +18,7 @@
 
 #define CTX_DUMP_BUFSIZE            4096                /*!< Maximum size allocated to a FKO context dump */
 
-/* Validate and in some cases preprocess/reformat the SPA data.  Return an
- * error code value if there is any indication the data is not valid spa data.
+/* 
  * 验证并在某些情况下预处理/重新格式化SPA数据。如果存在任何指示数据不是有效的SPA数据的迹象，则返回错误代码值。
 */
 static int
@@ -60,124 +31,112 @@ preprocess_spa_data(const fko_srv_options_t *opts, spa_pkt_info_t *spa_pkt, spa_
 
     pkt_data_len = spa_pkt->packet_data_len;
 
-    /* At this point, we can reset the packet data length to 0.  This is our
-     * indicator to the rest of the program that we do not have a current
-     * spa packet to process (after this one that is).
-     * 在这一点上，我们可以将数据包数据长度重置为0。
-     * 这是我们向程序的其余部分指示的信号，表示我们没有要处理的当前SPA数据包（在这个数据包之后）。
-     * 
+   /* 在这一点上，我们可以将数据包数据长度重置为0。这是我们程序的其余部分的指示，表明我们没有当前的 SPA 数据包要处理（除了当前这一个）。
+ * 
+ */
+
+spa_pkt->packet_data_len = 0;
+
+/* 这两个检查已经在 process_packet() 中完成，但这是一个防御性措施，以便在这里再次运行它们
+ * 
+ */
+
+if(pkt_data_len < MIN_SPA_DATA_SIZE)
+    return(SPA_MSG_BAD_DATA);
+
+if(pkt_data_len > MAX_SPA_PACKET_LEN)
+    return(SPA_MSG_BAD_DATA);
+
+/* 忽略包含 Rijndael 或 GnuPG 前缀的任何 SPA 数据包，因为攻击者可能将它们附加到以前见过的 SPA 数据包中，以试图通过重放检查。而且，我们不会更糟糕，因为合法的 SPA 数据包，如果包含外部前缀之后的前缀，则会被删除，无论如何都不会正确解密，因为 libfko 不会添加新的前缀。
+ * TODO:?
+ * 
+ */
+
+   
+   if (constant_runtime_cmp(ndx, B64_RIJNDAEL_SALT, B64_RIJNDAEL_SALT_STR_LEN) == 0)
+    return(SPA_MSG_BAD_DATA);
+
+if (pkt_data_len > MIN_GNUPG_MSG_SIZE
+        && constant_runtime_cmp(ndx, B64_GPG_PREFIX, B64_GPG_PREFIX_STR_LEN) == 0)
+    return(SPA_MSG_BAD_DATA);
+
+/* 初始化 X-Forwarded-For 字段 */
+spadat->pkt_source_xff_ip[0] = '\0';
+
+/* 检测并解析来自 HTTP 请求的 SPA 数据。如果 SPA 数据以 "GET /" 开头，而用户代理以 "Fwknop" 开头，那么假定这是一个通过 HTTP 请求的 SPA。
+*/
+if (strncasecmp(opts->config[CONF_ENABLE_SPA_OVER_HTTP], "Y", 1) == 0
+  && strncasecmp(ndx, "GET /", 5) == 0)
+{
+    /* 这看起来像一个 HTTP 请求，因此让我们看看是否配置为接受这种请求，如果是的话，找到 SPA 数据。
     */
-    spa_pkt->packet_data_len = 0;
 
-    /* These two checks are already done in process_packet(), but this is a 
-     * defensive measure to run them again here
-     * 这两个检查已经在process_packet()中完成，但这是一种防御性措施，再次运行它们
+    /* 首先看看我们是否需要 User-Agent 以 'Fwknop' 开头
     */
-    if(pkt_data_len < MIN_SPA_DATA_SIZE)
-        return(SPA_MSG_BAD_DATA);
-
-    if(pkt_data_len > MAX_SPA_PACKET_LEN)
-        return(SPA_MSG_BAD_DATA);
-
-    /* Ignore any SPA packets that contain the Rijndael or GnuPG prefixes
-     * since an attacker might have tacked them on to a previously seen
-     * SPA packet in an attempt to get past the replay check.  And, we're
-     * no worse off since a legitimate SPA packet that happens to include
-     * a prefix after the outer one is stripped off won't decrypt properly
-     * anyway because libfko would not add a new one.
-     * TODO:?
-     * 
-    */
-    if(constant_runtime_cmp(ndx, B64_RIJNDAEL_SALT, B64_RIJNDAEL_SALT_STR_LEN) == 0)
-        return(SPA_MSG_BAD_DATA);
-
-    if(pkt_data_len > MIN_GNUPG_MSG_SIZE
-            && constant_runtime_cmp(ndx, B64_GPG_PREFIX, B64_GPG_PREFIX_STR_LEN) == 0)
-        return(SPA_MSG_BAD_DATA);
-
-    /* Initialize X-Forwarded-For field */
-    spadat->pkt_source_xff_ip[0] = '\0';
-
-    /* Detect and parse out SPA data from an HTTP request. If the SPA data
-     * starts with "GET /" and the user agent starts with "Fwknop", then
-     * assume it is a SPA over HTTP request.
-    */
-    if(strncasecmp(opts->config[CONF_ENABLE_SPA_OVER_HTTP], "Y", 1) == 0
-      && strncasecmp(ndx, "GET /", 5) == 0)
+    if (strncasecmp(opts->config[CONF_ALLOW_ANY_USER_AGENT], "N", 1) == 0
+      && strstr(ndx, "User-Agent: Fwknop") == NULL)
     {
-        /* This looks like an HTTP request, so let's see if we are
-         * configured to accept such request and if so, find the SPA
-         * data.
-        */
-
-        /* First see if we require the User-Agent to start with 'Fwknop'
-        */
-        if(strncasecmp(opts->config[CONF_ALLOW_ANY_USER_AGENT], "N", 1) == 0
-          && strstr(ndx, "User-Agent: Fwknop") == NULL)
-        {
-            return(SPA_MSG_BAD_DATA);
-        }
-
-        /* Process X-Forwarded-For header */
-
-        xff = strcasestr(ndx, "X-Forwarded-For: ");
-
-        if (xff != NULL && strncasecmp(opts->config[CONF_ENABLE_X_FORWARDED_FOR], "Y", 1) == 0) {
-            xff += 17;
-
-            for (i = 0; *xff != '\0'; i++)
-                if (isspace((int)(unsigned char)*xff))
-                   *xff = '\0';
-                else
-                   xff++;
-
-            xff -= i - 1;
-
-            if (!is_valid_ipv4_addr(xff, strlen(xff)))
-                log_msg(LOG_WARNING,
-                "Error parsing X-Forwarded-For header: value '%s' is not an IP address",
-                xff);
-            else
-                strlcpy(spadat->pkt_source_xff_ip, xff, i);
-        }
-
-        /* Now extract, adjust (convert characters translated by the fwknop
-         * client), and reset the SPA message itself.
-        */
-        strlcpy((char *)spa_pkt->packet_data, ndx+5, pkt_data_len);
-        pkt_data_len -= 5;
-
-        for(i=0; i<pkt_data_len; i++)
-        {
-            if(isspace((int)(unsigned char)*ndx)) /* The first space marks the end of the req */
-            {
-                *ndx = '\0';
-                break;
-            }
-            else if(*ndx == '-') /* Convert '-' to '+' */
-                *ndx = '+';
-            else if(*ndx == '_') /* Convert '_' to '/' */
-                *ndx = '/';
-
-            ndx++;
-        }
-
-        if(i < MIN_SPA_DATA_SIZE)
-            return(SPA_MSG_BAD_DATA);
-
-        spa_pkt->packet_data_len = pkt_data_len = i;
+        return(SPA_MSG_BAD_DATA);
     }
 
-    /* Require base64-encoded data
+    /* 处理 X-Forwarded-For 标头 */
+
+    xff = strcasestr(ndx, "X-Forwarded-For: ");
+
+    if (xff != NULL && strncasecmp(opts->config[CONF_ENABLE_X_FORWARDED_FOR], "Y", 1) == 0) {
+        xff += 17;
+
+        for (i = 0; *xff != '\0'; i++)
+            if (isspace((int)(unsigned char)*xff))
+               *xff = '\0';
+            else
+               xff++;
+
+        xff -= i - 1;
+
+        if (!is_valid_ipv4_addr(xff, strlen(xff)))
+            log_msg(LOG_WARNING,
+            "解析 X-Forwarded-For 标头时出错：值 '%s' 不是 IP 地址",
+            xff);
+        else
+            strlcpy(spadat->pkt_source_xff_ip, xff, i);
+    }
+
+    /* 现在提取、调整（将由 fwknop 客户端转换的字符转换回来）并重置 SPA 消息本身。
     */
+    strlcpy((char *)spa_pkt->packet_data, ndx+5, pkt_data_len);
+    pkt_data_len -= 5;
+
+    for(i=0; i<pkt_data_len; i++)
+    {
+        if(isspace((int)(unsigned char)*ndx)) /* 第一个空格标记着请求的结束 */
+        {
+            *ndx = '\0';
+            break;
+        }
+        else if(*ndx == '-') /* 将 '-' 转换为 '+' */
+            *ndx = '+';
+        else if(*ndx == '_') /* 将 '_' 转换为 '/' */
+            *ndx = '/';
+
+        ndx++;
+    }
+
+    if(i < MIN_SPA_DATA_SIZE)
+        return(SPA_MSG_BAD_DATA);
+
+    spa_pkt->packet_data_len = pkt_data_len = i;
+}
+
+
+    
+   // 要求 base64 编码的数据
     if(! is_base64(spa_pkt->packet_data, pkt_data_len))
         return(SPA_MSG_NOT_SPA_DATA);
 
 
-    /* If we made it here, we have no reason to assume this is not SPA data.
-     * The ultimate test will be whether the SPA data authenticates via an
-     * HMAC anyway.
-    */
+    
+   // 如果我们到达这里，我们没有理由认为这不是 SPA 数据。最终的测试将是 SPA 数据是否通过 HMAC 进行身份验证。
     return(FKO_SUCCESS);
 }
 
@@ -191,9 +150,8 @@ get_raw_digest(char **digest, char *pkt_data)
     int          res = FKO_SUCCESS;
     short        raw_digest_type = -1;
 
-    /* initialize an FKO context with no decryption key just so
-     * we can get the outer message digest
-    */
+    
+   // 初始化一个没有解密密钥的 FKO 上下文，以便我们可以获得外部消息摘要
     res = fko_new_with_data(&ctx, (char *)pkt_data, NULL, 0,
             FKO_DEFAULT_ENC_MODE, NULL, 0, 0);
 
@@ -226,8 +184,7 @@ get_raw_digest(char **digest, char *pkt_data)
         return(SPA_MSG_DIGEST_ERROR);
     }
 
-    /* Make sure the digest type is what we expect
-    */
+   // 保证摘要类型是我们期望的
     if(raw_digest_type != FKO_DEFAULT_DIGEST)
     {
         log_msg(LOG_WARNING, "Error setting digest type for SPA data: %s",
@@ -260,16 +217,17 @@ get_raw_digest(char **digest, char *pkt_data)
     *digest = strdup(tmp_digest);
 
     if (*digest == NULL)
-        res = SPA_MSG_ERROR;  /* really a strdup() memory allocation problem */
+        res = SPA_MSG_ERROR;   // 真的是一个 strdup() 内存分配问题
 
     fko_destroy(ctx);
     ctx = NULL;
 
     return res;
 }
+/*从初始化（并填充）的FKO上下文中弹出spa_data结构。
 
-/* Popluate a spa_data struct from an initialized (and populated) FKO context.
 */
+
 static int
 get_spa_data_fields(fko_ctx_t ctx, spa_data_t *spdat)
 {
@@ -357,9 +315,8 @@ check_stanza_expiration(acc_stanza_t *acc, spa_data_t *spadat,
     return 1;
 }
 
-/* Check for access.conf stanza SOURCE match based on SPA packet
- * source IP
-*/
+
+// 检查基于SPA数据包源IP的access.conf段源匹配
 static int
 is_src_match(acc_stanza_t *acc, const uint32_t ip)
 {
@@ -381,8 +338,8 @@ src_check(fko_srv_options_t *opts, spa_pkt_info_t *spa_pkt,
     {
         if(strncasecmp(opts->config[CONF_ENABLE_DIGEST_PERSISTENCE], "Y", 1) == 0)
         {
-            /* Check for a replay attack
-            */
+            
+           // 检查重放攻击
             if(get_raw_digest(raw_digest, (char *)spa_pkt->packet_data) != FKO_SUCCESS)
             {
                 if (*raw_digest != NULL)
@@ -453,8 +410,8 @@ src_dst_check(acc_stanza_t *acc, spa_pkt_info_t *spa_pkt,
     return 1;
 }
 
-/* Process command messages
-*/
+
+// 处理命令消息
 static int
 process_cmd_msg(fko_srv_options_t *opts, acc_stanza_t *acc,
         spa_data_t *spadat, const int stanza_num, int *res)
@@ -488,9 +445,9 @@ process_cmd_msg(fko_srv_options_t *opts, acc_stanza_t *acc,
         memset(cmd_buf, 0x0, sizeof(cmd_buf));
         if(acc->enable_cmd_sudo_exec)
         {
-            /* Run the command via sudo - this allows sudo filtering
-             * to apply to the incoming command
-            */
+            
+
+           // 如果我们有一个 sudo 用户，那么我们将使用它来执行命令
             strlcpy(cmd_buf, opts->config[CONF_SUDO_EXE],
                     sizeof(cmd_buf));
             if(acc->cmd_sudo_exec_user != NULL
@@ -525,7 +482,7 @@ process_cmd_msg(fko_srv_options_t *opts, acc_stanza_t *acc,
                     cmd_buf, NULL, 0, WANT_STDERR, NO_TIMEOUT,
                     &pid_status, opts);
         }
-        else /* Just run it as we are (root that is). */
+        else // 以 root 身份运行
         {
             log_msg(LOG_INFO,
                     "[%s] (stanza #%d) Running command '%s'",
@@ -534,8 +491,9 @@ process_cmd_msg(fko_srv_options_t *opts, acc_stanza_t *acc,
                     5, &pid_status, opts);
         }
 
-        /* should only call WEXITSTATUS() if WIFEXITED() is true
-        */
+       
+
+       // 如果WIFEXITED()命令成功执行，则将结果设置为 SPA_MSG_COMMAND_SUCCESS
         log_msg(LOG_INFO,
             "[%s] (stanza #%d) CMD_EXEC: command returned %i, pid_status: %d",
             spadat->pkt_source_ip, stanza_num, *res,
@@ -564,8 +522,7 @@ check_mode_ctx(spa_data_t *spadat, fko_ctx_t *ctx, int attempted_decrypt,
         return 0;
     }
 
-    /* Do we have a valid FKO context?  Did the SPA decrypt properly?
-    */
+    
     if(res != FKO_SUCCESS)
     {
         log_msg(LOG_WARNING, "[%s] (stanza #%d) Error creating fko context: %s",
@@ -606,9 +563,8 @@ handle_gpg_enc(acc_stanza_t *acc, spa_pkt_info_t *spa_pkt,
 {
     if(acc->use_gpg && enc_type == FKO_ENCRYPTION_GPG && cmd_exec_success == 0)
     {
-        /* For GPG we create the new context without decrypting on the fly
-         * so we can set some GPG parameters first.
-        */
+        
+        // 如果我们有一个 GPG 密码，或者允许没有密码，则创建一个新的 FKO 上下文
         if(acc->gpg_decrypt_pw != NULL || acc->gpg_allow_no_pw)
         {
             *res = fko_new_with_data(ctx, (char *)spa_pkt->packet_data, NULL,
@@ -624,8 +580,8 @@ handle_gpg_enc(acc_stanza_t *acc, spa_pkt_info_t *spa_pkt,
                 return 0;
             }
 
-            /* Set whatever GPG parameters we have.
-            */
+         
+           // 如果我们有一个 GPG 可执行文件路径，则设置它
             if(acc->gpg_exe != NULL)
             {
                 *res = fko_set_gpg_exe(*ctx, acc->gpg_exe);
@@ -657,27 +613,26 @@ handle_gpg_enc(acc_stanza_t *acc, spa_pkt_info_t *spa_pkt,
             if(acc->gpg_decrypt_id != NULL)
                 fko_set_gpg_recipient(*ctx, acc->gpg_decrypt_id);
 
-            /* If GPG_REQUIRE_SIG is set for this acc stanza, then set
-             * the FKO context accordingly and check the other GPG Sig-
-             * related parameters. This also applies when REMOTE_ID is
-             * set.
-            */
-            if(acc->gpg_require_sig)
-            {
-                fko_set_gpg_signature_verify(*ctx, 1);
+           /* 如果为此 acc stanza 设置了 GPG_REQUIRE_SIG，则相应地设置 FKO 上下文并检查其他与 GPG 签名相关的参数。当设置了 REMOTE_ID 时，也适用。
+*/
 
-                /* Set whether or not to ignore signature verification errors.
-                */
-                fko_set_gpg_ignore_verify_error(*ctx, acc->gpg_ignore_sig_error);
-            }
-            else
-            {
-                fko_set_gpg_signature_verify(*ctx, 0);
-                fko_set_gpg_ignore_verify_error(*ctx, 1);
-            }
+if (acc->gpg_require_sig)
+{
+    fko_set_gpg_signature_verify(*ctx, 1);
 
-            /* Now decrypt the data.
-            */
+    /* 设置是否忽略签名验证错误。
+    */
+    fko_set_gpg_ignore_verify_error(*ctx, acc->gpg_ignore_sig_error);
+}
+else
+{
+    fko_set_gpg_signature_verify(*ctx, 0);
+    fko_set_gpg_ignore_verify_error(*ctx, 1);
+}
+
+/* 现在解密数据。
+*/
+
             *res = fko_decrypt_spa_data(*ctx, acc->gpg_decrypt_pw, 0);
             *attempted_decrypt = 1;
         }
@@ -718,8 +673,8 @@ handle_gpg_sigs(acc_stanza_t *acc, spa_data_t *spadat,
                 "[%s] (stanza #%d) Incoming SPA data signed by '%s' (fingerprint '%s').",
                 spadat->pkt_source_ip, stanza_num, gpg_id, gpg_fpr);
 
-        /* prefer GnuPG fingerprint match if so configured
-        */
+       /* 如果已配置，优先使用 GnuPG 指纹匹配*/
+
         if(acc->gpg_remote_fpr != NULL)
         {
             is_gpg_match = 0;
@@ -890,7 +845,7 @@ set_timeout(acc_stanza_t *acc, spa_data_t *spadat)
     if(spadat->client_timeout > 0)
         if(acc->max_fw_timeout < spadat->client_timeout)
         {
-            /* don't allow clients to request more time than the max
+            /* 
              * 不允许客户端请求超过最大允许的时间。
             */
             spadat->fw_access_timeout = acc->max_fw_timeout;
@@ -919,17 +874,14 @@ check_port_proto(acc_stanza_t *acc, spa_data_t *spadat, const int stanza_num)
     return 1;
 }
 
-/* Process the SPA packet data
-*/
+
 //处理spa数据包
 void
 incoming_spa(fko_srv_options_t *opts)
 {   
     //初始化总是一个好主意，如果它将被使用
     //重复（特别是使用fko_new_with_data（））。
-    /* Always a good idea to initialize ctx to null if it will be used
-     * repeatedly (especially when using fko_new_with_data()).
-    */
+    
    
     fko_ctx_t       ctx = NULL;
 
@@ -941,13 +893,11 @@ incoming_spa(fko_srv_options_t *opts)
 
     spa_pkt_info_t *spa_pkt = &(opts->spa_pkt);
 
-    /* This will hold our pertinent SPA data.
-    */
+   
    //这将保存我们的相关SPA数据
     spa_data_t spadat;
 
-    /* Loop through all access stanzas looking for a match
-    */
+    
    //循环遍历所有访问部分，寻找匹配
     acc_stanza_t        *acc = opts->acc_stanzas;
 
@@ -958,19 +908,12 @@ incoming_spa(fko_srv_options_t *opts)
     inet_ntop(AF_INET, &(spa_pkt->packet_dst_ip),
         spadat.pkt_destination_ip, sizeof(spadat.pkt_destination_ip));
 
-    /* At this point, we want to validate and (if needed) preprocess the
-     * SPA data and/or to be reasonably sure we have a SPA packet (i.e
-     * try to eliminate obvious non-spa packets).
-    */
+    
    //在这一点上，我们想要验证并（如果需要）预处理SPA数据和/或合理地确定我们是否有一个SPA数据包
 //    （即尝试消除明显的非spa数据包）
     if(!precheck_pkt(opts, spa_pkt, &spadat, &raw_digest))
         return;
 
-    /* Now that we know there is a matching access.conf stanza and the
-     * incoming SPA packet is not a replay, see if we should grant any
-     * access
-    */
    //现在我们知道有一个匹配的access.conf部分和传入的SPA数据包不是重播，看看我们是否应该授予任何访问
     while(acc)
     {
@@ -979,7 +922,7 @@ incoming_spa(fko_srv_options_t *opts)
         attempted_decrypt = 0;
         stanza_num++;
 
-        /* Start access loop with a clean FKO context
+        /* 
          * 使用一个干净的FKO上下文开始访问循环
         */
         if(ctx != NULL)
@@ -992,7 +935,7 @@ incoming_spa(fko_srv_options_t *opts)
             ctx = NULL;
         }
 
-        /* Check for a match for the SPA source and destination IP and the access stanza
+        /* 
          * 检查SPA源IP和目标IP以及访问段落的匹配情况。
         */
         if(! src_dst_check(acc, spa_pkt, &spadat, stanza_num))
@@ -1007,7 +950,7 @@ incoming_spa(fko_srv_options_t *opts)
 
         log_msg(LOG_DEBUG, "SPA Packet: '%s'", spa_pkt->packet_data);
 
-        /* Make sure this access stanza has not expired
+        /* 
         */
        //保证这个访问部分没有过期
         if(! check_stanza_expiration(acc, &spadat, stanza_num))
@@ -1016,8 +959,7 @@ incoming_spa(fko_srv_options_t *opts)
             continue;
         }
 
-        /* Get encryption type and try its decoding routine first (if the key
-         * for that type is set)
+        /* 
          * 获取加密类型并首先尝试其解码例程（如果已设置该类型的密钥）
         */
         enc_type = fko_encryption_type((char *)spa_pkt->packet_data);
@@ -1041,8 +983,8 @@ incoming_spa(fko_srv_options_t *opts)
             continue;
         }
 
-        /* Add this SPA packet into the replay detection cache将此SPA数据包添加到重放检测缓存中。
-        */
+        
+       // 如果我们没有在测试模式下运行，而且我们还没有添加这个摘要，那么就添加它。
         if(! add_replay_cache(opts, acc, &spadat, raw_digest,
                     &added_replay_digest, stanza_num, &res))
         {
@@ -1050,9 +992,7 @@ incoming_spa(fko_srv_options_t *opts)
             continue;
         }
 
-        /* At this point the SPA data is authenticated via the HMAC (if used
-         * for now). Next we need to see if it meets our access criteria which
-         * the server imposes regardless of the content of the SPA packet.
+        /* .
          * 在这一点上，SPA数据已通过HMAC（如果使用）进行身份验证。
          * 接下来，我们需要检查它是否满足我们的访问标准，这是服务器无论SPA数据包的内容都会强制执行的。
         */
@@ -1065,9 +1005,7 @@ incoming_spa(fko_srv_options_t *opts)
         else
             log_msg(LOG_WARNING, "Unable to dump FKO context: %s", fko_errstr(res));
 
-        /* First, if this is a GPG message, and GPG_REMOTE_ID list is not empty,
-         * then we need to make sure this incoming message is signer ID matches
-         * an entry in the list.
+        /* 
          * 首先，如果这是一条GPG消息，并且GPG_REMOTE_ID列表不为空，
          * 那么我们需要确保传入的消息签名者ID与列表中的某个条目匹配。
         */
@@ -1078,7 +1016,7 @@ incoming_spa(fko_srv_options_t *opts)
             continue;
         }
 
-        /* Populate our spa data struct for future reference.
+        /* 
         * 为将来的参考，填充我们的spa数据结构。
         */
         res = get_spa_data_fields(ctx, &spadat);
@@ -1093,16 +1031,14 @@ incoming_spa(fko_srv_options_t *opts)
             continue;
         }
 
-        /* Figure out what our timeout will be. If it is specified in the SPA
-         * data, then use that.  If not, try the FW_ACCESS_TIMEOUT from the
-         * access.conf file (if there is one).  Otherwise use the default.
+        /* 
          * 确定我们的超时时间将会是多少。如果在SPA数据中指定了超时时间，那么使用该值。
          * 如果没有指定，尝试使用access.conf文件中的FW_ACCESS_TIMEOUT（如果存在）。
          * 否则，使用默认超时时间。
         */
         set_timeout(acc, &spadat);
 
-        /* Check packet age if so configured.
+        /* 
          * 如果已配置，则检查数据包的年龄。
         */
         if(! check_pkt_age(opts, &spadat, stanza_num))
@@ -1111,9 +1047,7 @@ incoming_spa(fko_srv_options_t *opts)
             continue;
         }
 
-        /* At this point, we have enough to check the embedded (or packet source)
-         * IP address against the defined access rights.  We start by splitting
-         * the spa msg source IP from the remainder of the message.
+        /* 
          * 此时，我们已经具备足够的信息来检查嵌入（或数据包源）的IP地址是否符合定义的访问权限。
          * 我们首先从消息中分离SPA消息源IP地址和其余部分。
         */
@@ -1150,8 +1084,7 @@ incoming_spa(fko_srv_options_t *opts)
 
         strlcpy(spadat.spa_message_remain, spa_ip_demark+1, MAX_DECRYPTED_SPA_LEN);
 
-        /* If use source IP was requested (embedded IP of 0.0.0.0), make sure it
-         * is allowed.
+        /* 
          * 如果请求使用源IP地址（嵌入IP地址为0.0.0.0），确保它是被允许的。
         */
         if(! check_src_access(acc, &spadat, stanza_num))
@@ -1160,8 +1093,7 @@ incoming_spa(fko_srv_options_t *opts)
             continue;
         }
 
-        /* If REQUIRE_USERNAME is set, make sure the username in this SPA data
-         * matches.
+        /* 
          * 如果设置了REQUIRE_USERNAME，请确保此SPA数据中的用户名匹配。
         */
         if(! check_username(acc, &spadat, stanza_num))
@@ -1170,32 +1102,32 @@ incoming_spa(fko_srv_options_t *opts)
             continue;
         }
 
-        /* Take action based on SPA message type.
-        */
-        if(! check_nat_access_types(opts, acc, &spadat, stanza_num))
-        {
-            acc = acc->next;
-            continue;
-        }
+       /* 根据 SPA 消息类型采取行动。
+*/
+if (!check_nat_access_types(opts, acc, &spadat, stanza_num))
+{
+    acc = acc->next;
+    continue;
+}
 
-        /* Command messages.
-        */
-        if(acc->cmd_cycle_open != NULL)
-        {
-            if(cmd_cycle_open(opts, acc, &spadat, stanza_num, &res))
-                break; /* successfully processed a matching access stanza 成功处理了匹配的访问部分。*/
-            else
-            {
-                acc = acc->next;
-                continue;
-            }
-        }
+/* 命令消息。
+*/
+if (acc->cmd_cycle_open != NULL)
+{
+    if (cmd_cycle_open(opts, acc, &spadat, stanza_num, &res))
+        break; /* 成功处理了匹配的访问部分。*/
+    else
+    {
+        acc = acc->next;
+        continue;
+   }
+}
+
         else if(spadat.message_type == FKO_COMMAND_MSG)
         {
             if(process_cmd_msg(opts, acc, &spadat, stanza_num, &res))
             {
-                /* we processed the command on a matching access stanza, so we
-                 * don't look for anything else to do with this SPA packet
+                /* 
                  * 我们已经在匹配的访问部分上处理了命令，因此不需要再查找与此SPA数据包有关的其他操作。
                 */
                 break;
@@ -1207,9 +1139,6 @@ incoming_spa(fko_srv_options_t *opts)
             }
         }
 
-        /* From this point forward, we have some kind of access message. So
-         * we first see if access is allowed by checking access against
-         * restrict_ports and open_ports.
          * 从这一点开始，我们有某种类型的访问消息。
          * 因此，我们首先通过检查访问权限来查看是否允许访问，
          * 这是通过与restrict_ports和open_ports进行比较来完成的。
@@ -1222,12 +1151,10 @@ incoming_spa(fko_srv_options_t *opts)
             continue;
         }
 
-        /* At this point, we process the SPA request and break out of the
-         * access stanza loop (first valid access stanza stops us looking
-         * for others).
+        /* 
          * 在这一点上，我们处理SPA请求并跳出访问部分循环（第一个有效的访问部分停止我们查找其他的）。
         */
-        if(opts->test)  /* no firewall changes in --test mode */
+        if(opts->test)   //在测试模式下没有防火墙更改
         {
             log_msg(LOG_WARNING,
                 "[%s] (stanza #%d) --test mode enabled, skipping firewall manipulation.",
@@ -1241,7 +1168,7 @@ incoming_spa(fko_srv_options_t *opts)
             if(acc->cmd_cycle_open != NULL)
             {
                 if(cmd_cycle_open(opts, acc, &spadat, stanza_num, &res))
-                    break; /* successfully processed a matching access stanza */
+                    break; // 成功处理了匹配的访问部分。
                 else
                 {
                     acc = acc->next;
@@ -1254,8 +1181,7 @@ incoming_spa(fko_srv_options_t *opts)
             }
         }
 
-        /* If we made it here, then the SPA packet was processed according
-         * to a matching access.conf stanza, so we're done with this packet.
+        /* 
          * 如果我们执行到了这一步，那么SPA数据包已根据匹配的access.conf访问部分进行处理，因此我们已完成了对这个数据包的处理。
         */
         break;

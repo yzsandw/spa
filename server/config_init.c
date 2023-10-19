@@ -1,32 +1,8 @@
 /**
- * \file server/config_init.c
- *
- * \brief Command-line and config file processing for fwknop server.
- */
-
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- ******************************************************************************
+\file server/config_init.c
+\brief 用于fwknop服务器的命令行和配置文件处理。
 */
+
 #include "fwknopd_common.h"
 #include "fwknopd_errors.h"
 #include "config_init.h"
@@ -41,9 +17,7 @@
   #include "fw_util_iptables.h"
 #endif
 
-/* Check to see if an integer variable has a value that is within a
- * specific range
-*/
+/* 检查整数变量是否具有特定范围内的值 */
 static int
 range_check(fko_srv_options_t *opts, char *var, char *val, int low, int high)
 {
@@ -60,38 +34,34 @@ range_check(fko_srv_options_t *opts, char *var, char *val, int low, int high)
     return rv;
 }
 
-/* Take an index and a string value. malloc the space for the value
- * and assign it to the array at the specified index.
-*/
+
+/* 接受一个索引和一个字符串值，为该值分配内存空间，然后将其分配给指定索引处的数组。 */
 static void
 set_config_entry(fko_srv_options_t *opts, const int var_ndx, const char *value)
 {
     int space_needed;
 
-    /* Sanity check the index value.
-    */
+    
+    // 检查索引值是否有效
     if(var_ndx < 0 || var_ndx >= NUMBER_OF_CONFIG_ENTRIES)
     {
         log_msg(LOG_ERR, "[*] Index value of %i is not valid", var_ndx);
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
 
-    /* If this particular entry was already set (i.e. not NULL), then
-     * assume it needs to be freed first.
-    */
+   // 如果这个特定的条目已经设置（即不为NULL），则假定它需要首先释放。
     if(opts->config[var_ndx] != NULL)
         free(opts->config[var_ndx]);
 
-    /* If we are setting it to NULL, do it and be done.
-    */
+   // 如果值为NULL，则将其设置为NULL并返回。
     if(value == NULL)
     {
         opts->config[var_ndx] = NULL;
         return;
     }
 
-    /* Otherwise, make the space we need and set it.
-    */
+    
+    // 否则，分配内存空间并将其设置。
     space_needed = strlen(value) + 1;
 
     opts->config[var_ndx] = calloc(1, space_needed);
@@ -107,7 +77,7 @@ set_config_entry(fko_srv_options_t *opts, const int var_ndx, const char *value)
     return;
 }
 
-/* Given a config parameter name, return its index or -1 if not found.
+/* 给定一个配置参数名称，返回其索引，如果未找到则返回-1。
 */
 static int
 config_entry_index(const fko_srv_options_t *opts, const char *var)
@@ -121,8 +91,8 @@ config_entry_index(const fko_srv_options_t *opts, const char *var)
     return(-1);
 }
 
-/* Free the config memory
-*/
+
+// 释放配置内存
 void
 free_configs(fko_srv_options_t *opts)
 {
@@ -180,9 +150,8 @@ validate_int_var_ranges(fko_srv_options_t *opts)
         opts->config[CONF_IPFW_EXPIRE_PURGE_INTERVAL],
         1, RCHK_MAX_IPFW_PURGE_INTERVAL);
 
-    /* Make sure the active and expire sets are not identical whenever
-     * they are non-zero
-    */
+    
+   // 确保活动和过期集在非零时不相同
     if((strtol_wrapper(opts->config[CONF_IPFW_ACTIVE_SET_NUM],
                     0, RCHK_MAX_IPFW_SET_NUM, NO_EXIT_UPON_ERR, &is_err) > 0
             && strtol_wrapper(opts->config[CONF_IPFW_EXPIRE_SET_NUM],
@@ -207,15 +176,16 @@ validate_int_var_ranges(fko_srv_options_t *opts)
     range_check(opts, "PF_EXPIRE_INTERVAL", opts->config[CONF_PF_EXPIRE_INTERVAL],
         1, RCHK_MAX_PF_EXPIRE_INTERVAL);
 
-#endif /* FIREWALL type */
+#endif  // 防火墙类型
 
     return;
 }
 
+
 /**
- * @brief Generate Rijndael + HMAC keys from /dev/urandom (base64 encoded).
+ * @brief 从/dev/urandom生成Rijndael + HMAC密钥（经过Base64编码）。
  *
- * @param options FKO command line option structure
+ * @param options FKO命令行选项结构
  */
 static void
 generate_keys(fko_srv_options_t *options)
@@ -226,8 +196,7 @@ generate_keys(fko_srv_options_t *options)
     FILE  *key_gen_file_ptr = NULL;
     int res;
 
-    /* Set defaults and validate for --key-gen mode
-    */
+   // 如果没有指定密钥长度，则使用默认值
     if(options->key_len == 0)
         options->key_len = FKO_DEFAULT_KEY_LEN;
 
@@ -237,11 +206,13 @@ generate_keys(fko_srv_options_t *options)
     if(options->hmac_type == 0)
         options->hmac_type = FKO_DEFAULT_HMAC_MODE;
 
-    /* Zero out the key buffers */
+    
+    // 将密钥缓冲区清零
     memset(key_base64, 0x00, sizeof(key_base64));
     memset(hmac_key_base64, 0x00, sizeof(hmac_key_base64));
 
-    /* Generate the key through libfko */
+    
+    // 生成密钥
     res = fko_key_gen(key_base64, options->key_len,
             hmac_key_base64, options->hmac_key_len,
             options->hmac_type);
@@ -275,8 +246,8 @@ generate_keys(fko_srv_options_t *options)
     clean_exit(options, NO_FW_CLEANUP, EXIT_SUCCESS);
 }
 
-/* Parse the config file...
-*/
+
+// 解析配置文件
 static void
 parse_config_file(fko_srv_options_t *opts, const char *config_file)
 {
@@ -291,9 +262,9 @@ parse_config_file(fko_srv_options_t *opts, const char *config_file)
     char            tmp1[MAX_LINE_LEN] = {0};
     char            tmp2[MAX_LINE_LEN] = {0};
 
-    /* See the comment in the parse_access_file() function regarding security
-     * here relative to a TOCTOU bug flagged by Coverity.
-    */
+    /* 请参见parse_access_file()函数中的注释，有关Coverity标记的TOCTOU漏洞，涉及到相对于安全性的问题。 */
+   
+   
     if ((cfile_ptr = fopen(config_file, "r")) == NULL)
     {
         log_msg(LOG_ERR, "[*] Could not open config file: %s",
@@ -318,9 +289,8 @@ parse_config_file(fko_srv_options_t *opts, const char *config_file)
         numLines++;
         conf_line_buf[MAX_LINE_LEN-1] = '\0';
 
-        /* Get past comments and empty lines (note: we only look at the
-         * first character.
-        */
+        
+       /* 忽略注释和空行（注意：我们只看第一个字符）。 */
         if(IS_EMPTY_LINE(conf_line_buf[0]))
             continue;
 
@@ -332,8 +302,8 @@ parse_config_file(fko_srv_options_t *opts, const char *config_file)
             );
             continue;
         }
-        /* Remove any trailing whitespace from the value
-        */
+        
+       // 从值中删除任何尾随空格
         chop_whitespace(val);
 
         good_ent = 0;
@@ -341,10 +311,8 @@ parse_config_file(fko_srv_options_t *opts, const char *config_file)
         {
             if(CONF_VAR_IS(config_map[i], var))
             {
-                /* First check to see if we need to do a varable expansion
-                 * on this value.  Note: this only supports one expansion and
-                 * only if the value starts with the variable.
-                */
+                /* 首先检查是否需要对该值进行变量扩展。注意：这只支持
+                一次扩展，只能在该值以变量开头的情况下才会进行扩展。 */
                 if(*val == '$')
                 {
                     if(sscanf((val+1), "%[A-Z_]%s", tmp1, tmp2))
@@ -356,9 +324,7 @@ parse_config_file(fko_srv_options_t *opts, const char *config_file)
                         }
                         else
                         {
-                            /* We didn't map the embedded variable to a valid
-                             * config parameter
-                            */
+                            /* 我们没有将嵌入的变量映射到有效的配置参数 */
                             log_msg(LOG_ERR,
                                 "[*] Invalid embedded variable in: '%s'", val);
                             break;
@@ -384,28 +350,23 @@ parse_config_file(fko_srv_options_t *opts, const char *config_file)
     return;
 }
 
-/* Set defaults, and do sanity and bounds checks for the various options.
-*/
+/* 设置默认值，并对各种选项进行合理性和边界检查。 */
 static void
 validate_options(fko_srv_options_t *opts)
 {
     char tmp_path[MAX_PATH_LEN] = {0};
 
-    /* If no conf dir is set in the config file, use the default.
-    */
+   // 如果在命令行上没有指定配置文件路径，则使用默认值。
     if(opts->config[CONF_FWKNOP_CONF_DIR] == NULL)
         set_config_entry(opts, CONF_FWKNOP_CONF_DIR, DEF_CONF_DIR);
 
-    /* If no access.conf path was specified on the command line or set in
-     * the config file, use the default.
-    */
+   // 如果在命令行上没有指定access.conf路径，则使用默认值。
     if(opts->config[CONF_ACCESS_FILE] == NULL)
         set_config_entry(opts, CONF_ACCESS_FILE, DEF_ACCESS_FILE);
 
-    /* If the pid and digest cache files where not set in the config file or
-     * via command-line, then grab the defaults. Start with RUN_DIR as the
-     * files may depend on that.
-    */
+  /* 如果配置文件或命令行中未设置pid和digest缓存文件
+  ，则获取默认值。从RUN_DIR开始，因为文件可能依赖于它。 */
+   
     if(opts->config[CONF_FWKNOP_RUN_DIR] == NULL)
         set_config_entry(opts, CONF_FWKNOP_RUN_DIR, DEF_RUN_DIR);
 
@@ -420,7 +381,7 @@ validate_options(fko_srv_options_t *opts)
 
         set_config_entry(opts, CONF_FWKNOP_PID_FILE, tmp_path);
     }
-
+}
 #if USE_FILE_CACHE
     if(opts->config[CONF_DIGEST_FILE] == NULL)
 #else
@@ -441,47 +402,33 @@ validate_options(fko_srv_options_t *opts)
 #endif
     }
 
-    /* Set remaining require CONF_ vars if they are not already set.  */
+   /* 如果尚未设置剩余的必要的CONF_变量，则设置它们。 */
 
-    /* PCAP capture interface - note that if '-r <pcap file>' is specified
-     * on the command line, then this will override the pcap interface setting.
-    */
-    if(opts->config[CONF_PCAP_INTF] == NULL)
-        set_config_entry(opts, CONF_PCAP_INTF, DEF_INTERFACE);
+/* PCAP捕获接口 - 请注意，如果在命令行上指定了'-r <pcap文件>'，则将覆盖PCAP接口设置。 */
+if (opts->config[CONF_PCAP_INTF] == NULL)
+    set_config_entry(opts, CONF_PCAP_INTF, DEF_INTERFACE);
 
-    /* PCAP Promiscuous mode.
-    */
-    if(opts->config[CONF_ENABLE_PCAP_PROMISC] == NULL)
-        set_config_entry(opts, CONF_ENABLE_PCAP_PROMISC,
-            DEF_ENABLE_PCAP_PROMISC);
+/* PCAP混杂模式。 */
+if (opts->config[CONF_ENABLE_PCAP_PROMISC] == NULL)
+    set_config_entry(opts, CONF_ENABLE_PCAP_PROMISC, DEF_ENABLE_PCAP_PROMISC);
 
-    /* The packet count argument to pcap_dispatch()
-    */
-    if(opts->config[CONF_PCAP_DISPATCH_COUNT] == NULL)
-        set_config_entry(opts, CONF_PCAP_DISPATCH_COUNT,
-            DEF_PCAP_DISPATCH_COUNT);
+/* 传递给pcap_dispatch()的数据包计数参数。 */
+if (opts->config[CONF_PCAP_DISPATCH_COUNT] == NULL)
+    set_config_entry(opts, CONF_PCAP_DISPATCH_COUNT, DEF_PCAP_DISPATCH_COUNT);
 
-    /* Microseconds to sleep between pcap loop iterations
-    */
-    if(opts->config[CONF_PCAP_LOOP_SLEEP] == NULL)
-        set_config_entry(opts, CONF_PCAP_LOOP_SLEEP,
-            DEF_PCAP_LOOP_SLEEP);
+/* 在pcap循环迭代之间休眠的微秒数。 */
+if (opts->config[CONF_PCAP_LOOP_SLEEP] == NULL)
+    set_config_entry(opts, CONF_PCAP_LOOP_SLEEP, DEF_PCAP_LOOP_SLEEP);
 
-    /* Control whether to exit if the interface where we're sniffing
-     * goes down.
-    */
-    if(opts->config[CONF_EXIT_AT_INTF_DOWN] == NULL)
-        set_config_entry(opts, CONF_EXIT_AT_INTF_DOWN,
-            DEF_EXIT_AT_INTF_DOWN);
+/* 控制是否在我们嗅探的接口关闭时退出。 */
+if (opts->config[CONF_EXIT_AT_INTF_DOWN] == NULL)
+    set_config_entry(opts, CONF_EXIT_AT_INTF_DOWN, DEF_EXIT_AT_INTF_DOWN);
 
-    /* PCAP Filter.
-    */
-    if(opts->config[CONF_PCAP_FILTER] == NULL)
-        set_config_entry(opts, CONF_PCAP_FILTER, DEF_PCAP_FILTER);
+/* PCAP过滤器。 */
+if (opts->config[CONF_PCAP_FILTER] == NULL)
+    set_config_entry(opts, CONF_PCAP_FILTER, DEF_PCAP_FILTER);
 
-    /* Enable SPA packet aging unless we're getting packet data
-     * directly from a pcap file
-    */
+/* 启用SPA数据包老化，除非我们直接从pcap文件中获取数据包数据。 */
     if(opts->config[CONF_ENABLE_SPA_PACKET_AGING] == NULL)
     {
         if(opts->config[CONF_PCAP_FILE] == NULL)
@@ -495,62 +442,43 @@ validate_options(fko_srv_options_t *opts)
         }
     }
 
-    /* SPA packet age.
-    */
-    if(opts->config[CONF_MAX_SPA_PACKET_AGE] == NULL)
-        set_config_entry(opts, CONF_MAX_SPA_PACKET_AGE,
-            DEF_MAX_SPA_PACKET_AGE);
+  /* SPA数据包老化。 */
+if (opts->config[CONF_MAX_SPA_PACKET_AGE] == NULL)
+    set_config_entry(opts, CONF_MAX_SPA_PACKET_AGE, DEF_MAX_SPA_PACKET_AGE);
 
-    /* Enable digest persistence.
-    */
-    if(opts->config[CONF_ENABLE_DIGEST_PERSISTENCE] == NULL)
-        set_config_entry(opts, CONF_ENABLE_DIGEST_PERSISTENCE,
-            DEF_ENABLE_DIGEST_PERSISTENCE);
+/* 启用摘要持久性。 */
+if (opts->config[CONF_ENABLE_DIGEST_PERSISTENCE] == NULL)
+    set_config_entry(opts, CONF_ENABLE_DIGEST_PERSISTENCE, DEF_ENABLE_DIGEST_PERSISTENCE);
 
-    /* Set firewall rule "deep" collection interval - this allows
-     * fwknopd to remove rules with proper _exp_<time> expiration
-     * times even when added by a different program.
-    */
-    if(opts->config[CONF_RULES_CHECK_THRESHOLD] == NULL)
-        set_config_entry(opts, CONF_RULES_CHECK_THRESHOLD,
-            DEF_RULES_CHECK_THRESHOLD);
+/* 设置防火墙规则的“深度”收集间隔 - 这允许fwknopd在由不同程序添加时删除具有适当的_exp_<time>过期时间的规则。 */
+if (opts->config[CONF_RULES_CHECK_THRESHOLD] == NULL)
+    set_config_entry(opts, CONF_RULES_CHECK_THRESHOLD, DEF_RULES_CHECK_THRESHOLD);
 
-    /* Enable destination rule.
-    */
-    if(opts->config[CONF_ENABLE_DESTINATION_RULE] == NULL)
-        set_config_entry(opts, CONF_ENABLE_DESTINATION_RULE,
-            DEF_ENABLE_DESTINATION_RULE);
+/* 启用目标规则。 */
+if (opts->config[CONF_ENABLE_DESTINATION_RULE] == NULL)
+    set_config_entry(opts, CONF_ENABLE_DESTINATION_RULE, DEF_ENABLE_DESTINATION_RULE);
 
-    /* Max sniff bytes.
-    */
-    if(opts->config[CONF_MAX_SNIFF_BYTES] == NULL)
-        set_config_entry(opts, CONF_MAX_SNIFF_BYTES, DEF_MAX_SNIFF_BYTES);
-
+/* 最大嗅探字节数。 */
+if (opts->config[CONF_MAX_SNIFF_BYTES] == NULL)
+    set_config_entry(opts, CONF_MAX_SNIFF_BYTES, DEF_MAX_SNIFF_BYTES);
 #if FIREWALL_FIREWALLD
-    /* Enable FIREWD forwarding.
-    */
-    if(opts->config[CONF_ENABLE_FIREWD_FORWARDING] == NULL)
-        set_config_entry(opts, CONF_ENABLE_FIREWD_FORWARDING,
-            DEF_ENABLE_FIREWD_FORWARDING);
+   /* 启用FIREWD转发。 */
+if (opts->config[CONF_ENABLE_FIREWD_FORWARDING] == NULL)
+    set_config_entry(opts, CONF_ENABLE_FIREWD_FORWARDING, DEF_ENABLE_FIREWD_FORWARDING);
 
-    /* Enable FIREWD local NAT.
-    */
-    if(opts->config[CONF_ENABLE_FIREWD_LOCAL_NAT] == NULL)
-        set_config_entry(opts, CONF_ENABLE_FIREWD_LOCAL_NAT,
-            DEF_ENABLE_FIREWD_LOCAL_NAT);
+/* 启用FIREWD本地NAT。 */
+if (opts->config[CONF_ENABLE_FIREWD_LOCAL_NAT] == NULL)
+    set_config_entry(opts, CONF_ENABLE_FIREWD_LOCAL_NAT, DEF_ENABLE_FIREWD_LOCAL_NAT);
 
-    /* Enable FIREWD SNAT.
-    */
-    if(opts->config[CONF_ENABLE_FIREWD_SNAT] == NULL)
-        set_config_entry(opts, CONF_ENABLE_FIREWD_SNAT,
-            DEF_ENABLE_FIREWD_SNAT);
+/* 启用FIREWD SNAT。 */
+if (opts->config[CONF_ENABLE_FIREWD_SNAT] == NULL)
+    set_config_entry(opts, CONF_ENABLE_FIREWD_SNAT, DEF_ENABLE_FIREWD_SNAT);
 
-    /* Make sure we have a valid IP if SNAT is enabled
-    */
-    if(strncasecmp(opts->config[CONF_ENABLE_FIREWD_SNAT], "Y", 1) == 0)
-    {
-        /* Note that fw_config_init() will set use_masquerade if necessary
-        */
+/* 确保在启用SNAT时有一个有效的IP */
+if (strncasecmp(opts->config[CONF_ENABLE_FIREWD_SNAT], "Y", 1) == 0)
+{
+    /* 请注意，fw_config_init()将在必要时设置use_masquerade */
+
         if(opts->config[CONF_SNAT_TRANSLATE_IP] != NULL)
         {
             if(! is_valid_ipv4_addr(opts->config[CONF_SNAT_TRANSLATE_IP], strlen(opts->config[CONF_SNAT_TRANSLATE_IP])))
@@ -563,24 +491,22 @@ validate_options(fko_srv_options_t *opts)
         }
     }
 
-    /* Enable FIREWD OUTPUT.
-    */
+   // 启用FIREWD输出。
     if(opts->config[CONF_ENABLE_FIREWD_OUTPUT] == NULL)
         set_config_entry(opts, CONF_ENABLE_FIREWD_OUTPUT,
             DEF_ENABLE_FIREWD_OUTPUT);
 
-    /* Flush FIREWD at init.
-    */
+    
+   // 在init时刷新FIREWD。
     if(opts->config[CONF_FLUSH_FIREWD_AT_INIT] == NULL)
         set_config_entry(opts, CONF_FLUSH_FIREWD_AT_INIT, DEF_FLUSH_FIREWD_AT_INIT);
 
-    /* Flush FIREWD at exit.
-    */
+    
+   // 在退出时刷新FIREWD。
     if(opts->config[CONF_FLUSH_FIREWD_AT_EXIT] == NULL)
         set_config_entry(opts, CONF_FLUSH_FIREWD_AT_EXIT, DEF_FLUSH_FIREWD_AT_EXIT);
 
-    /* FIREWD input access.
-    */
+   // 启用FIREWD输入。
     if(opts->config[CONF_FIREWD_INPUT_ACCESS] == NULL)
         set_config_entry(opts, CONF_FIREWD_INPUT_ACCESS,
             DEF_FIREWD_INPUT_ACCESS);
@@ -588,13 +514,12 @@ validate_options(fko_srv_options_t *opts)
     if(validate_firewd_chain_conf(opts->config[CONF_FIREWD_INPUT_ACCESS]) != 1)
     {
         log_msg(LOG_ERR,
-            "Invalid FIREWD_INPUT_ACCESS specification, see fwknopd.conf comments"
+            "无效的FIREWD_INPUT_ACCESS规范，请参阅fwknopd.conf注释"
         );
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
 
-    /* FIREWD output access.
-    */
+   // 启用FIREWD输出。
     if(opts->config[CONF_FIREWD_OUTPUT_ACCESS] == NULL)
         set_config_entry(opts, CONF_FIREWD_OUTPUT_ACCESS,
             DEF_FIREWD_OUTPUT_ACCESS);
@@ -607,8 +532,8 @@ validate_options(fko_srv_options_t *opts)
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
 
-    /* FIREWD forward access.
-    */
+    
+   // 启用FIREWD转发。
     if(opts->config[CONF_FIREWD_FORWARD_ACCESS] == NULL)
         set_config_entry(opts, CONF_FIREWD_FORWARD_ACCESS,
             DEF_FIREWD_FORWARD_ACCESS);
@@ -621,8 +546,8 @@ validate_options(fko_srv_options_t *opts)
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
 
-    /* FIREWD dnat access.
-    */
+    
+   // 启用FIREWD dnat。
     if(opts->config[CONF_FIREWD_DNAT_ACCESS] == NULL)
         set_config_entry(opts, CONF_FIREWD_DNAT_ACCESS,
             DEF_FIREWD_DNAT_ACCESS);
@@ -635,8 +560,8 @@ validate_options(fko_srv_options_t *opts)
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
 
-    /* FIREWD snat access.
-    */
+    
+   // 启用FIREWD snat。
     if(opts->config[CONF_FIREWD_SNAT_ACCESS] == NULL)
         set_config_entry(opts, CONF_FIREWD_SNAT_ACCESS,
             DEF_FIREWD_SNAT_ACCESS);
@@ -649,8 +574,7 @@ validate_options(fko_srv_options_t *opts)
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
 
-    /* FIREWD masquerade access.
-    */
+   // 启用FIREWD masquerade。
     if(opts->config[CONF_FIREWD_MASQUERADE_ACCESS] == NULL)
         set_config_entry(opts, CONF_FIREWD_MASQUERADE_ACCESS,
             DEF_FIREWD_MASQUERADE_ACCESS);
@@ -663,37 +587,31 @@ validate_options(fko_srv_options_t *opts)
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
 
-    /* Check for the firewalld 'comment' match at init time
-    */
+     /* 在初始化时检查firewalld“comment”匹配 */
     if(opts->config[CONF_ENABLE_FIREWD_COMMENT_CHECK] == NULL)
         set_config_entry(opts, CONF_ENABLE_FIREWD_COMMENT_CHECK,
             DEF_ENABLE_FIREWD_COMMENT_CHECK);
 
 #elif FIREWALL_IPTABLES
-    /* Enable IPT forwarding.
-    */
+    /* 启用IPT转发。 */
     if(opts->config[CONF_ENABLE_IPT_FORWARDING] == NULL)
         set_config_entry(opts, CONF_ENABLE_IPT_FORWARDING,
             DEF_ENABLE_IPT_FORWARDING);
 
-    /* Enable IPT local NAT.
-    */
+    /* 启用IPT本地NAT。 */
     if(opts->config[CONF_ENABLE_IPT_LOCAL_NAT] == NULL)
         set_config_entry(opts, CONF_ENABLE_IPT_LOCAL_NAT,
             DEF_ENABLE_IPT_LOCAL_NAT);
 
-    /* Enable IPT SNAT.
-    */
+    /* 启用IPT SNAT。 */
     if(opts->config[CONF_ENABLE_IPT_SNAT] == NULL)
         set_config_entry(opts, CONF_ENABLE_IPT_SNAT,
             DEF_ENABLE_IPT_SNAT);
 
-    /* Make sure we have a valid IP if SNAT is enabled
-    */
+    /* 如果启用SNAT，请确保我们有一个有效的IP */
     if(strncasecmp(opts->config[CONF_ENABLE_IPT_SNAT], "Y", 1) == 0)
     {
-        /* Note that fw_config_init() will set use_masquerade if necessary
-        */
+        /* 请注意，fw_config_init（）将在必要时设置use_masqurade */
         if(opts->config[CONF_SNAT_TRANSLATE_IP] != NULL)
         {
             if(! is_valid_ipv4_addr(opts->config[CONF_SNAT_TRANSLATE_IP], strlen(opts->config[CONF_SNAT_TRANSLATE_IP])))
@@ -706,24 +624,20 @@ validate_options(fko_srv_options_t *opts)
         }
     }
 
-    /* Enable IPT OUTPUT.
-    */
+    /* 启用IPT OUTPUT。 */
     if(opts->config[CONF_ENABLE_IPT_OUTPUT] == NULL)
         set_config_entry(opts, CONF_ENABLE_IPT_OUTPUT,
             DEF_ENABLE_IPT_OUTPUT);
 
-    /* Flush IPT at init.
-    */
+    /* 在初始化时刷新IPT。 */
     if(opts->config[CONF_FLUSH_IPT_AT_INIT] == NULL)
         set_config_entry(opts, CONF_FLUSH_IPT_AT_INIT, DEF_FLUSH_IPT_AT_INIT);
 
-    /* Flush IPT at exit.
-    */
+    /* 在出口冲洗IPT。 */
     if(opts->config[CONF_FLUSH_IPT_AT_EXIT] == NULL)
         set_config_entry(opts, CONF_FLUSH_IPT_AT_EXIT, DEF_FLUSH_IPT_AT_EXIT);
 
-    /* IPT input access.
-    */
+    /* IPT输入访问。 */
     if(opts->config[CONF_IPT_INPUT_ACCESS] == NULL)
         set_config_entry(opts, CONF_IPT_INPUT_ACCESS,
             DEF_IPT_INPUT_ACCESS);
@@ -736,8 +650,7 @@ validate_options(fko_srv_options_t *opts)
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
 
-    /* IPT output access.
-    */
+    /* IPT输出访问。 */
     if(opts->config[CONF_IPT_OUTPUT_ACCESS] == NULL)
         set_config_entry(opts, CONF_IPT_OUTPUT_ACCESS,
             DEF_IPT_OUTPUT_ACCESS);
@@ -750,8 +663,7 @@ validate_options(fko_srv_options_t *opts)
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
 
-    /* IPT forward access.
-    */
+    /* IPT转发访问。 */
     if(opts->config[CONF_IPT_FORWARD_ACCESS] == NULL)
         set_config_entry(opts, CONF_IPT_FORWARD_ACCESS,
             DEF_IPT_FORWARD_ACCESS);
@@ -764,8 +676,7 @@ validate_options(fko_srv_options_t *opts)
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
 
-    /* IPT dnat access.
-    */
+    /* IPT dnat访问。 */
     if(opts->config[CONF_IPT_DNAT_ACCESS] == NULL)
         set_config_entry(opts, CONF_IPT_DNAT_ACCESS,
             DEF_IPT_DNAT_ACCESS);
@@ -778,8 +689,7 @@ validate_options(fko_srv_options_t *opts)
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
 
-    /* IPT snat access.
-    */
+    /* IPT获取访问权限。 */
     if(opts->config[CONF_IPT_SNAT_ACCESS] == NULL)
         set_config_entry(opts, CONF_IPT_SNAT_ACCESS,
             DEF_IPT_SNAT_ACCESS);
@@ -792,8 +702,7 @@ validate_options(fko_srv_options_t *opts)
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
 
-    /* IPT masquerade access.
-    */
+    /* IPT伪装访问。 */
     if(opts->config[CONF_IPT_MASQUERADE_ACCESS] == NULL)
         set_config_entry(opts, CONF_IPT_MASQUERADE_ACCESS,
             DEF_IPT_MASQUERADE_ACCESS);
@@ -806,134 +715,111 @@ validate_options(fko_srv_options_t *opts)
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
 
-    /* Check for the iptables 'comment' match at init time
-    */
+    /* 在初始化时检查iptables的“comment”匹配 */
     if(opts->config[CONF_ENABLE_IPT_COMMENT_CHECK] == NULL)
         set_config_entry(opts, CONF_ENABLE_IPT_COMMENT_CHECK,
             DEF_ENABLE_IPT_COMMENT_CHECK);
 
 #elif FIREWALL_IPFW
 
-    /* Flush ipfw rules at init.
-    */
+    /* 在init刷新ipfw规则。 */
     if(opts->config[CONF_FLUSH_IPFW_AT_INIT] == NULL)
         set_config_entry(opts, CONF_FLUSH_IPFW_AT_INIT, DEF_FLUSH_IPFW_AT_INIT);
 
-    /* Flush ipfw rules at exit.
-    */
+    /* 在出口刷新ipfw规则。 */
     if(opts->config[CONF_FLUSH_IPFW_AT_EXIT] == NULL)
         set_config_entry(opts, CONF_FLUSH_IPFW_AT_EXIT, DEF_FLUSH_IPFW_AT_EXIT);
 
-    /* Set IPFW start rule number.
-    */
+    /* 设置IPFW启动规则编号。 */
     if(opts->config[CONF_IPFW_START_RULE_NUM] == NULL)
         set_config_entry(opts, CONF_IPFW_START_RULE_NUM,
             DEF_IPFW_START_RULE_NUM);
 
-    /* Set IPFW max rules.
-    */
+    /* 设置IPFW最大规则。 */
     if(opts->config[CONF_IPFW_MAX_RULES] == NULL)
         set_config_entry(opts, CONF_IPFW_MAX_RULES,
             DEF_IPFW_MAX_RULES);
 
-    /* Set IPFW active set number.
-    */
+    /* 设置IPFW活动集编号。 */
     if(opts->config[CONF_IPFW_ACTIVE_SET_NUM] == NULL)
         set_config_entry(opts, CONF_IPFW_ACTIVE_SET_NUM,
             DEF_IPFW_ACTIVE_SET_NUM);
 
-    /* Set IPFW expire set number.
-    */
+    /* 设置IPFW过期集编号。 */
     if(opts->config[CONF_IPFW_EXPIRE_SET_NUM] == NULL)
         set_config_entry(opts, CONF_IPFW_EXPIRE_SET_NUM,
             DEF_IPFW_EXPIRE_SET_NUM);
 
-    /* Set IPFW Dynamic rule expiry interval.
-    */
+    /* 设置IPFW动态规则到期间隔。 */
     if(opts->config[CONF_IPFW_EXPIRE_PURGE_INTERVAL] == NULL)
         set_config_entry(opts, CONF_IPFW_EXPIRE_PURGE_INTERVAL,
             DEF_IPFW_EXPIRE_PURGE_INTERVAL);
 
-    /* Set IPFW Dynamic rule expiry interval.
-    */
+    /* 设置IPFW动态规则到期间隔。 */
     if(opts->config[CONF_IPFW_ADD_CHECK_STATE] == NULL)
         set_config_entry(opts, CONF_IPFW_ADD_CHECK_STATE,
             DEF_IPFW_ADD_CHECK_STATE);
 
 #elif FIREWALL_PF
-    /* Set PF anchor name
-    */
+    /* 设置PF锚点名称 */
     if(opts->config[CONF_PF_ANCHOR_NAME] == NULL)
         set_config_entry(opts, CONF_PF_ANCHOR_NAME,
             DEF_PF_ANCHOR_NAME);
 
-    /* Set PF rule expiry interval.
-    */
+    /* 设置PF规则到期间隔。 */
     if(opts->config[CONF_PF_EXPIRE_INTERVAL] == NULL)
         set_config_entry(opts, CONF_PF_EXPIRE_INTERVAL,
             DEF_PF_EXPIRE_INTERVAL);
 
 #elif FIREWALL_IPF
-    /* --DSS Place-holder */
+    /* --DSS占位符 */
 
-#endif /* FIREWALL type */
+ #endif /* 防火墙类型 */
 
-    /* Disallow ENABLE_X_FORWARDED_FOR by default*/
+    /* 默认情况下不允许ENABLE_X_FORWARDED_FOR */
     if(opts->config[CONF_ENABLE_X_FORWARDED_FOR] == NULL)
         set_config_entry(opts, CONF_ENABLE_X_FORWARDED_FOR, DEF_ENABLE_X_FORWARDED_FOR);
 
-    /* Prepend firewall rules*/
+    /* 准备防火墙规则 */
     if(opts->config[CONF_ENABLE_RULE_PREPEND] == NULL)
         set_config_entry(opts, CONF_ENABLE_RULE_PREPEND, DEF_ENABLE_RULE_PREPEND);
 
-    /* NAT DNS enabled*/
+    /* NAT DNS已启用 */
     if(opts->config[CONF_ENABLE_NAT_DNS] == NULL)
         set_config_entry(opts, CONF_ENABLE_NAT_DNS, DEF_ENABLE_NAT_DNS);
 
-    /* GPG Home dir.
-    */
+    /* GPG主页目录。 */
     if(opts->config[CONF_GPG_HOME_DIR] == NULL)
         set_config_entry(opts, CONF_GPG_HOME_DIR, DEF_GPG_HOME_DIR);
 
-    /* GPG executable
-    */
+    /* GPG可执行文件 */
     if(opts->config[CONF_GPG_EXE] == NULL)
         set_config_entry(opts, CONF_GPG_EXE, DEF_GPG_EXE);
 
-    /* sudo executable
-    */
+    /* sudo可执行文件 */
     if(opts->config[CONF_SUDO_EXE] == NULL)
         set_config_entry(opts, CONF_SUDO_EXE, DEF_SUDO_EXE);
 
-    /* Enable SPA over HTTP.
-    */
+    /* 通过HTTP启用SPA。 */
     if(opts->config[CONF_ENABLE_SPA_OVER_HTTP] == NULL)
         set_config_entry(opts, CONF_ENABLE_SPA_OVER_HTTP,
             DEF_ENABLE_SPA_OVER_HTTP);
 
-    /* When CONF_ENABLE_SPA_OVER_HTTP is enabled, control whether to require the
-     * User-Agent string to begin with 'Fwknop'. The default is 'N', but setting
-     * this to 'Y' in the fwknopd.conf file allows any User-Agent to be used.
-     * Then, from the client, a custom User-Agent can be set with the
-     * '--user-agent' command line option.
-    */
+    /* 启用CONF_ENABLE_SPA_OVER_HTTP时，控制是否需要 */
     if(opts->config[CONF_ALLOW_ANY_USER_AGENT] == NULL)
         set_config_entry(opts, CONF_ALLOW_ANY_USER_AGENT,
             DEF_ALLOW_ANY_USER_AGENT);
 
-    /* Enable TCP server.
-    */
+    /* 启用TCP服务器。 */
     if(opts->config[CONF_ENABLE_TCP_SERVER] == NULL)
         set_config_entry(opts, CONF_ENABLE_TCP_SERVER, DEF_ENABLE_TCP_SERVER);
 
-    /* TCP Server port.
-    */
+    /* TCP服务器端口。 */
     if(opts->config[CONF_TCPSERV_PORT] == NULL)
         set_config_entry(opts, CONF_TCPSERV_PORT, DEF_TCPSERV_PORT);
 
 #if USE_LIBNETFILTER_QUEUE
-    /* Enable NFQ Capture
-    */
+    /* 启用NFQ捕获 */
     if(opts->config[CONF_ENABLE_NFQ_CAPTURE] == NULL)
         set_config_entry(opts, CONF_ENABLE_NFQ_CAPTURE, DEF_ENABLE_NFQ_CAPTURE);
 
@@ -943,40 +829,33 @@ validate_options(fko_srv_options_t *opts)
         opts->enable_nfq_capture = 1;
     }
 
-    /* NFQ Interface
-    */
+    /* NFQ接口 */
     if(opts->config[CONF_NFQ_INTERFACE] == NULL)
         set_config_entry(opts, CONF_NFQ_INTERFACE, DEF_NFQ_INTERFACE);
 
-    /* NFQ port.
-    */
+    /* NFQ端口。 */
     if(opts->config[CONF_NFQ_PORT] == NULL)
         set_config_entry(opts, CONF_NFQ_PORT, DEF_NFQ_PORT);
 
-    /* NFQ Queue Number
-    */
+    /* NFQ队列编号 */
     if(opts->config[CONF_NFQ_QUEUE_NUMBER] == NULL)
         set_config_entry(opts, CONF_NFQ_QUEUE_NUMBER,
             DEF_NFQ_QUEUE_NUMBER);
 
-    /* NFQ Chain
-    */
+    /* NFQ链 */
     if(opts->config[CONF_NFQ_CHAIN] == NULL)
         set_config_entry(opts, CONF_NFQ_CHAIN, DEF_NFQ_CHAIN);
 
-    /* NFQ Table
-    */
+    /* NFQ表 */
     if(opts->config[CONF_NFQ_TABLE] == NULL)
         set_config_entry(opts, CONF_NFQ_TABLE, DEF_NFQ_TABLE);
 
-    /* NFQ loop delay
-    */
+    /* NFQ环路延迟 */
     if(opts->config[CONF_NFQ_LOOP_SLEEP] == NULL)
         set_config_entry(opts, CONF_NFQ_LOOP_SLEEP, DEF_CONF_NFQ_LOOP_SLEEP);
 #endif
 
-    /* Enable UDP server.
-    */
+    /* 启用UDP服务器。 */
     if(opts->config[CONF_ENABLE_UDP_SERVER] == NULL)
     {
         if((strncasecmp(DEF_ENABLE_UDP_SERVER, "Y", 1) == 0) &&
@@ -988,47 +867,35 @@ validate_options(fko_srv_options_t *opts)
         set_config_entry(opts, CONF_ENABLE_UDP_SERVER, DEF_ENABLE_UDP_SERVER);
     }
 
-    /* UDP Server port.
-    */
+    /* UDP服务器端口。 */
     if(opts->config[CONF_UDPSERV_PORT] == NULL)
         set_config_entry(opts, CONF_UDPSERV_PORT, DEF_UDPSERV_PORT);
 
-    /* UDP server select() timeout in microseconds
-    */
+    /* UDP服务器select（）超时（以微秒为单位） */
     if(opts->config[CONF_UDPSERV_SELECT_TIMEOUT] == NULL)
         set_config_entry(opts, CONF_UDPSERV_SELECT_TIMEOUT,
             DEF_UDPSERV_SELECT_TIMEOUT);
 
-    /* Syslog identity.
-    */
+    /* 系统日志标识。 */
     if(opts->config[CONF_SYSLOG_IDENTITY] == NULL)
         set_config_entry(opts, CONF_SYSLOG_IDENTITY, DEF_SYSLOG_IDENTITY);
 
-    /* Syslog facility.
-    */
+    /* Syslog设施。 */
     if(opts->config[CONF_SYSLOG_FACILITY] == NULL)
         set_config_entry(opts, CONF_SYSLOG_FACILITY, DEF_SYSLOG_FACILITY);
 
 
-    /* Validate integer variable ranges
-    */
+    /* 验证整数变量范围 */
     validate_int_var_ranges(opts);
 
-    /* Some options just trigger some output of information, or trigger an
-     * external function, but do not actually start fwknopd.  If any of those
-     * are set, we can return here an skip the validation routines as all
-     * other options will be ignored anyway.
-     *
-     * These are also mutually exclusive (for now).
-    */
+    /* 有些选项只是触发一些信息输出，或者触发 */
     if((opts->dump_config + opts->kill + opts->restart + opts->status) == 1)
         return;
 
     if((opts->dump_config + opts->kill + opts->restart + opts->status) > 1)
     {
         log_msg(LOG_ERR,
-            "The -D, -K, -R, and -S options are mutually exclusive.  Pick only one."
-        );
+            "The -D, -K, -R, and -S options are mutually exclusive.  Pick only one.");
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
 
@@ -1046,23 +913,16 @@ validate_options(fko_srv_options_t *opts)
 void
 set_preconfig_entries(fko_srv_options_t *opts)
 {
-    /* First, set any default or otherwise static settings here.  Some may
-     * end up being overwritten via config file or command-line.
-    */
+    /* 首先，在此处设置任何默认或静态设置。有些可能 */
 
-    /* Setup the firewall executable based on build-time info.
-     * --DSS Note: We will want to either force external script mode, or
-     *             error out if we do not have a firewall executable defined.
-    */
+    /* 根据生成时信息设置防火墙可执行文件。 */
 #ifdef FIREWALL_EXE
     set_config_entry(opts, CONF_FIREWALL_EXE, FIREWALL_EXE);
 #endif
 
 }
 
-/* Initialize program configuration via config file and/or command-line
- * switches.
-*/
+/* 通过配置文件和/或命令行初始化程序配置 */
 void
 config_init(fko_srv_options_t *opts, int argc, char **argv)
 {
@@ -1072,33 +932,26 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
     char            override_file[MAX_LINE_LEN] = {0};
     char           *ndx, *cmrk;
 
-    /* Zero out options and opts_track.
-    */
+    /* 清零选项和opts_track。 */
     memset(opts, 0x00, sizeof(fko_srv_options_t));
 
-    /* Set some preconfiguration options (i.e. build-time defaults)
-    */
+    /* 设置一些预配置选项（即构建时默认值） */
     set_preconfig_entries(opts);
 
-    /* In case this is a re-config.
-    */
+    /* 如果这是重新配置。 */
     optind = 0;
 
-    /* Enable access.conf parsing (in case this is a re-config)
-    */
+    /* 启用access.conf解析（如果这是重新配置） */
     enable_acc_stanzas_init();
 
-    /* First, scan the command-line args to see if we are in key-generation
-     * mode. This is independent of config parsing and other operations, so
-     * it is done as the very first thing. Also handle printing of the fwknop
-     * version string since we don't need to parse a config for this.
-    */
+    /* 首先，扫描命令行参数，看看我们是否正在生成密钥 */
     while ((cmd_arg = getopt_long(argc, argv,
             GETOPTS_OPTION_STRING, cmd_opts, &index)) != -1) {
 
         switch(cmd_arg) {
             case 'V':
-                fprintf(stdout, "fwknopd server %s, compiled for firewall bin: %s\n",
+                fprintf(stdout, "fwknopd server %s, compiled for firewall bin: %s
+",
                         MY_VERSION, FIREWALL_EXE);
                 clean_exit(opts, NO_FW_CLEANUP, EXIT_SUCCESS);
             case 'k':
@@ -1108,7 +961,7 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
                 opts->key_gen = 1;
                 strlcpy(opts->key_gen_file, optarg, sizeof(opts->key_gen_file));
                 break;
-            case KEY_LEN:  /* used in --key-gen mode only */
+            case KEY_LEN:  /* 仅用于--key gen模式 */
                 opts->key_len = strtol_wrapper(optarg, 1,
                         MAX_KEY_LEN, NO_EXIT_UPON_ERR, &is_err);
                 if(is_err != FKO_SUCCESS)
@@ -1119,7 +972,7 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
                     clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
                 }
                 break;
-            case HMAC_DIGEST_TYPE:  /* used in --key-gen mode only */
+            case HMAC_DIGEST_TYPE:  /* 仅用于--key gen模式 */
                 if((opts->hmac_type = hmac_digest_strtoint(optarg)) < 0)
                 {
                     log_msg(LOG_ERR,
@@ -1128,7 +981,7 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
                     clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
                 }
                 break;
-            case HMAC_KEY_LEN:  /* used in --key-gen mode only */
+            case HMAC_KEY_LEN:  /* 仅用于--key gen模式 */
                 opts->hmac_key_len = strtol_wrapper(optarg, 1,
                         MAX_KEY_LEN, NO_EXIT_UPON_ERR, &is_err);
                 if(is_err != FKO_SUCCESS)
@@ -1143,70 +996,52 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
     }
 
     if(opts->key_gen)
-        generate_keys(opts); /* this function exits */
+        generate_keys(opts); /* 该函数退出 */
 
-    /* Reset the options index so we can run through them again.
-    */
+    /* 重置选项索引，以便我们可以再次浏览它们。 */
     optind = 0;
 
-    /* Now, scan the command-line args for -h/--help or an alternate
-     * configuration file. If we find an alternate config file, use it,
-     * otherwise use the default. We also grab any override config files
-     * as well. In addition, we handle key generation here since this is
-     * independent of configuration parsing.
-    */
+    /* 现在，扫描命令行参数以查找-h/--help或其他选项 */
     while ((cmd_arg = getopt_long(argc, argv,
             GETOPTS_OPTION_STRING, cmd_opts, &index)) != -1) {
 
-        /* If help is wanted, give it and exit.
-        */
+        /* 如果需要帮助，给予帮助并退出。 */
         switch(cmd_arg) {
             case 'h':
                 usage();
                 clean_exit(opts, NO_FW_CLEANUP, EXIT_SUCCESS);
 
-            /* Look for configuration file arg.
-            */
+            /* 查找配置文件arg。 */
             case 'c':
                 set_config_entry(opts, CONF_CONFIG_FILE, optarg);
                 got_conf_file++;
 
-                /* If we already have the config_override option, we are done.
-                */
+                /* 如果我们已经有了config_override选项，我们就完成了。 */
                 if(got_override_config > 0)
                     break;
 
-            /* Look for override configuration file arg.
-            */
+            /* 查找覆盖配置文件arg。 */
             case 'O':
                 set_config_entry(opts, CONF_OVERRIDE_CONFIG, optarg);
                 got_override_config++;
 
-                /* If we already have the conf_file option, we are done.
-                */
+                /* 如果我们已经有了conf_file选项，我们就完成了。 */
                 if(got_conf_file > 0)
                     break;
         }
     }
 
-    /* If no alternate configuration file was specified, we use the
-     * default.
-    */
+    /* 如果没有指定备用配置文件，则使用 */
     if(opts->config[CONF_CONFIG_FILE] == NULL)
         set_config_entry(opts, CONF_CONFIG_FILE, DEF_CONFIG_FILE);
 
-    /* Parse configuration file to populate any params not already specified
-     * via command-line options.
-    */
+    /* 分析配置文件以填充任何尚未指定的参数 */
     parse_config_file(opts, opts->config[CONF_CONFIG_FILE]);
 
-    /* If there are override configuration entries, process them
-     * here.
-    */
+    /* 如果存在覆盖配置条目，请对其进行处理 */
     if(opts->config[CONF_OVERRIDE_CONFIG] != NULL)
     {
-        /* Make a copy of the override_config string so we can munge it.
-        */
+        /* 制作一个override_config字符串的副本，以便我们可以对其进行处理。 */
         strlcpy(override_file, opts->config[CONF_OVERRIDE_CONFIG], sizeof(override_file));
 
         ndx  = override_file;
@@ -1214,29 +1049,24 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
 
         if(cmrk == NULL)
         {
-            /* Only one to process...
-            */
+            /* 只有一个要处理。。。 */
             parse_config_file(opts, ndx);
 
         } else {
-            /* Walk the string pulling the next config override
-             * at the comma delimiters.
-            */
+            /* 遍历字符串，拉动下一个配置覆盖 */
             while(cmrk != NULL) {
-                *cmrk = '\0';
+                *cmrk = ' ';
                 parse_config_file(opts, ndx);
                 ndx = cmrk + 1;
                 cmrk = strchr(ndx, ',');
             }
 
-            /* Process the last entry
-            */
+            /* 处理最后一个条目 */
             parse_config_file(opts, ndx);
         }
     }
 
-    /* Set up the verbosity level according to the value found in the
-     * config files */
+    /* 根据在中找到的值设置详细级别 */
     if (opts->config[CONF_VERBOSE] != NULL)
     {
         opts->verbose = strtol_wrapper(opts->config[CONF_VERBOSE], 0, -1,
@@ -1249,13 +1079,10 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
         }
     }
 
-    /* Reset the options index so we can run through them again.
-    */
+    /* 重置选项索引，以便我们可以再次浏览它们。 */
     optind = 0;
 
-    /* Last, but not least, we process command-line options (some of which
-     * may override configuration file options.
-    */
+    /* 最后，但同样重要的是，我们处理命令行选项（其中一些 */
     while ((cmd_arg = getopt_long(argc, argv,
             GETOPTS_OPTION_STRING, cmd_opts, &index)) != -1) {
 
@@ -1300,7 +1127,7 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
                 }
                 break;
             case 'c':
-                /* This was handled earlier */
+                /* 这是早些时候处理的 */
                 break;
             case 'C':
                 opts->packet_ctr_limit = strtol_wrapper(optarg,
@@ -1399,7 +1226,7 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
                 break;
 #endif
             case 'O':
-                /* This was handled earlier */
+                /* 这是早些时候处理的 */
                 break;
             case 'p':
                 set_config_entry(opts, CONF_FWKNOP_PID_FILE, optarg);
@@ -1449,7 +1276,7 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
             case 'U':
                 opts->enable_udp_server = 1;
                 break;
-            /* Verbosity level */
+            /* 详细级别 */
             case 'v':
                 opts->verbose++;
                 break;
@@ -1462,25 +1289,22 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
         }
     }
 
-    /* Now that we have all of our options set, and we are actually going to
-     * start fwknopd, we can validate them.
-    */
+    /* 既然我们已经设定了所有的选项，我们实际上要 */
     validate_options(opts);
 
     return;
 }
 
-/* Dump the configuration
-*/
+/* 转储配置 */
 void
 dump_config(const fko_srv_options_t *opts)
 {
     int i;
 
-    fprintf(stdout, "Current fwknopd config settings:\n");
+    fprintf(stdout, "Current fwknopd config settings:");
 
     for(i=0; i<NUMBER_OF_CONFIG_ENTRIES; i++)
-        fprintf(stdout, "%3i. %-28s =  '%s'\n",
+        fprintf(stdout, "%3i. %-28s =  '%s'",
             i,
             config_map[i],
             (opts->config[i] == NULL) ? "<not set>" : opts->config[i]
@@ -1490,8 +1314,8 @@ dump_config(const fko_srv_options_t *opts)
     fflush(stdout);
 }
 
-/* Print usage message...
-*/
+/* 打印使用情况消息。。。 */
+
 void
 usage(void)
 {
@@ -1574,4 +1398,5 @@ usage(void)
     return;
 }
 
-/***EOF***/
+
+/* **EOF** */

@@ -1,32 +1,9 @@
 /**
  * \file server/udp_server.c
  *
- * \brief Collect SPA packets via a UDP server.
+ * \brief 通过UDP服务器收集SPA数据包。
  */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #include "fwknopd_common.h"
 #include "sig_handler.h"
 #include "incoming_spa.h"
@@ -64,9 +41,8 @@ run_udp_server(fko_srv_options_t *opts)
     log_msg(LOG_INFO, "Kicking off UDP server to listen on port %i.",
             opts->udpserv_port);
 
-    /* Now, let's make a UDP server
+    /* 制作一个UDP服务器
     */
-   // 创建一个UDP的socket
     if ((s_sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
         log_msg(LOG_ERR, "run_udp_server: socket() failed: %s",
@@ -74,9 +50,7 @@ run_udp_server(fko_srv_options_t *opts)
         return -1;
     }
 
-    /* Make our main socket non-blocking so we don't have to be stuck on
-     * listening for incoming datagrams.
-     * 将我们的主套接字设为非阻塞模式，这样我们就不必在监听传入的数据报文时被阻塞。
+    /* 使我们的主套接字非阻塞，这样我们就不必一直在侦听传入的数据报。
     */
     if((sfd_flags = fcntl(s_sock, F_GETFL, 0)) < 0)
     {
@@ -96,14 +70,13 @@ run_udp_server(fko_srv_options_t *opts)
         return -1;
     }
 
-    /* Construct local address structure */
+    /* 构建本地地址结构 */
     memset(&saddr, 0x0, sizeof(saddr));
-    saddr.sin_family      = AF_INET;           /* Internet address family */
-    saddr.sin_addr.s_addr = htonl(INADDR_ANY); /* Any incoming interface */
-    saddr.sin_port        = htons(opts->udpserv_port); /* Local port */
+    saddr.sin_family      = AF_INET;           /* Internet地址系列 */
+    saddr.sin_addr.s_addr = htonl(INADDR_ANY); /* 任何传入接口 */
+    saddr.sin_port        = htons(opts->udpserv_port); /*本地端口 */
 
-    /* Bind to the local address */
-    // 绑定本地地址
+    /* 绑定到本地地址 */
     if (bind(s_sock, (struct sockaddr *) &saddr, sizeof(saddr)) < 0)
     {
         log_msg(LOG_ERR, "run_udp_server: bind() failed: %s",
@@ -114,8 +87,7 @@ run_udp_server(fko_srv_options_t *opts)
 
     FD_ZERO(&sfd_set);
 
-    /* Now loop and receive SPA packets
-     * 现在循环并接收 SPA 数据包。
+    /*现在循环并接收SPA数据包
     */
     while(1)
     {
@@ -129,8 +101,7 @@ run_udp_server(fko_srv_options_t *opts)
 
         if(!opts->test)
         {
-            /* Check for any expired firewall rules and deal with them.
-             * 检查是否有任何已过期的防火墙规则并进行处理。
+            /* 检查是否存在任何过期的防火墙规则，并处理它们。
             */
             if(opts->enable_fw)
             {
@@ -147,33 +118,27 @@ run_udp_server(fko_srv_options_t *opts)
                 chk_rm_all = 0;
             }
 
-            /* See if any CMD_CYCLE_CLOSE commands need to be executed.
-             * 查看是否需要执行任何 CMD_CYCLE_CLOSE 命令。
+            /* 查看是否需要执行任何CMD_CYCLE_CLOSE命令。
             */
             cmd_cycle_close(opts);
         }
 
-        /* Initialize and setup the socket for select.
-         *初始化并设置用于 select 的套接字。
+        /* 初始化并设置用于选择的套接字。
         */
         FD_SET(s_sock, &sfd_set);
 
-        /* Set our select timeout to (500ms by default).
-         * 将我们的 select 超时时间设置为默认值 500 毫秒。
+        /* 将选择超时设置为（默认情况下为500ms）。
         */
         tv.tv_sec = 0;
         tv.tv_usec = opts->udpserv_select_timeout;
-        //todo select函数对&sfd_set位图中的文件描述符（或socket）不大于1024，但是一个进程中的socket可以远远大于1024，这时怎么办？
-        //  对位图中的套接字键对应值为1的套接字进行监听
+
         selval = select(s_sock+1, &sfd_set, NULL, NULL, &tv);
 
         if(selval == -1)
         {
             if(errno == EINTR)
             {
-                /* restart loop but only after we check for a terminating
-                 * signal above in sig_do_stop()
-                 * 在上面检查了终止信号（在 sig_do_stop() 中），然后重新启动循环。
+                /* 重新启动循环，但仅在我们检查上述sig_do_stop（）中的终止信号之后
                 */
                 continue;
             }
@@ -189,12 +154,10 @@ run_udp_server(fko_srv_options_t *opts)
         if(selval == 0)
             continue;
 
-        //  如果键s_sock的值在位图中在位图中为1
         if(! FD_ISSET(s_sock, &sfd_set))
             continue;
 
-        /* If we make it here then there is a datagram to process
-         * 如果程序执行到这里，说明有一个数据报需要处理。
+        /* 如果我们在这里做，那么就有一个数据报要处理
         */
         clen = sizeof(caddr);
 
@@ -211,11 +174,11 @@ run_udp_server(fko_srv_options_t *opts)
                     pkt_len, sipbuf);
         }
 
-        /* Expect the data to not be too large
+        /* 期望数据不要太大
         */
         if(pkt_len <= MAX_SPA_PACKET_LEN)
         {
-            /* Copy the packet for SPA processing
+            /* 复制数据包以进行SPA处理
             */
             strlcpy((char *)opts->spa_pkt.packet_data, dgram_msg, pkt_len+1);
             opts->spa_pkt.packet_data_len = pkt_len;
@@ -244,7 +207,7 @@ run_udp_server(fko_srv_options_t *opts)
             break;
         }
 
-    } /* infinite while loop */
+    } /* 无限while循环 */
 
     close(s_sock);
     return rv;

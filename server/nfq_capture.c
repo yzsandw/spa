@@ -1,34 +1,10 @@
 /**
  * \file server/nfq_capture.c
  *
- * \brief Capture routine for fwknopd that uses libnetfilter_queue.
- * \brief 使用 libnetfilter_queue 的 fwknopd 抓包例程
+ * \brief 这是使用libnetfilter_queue的fwknopd的捕获例程。
  */
 
-/*
- *  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2014 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
+
 #include "fwknopd_common.h"
 #include "nfq_capture.h"
 #include "process_packet.h"
@@ -47,13 +23,13 @@
 #include <linux/netfilter_ipv4.h>
 #include <libnetfilter_queue/libnetfilter_queue.h>
 
-static int process_nfq_packet(struct nfq_q_handle *qh,//Netfilter Queue 队列的处理句柄。
-        struct nfgenmsg *nfmsg,//netlink 消息的通用消息头
-        struct nfq_data *nfa,//Netfilter Queue 队列中接收到的数据包
+static int process_nfq_packet(struct nfq_q_handle *qh,
+        struct nfgenmsg *nfmsg,
+        struct nfq_data *nfa,
         void *data)
-{   //Netfilter Queue 库（libnetfilter_queue）交互的数据包头结构体，它通常在捕获或处理网络数据包时使用。
+{
     struct nfqnl_msg_packet_hdr *ph;
-    int pkt_len = 0;//数据包长度
+    int pkt_len = 0;
     int verdict;
     unsigned char *full_packet;
     fko_srv_options_t   *opts = (fko_srv_options_t *)data;
@@ -61,28 +37,20 @@ static int process_nfq_packet(struct nfq_q_handle *qh,//Netfilter Queue 队列�
     ph = nfq_get_msg_packet_hdr(nfa);
     if (ph) {
 
-        /* --DSS for ref
+        /* 
           id = ntohl(ph->packet_id);
           hook = ph->hook;
           hw_proto = ph->protocol;
         */
 
-        /* Retrieve packet payload
+        /* 检索数据包有效载荷。
         */
-
-        //是libnetfilter_queue库中的一个函数，用于获取netfilter队列中数据包的有效载荷（payload）
         pkt_len = nfq_get_payload(nfa, &full_packet);
 
-        //处理数据包
         process_packet(opts, pkt_len, full_packet);
 
-        /* Verdict on what to do with the packet.  If it is coming from
-         * the INPUT chain (NF_IP_LOCAL_IN), then it is assumed to be
-         * a spa packet and can be dropped. Otherwise, let it through.
-         * 对数据包的处理结果。
-         * 如果数据包来自 INPUT 链（NF_IP_LOCAL_IN），
-         * 则假定它是一个 SPA 数据包，并且可以被丢弃。
-         * 否则，允许其通过。
+        /* 对数据包的处理决策：如果它来自输入链（NF_IP_LOCAL_IN）
+        * 则假定为SPA数据包并可以被丢弃；否则，允许其继续传递。
         */
         verdict = (ph->hook == NF_IP_LOCAL_IN) ? NF_DROP : NF_ACCEPT;
         nfq_set_verdict(qh, ph->packet_id, verdict, 0, NULL);
@@ -91,7 +59,7 @@ static int process_nfq_packet(struct nfq_q_handle *qh,//Netfilter Queue 队列�
 }
 
 
-/* 
+/* nfq捕获例程。
 */
 int
 nfq_capture(fko_srv_options_t *opts)
@@ -103,7 +71,7 @@ nfq_capture(fko_srv_options_t *opts)
     char                nfq_buf[1500];
     int                 chk_rm_all = 0;
 
-    /* Netfilter-related handles
+    /* 与Netfilter相关的句柄
     */
     int                  nfq_fd;
     struct nfq_handle   *nfq_h;
@@ -116,16 +84,14 @@ nfq_capture(fko_srv_options_t *opts)
         clean_exit(opts, FW_CLEANUP, EXIT_FAILURE);
     }
 
-    /* Unbind existing nf_queue handler for AF_INET (if any)
-    *解绑已存在的AF_INET地址族的nf_queue处理程序（如果有的话）。
+    /* 解除已存在的AF_INET下的nf_queue处理程序绑定（如果有的话）
     */
     res = nfq_unbind_pf(nfq_h, AF_INET);
     if (res < 0)  {
         log_msg(LOG_WARNING, "[*] Error during nfq_unbind_pf() error: %d\n", res);
     }
 
-    /* Bind the given queue connection handle to process packets.
-    *  将给定的队列连接句柄绑定到处理数据包。
+    /* 将给定的队列连接句柄绑定以处理数据包
     */
     res =  nfq_bind_pf(nfq_h, AF_INET);
     if ( res < 0) {
@@ -141,22 +107,19 @@ nfq_capture(fko_srv_options_t *opts)
         clean_exit(opts, FW_CLEANUP, EXIT_FAILURE);
     }
 
-    /* Set the amount of data to be copied to userspace for each packet
-     * queued to the given queue.
+    /* 设置每个排队到给定队列的数据包要复制到用户空间的数据量。
     */
     if (nfq_set_mode(nfq_qh, NFQNL_COPY_PACKET, 0xffff) < 0) {
         log_msg(LOG_ERR, "Can't set packet_copy mode\n");
         clean_exit(opts, FW_CLEANUP, EXIT_FAILURE);
     }
 
-    /* Get the netlink handle associated with the given queue connection
-     * handle. Then use it to get the file descriptor we will use for
-     * receiving the queued packets
+    /* 获取与给定队列连接句柄相关联的Netlink句柄。然后使用它来获取我们将用于接收排队数据包的文件描述符。
     */
     nfq_nh = nfq_nfnlh(nfq_h);
     nfq_fd = nfnl_fd(nfq_nh);
 
-    /* Set our nfq handle nonblocking mode.
+    /* 设置我们的nfq句柄为非阻塞模式。
      *
     */
     if((fd_flags = fcntl(nfq_fd, F_GETFL, 0)) < 0)
@@ -177,13 +140,11 @@ nfq_capture(fko_srv_options_t *opts)
 
     log_msg(LOG_INFO, "Starting fwknopd main event loop.");
 
-    /* Jump into our home-grown packet cature loop.
+    /* 进入我们自己编写的数据包捕获循环。
     */
     while(1)
     {
-        /* If we got a SIGCHLD and it was the tcp server, then handle it here.
-        ** XXX: --DSS Do we need this here?  I'm guessing we would not be using
-        **            the TCP server in NF_QUEUE capture mode.
+        /* 如果我们收到了SIGCHLD信号，并且它来自于TCP服务器进程，那么在这里处理它。
         */
         if(got_sigchld)
         {
@@ -203,7 +164,7 @@ nfq_capture(fko_srv_options_t *opts)
 
                     opts->tcp_server_pid = 0;
 
-                    /* Attempt to restart tcp server ? */
+                    /* 尝试重新启动TCP服务器吗？ */
                     usleep(1000000);
                     run_tcp_server(opts);
                 }
@@ -212,7 +173,7 @@ nfq_capture(fko_srv_options_t *opts)
             got_sigchld = 0;
         }
 
-        /* Any signal except USR1, USR2, and SIGCHLD mean break the loop.
+        /* 除了USR1、USR2和SIGCHLD之外的任何信号都意味着中断循环。
         */
         if(got_signal != 0)
         {
@@ -222,7 +183,7 @@ nfq_capture(fko_srv_options_t *opts)
             }
             else if(got_sigusr1 || got_sigusr2)
             {
-                /* Not doing anything with these yet.
+                /* 目前尚未对这些信号采取任何操作
                 */
                 got_sigusr1 = got_sigusr2 = 0;
                 got_signal = 0;
@@ -233,15 +194,14 @@ nfq_capture(fko_srv_options_t *opts)
 
         res = recv(nfq_fd, nfq_buf, sizeof(nfq_buf), 0);
 
-        /* Count processed packets
+        /* 计算已处理的数据包数
         */
         if(res > 0)
         {
             nfq_handle_packet(nfq_h, nfq_buf, res);
 
-            /* Count the set of processed packets (nfq_dispatch() return
-             * value) - we use this as a comparison for --packet-limit regardless
-             * of SPA packet validity at this point.
+            /* 计算已处理的数据包集合（nfq_dispatch()的返回值），无论在这一点上SPA数据包是否有效，
+            * 我们都将其用作--packet-limit的比较值。
             */
             opts->packet_ctr += res;
             if (opts->packet_ctr_limit && opts->packet_ctr >= opts->packet_ctr_limit)
@@ -254,8 +214,7 @@ nfq_capture(fko_srv_options_t *opts)
                 pending_break = 1;
             }
         }
-        /* If there was an error, complain and go on (to an extent before
-         * giving up).
+        /* 如果出现错误，进行报错并继续（在放弃之前进行一定程度的尝试）。
         */
         else if(res < 0 && errno != EAGAIN)
         {
@@ -279,7 +238,7 @@ nfq_capture(fko_srv_options_t *opts)
         else
             nfq_errcnt = 0;
 
-        /* Check for any expired firewall rules and deal with them.
+        /* 检查是否有任何已过期的防火墙规则，并处理它们。
         */
         check_firewall_rules(opts, chk_rm_all);
 

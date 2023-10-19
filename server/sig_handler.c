@@ -1,32 +1,3 @@
-/**
- * \file server/sig_handler.c
- *
- * \brief Signal handling dta and routines for fwknopd.
- */
-
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #include "fwknopd_common.h"
 #include "log_msg.h"
 #include "sig_handler.h"
@@ -35,18 +6,18 @@
   #include <sys/wait.h>
 #endif
 
-sig_atomic_t got_signal     = 0;    /* General signal flag (break capture) */
+sig_atomic_t got_signal     = 0;    /* 通用信号标志（中断捕获） */
 
-sig_atomic_t got_sighup     = 0;    /* SIGHUP flag  */
-sig_atomic_t got_sigint     = 0;    /* SIGINT flag  */
-sig_atomic_t got_sigterm    = 0;    /* SIGTERM flag */
-sig_atomic_t got_sigusr1    = 0;    /* SIGUSR1 flag */
-sig_atomic_t got_sigusr2    = 0;    /* SIGUSR2 flag */
-sig_atomic_t got_sigchld    = 0;    /* SIGCHLD flag */
+sig_atomic_t got_sighup     = 0;    /* SIGHUP 标志  */
+sig_atomic_t got_sigint     = 0;    /* SIGINT 标志  */
+sig_atomic_t got_sigterm    = 0;    /* SIGTERM 标志 */
+sig_atomic_t got_sigusr1    = 0;    /* SIGUSR1 标志 */
+sig_atomic_t got_sigusr2    = 0;    /* SIGUSR2 标志 */
+sig_atomic_t got_sigchld    = 0;    /* SIGCHLD 标志 */
 
 sigset_t    *csmask;
 
-/* SIGHUP Handler
+/* SIGHUP 处理程序
 */
 void
 sig_handler(int sig)
@@ -71,15 +42,15 @@ sig_handler(int sig)
             got_sigusr2 = 1;
             return;
         case SIGCHLD:
-            o_errno = errno; /* Save errno */
+            o_errno = errno; /* 保存 errno */
             got_sigchld = 1;
             waitpid(-1, NULL, WNOHANG);
-            errno = o_errno; /* restore errno (in case reset by waitpid) */
+            errno = o_errno; /* 恢复 errno（以防被 waitpid 重置） */
             return;
     }
 }
 
-/* Setup signal handlers
+/* 设置信号处理程序
 */
 int
 set_sig_handlers(void)
@@ -87,7 +58,7 @@ set_sig_handlers(void)
     int                 err = 0;
     struct sigaction    act;
 
-    /* Clear the signal flags.
+    /* 清除信号标志。
     */
     got_signal     = 0;
     got_sighup     = 0;
@@ -96,7 +67,7 @@ set_sig_handlers(void)
     got_sigusr1    = 0;
     got_sigusr2    = 0;
 
-    /* Setup the handlers
+    /* 设置处理程序
     */
     act.sa_handler = sig_handler;
     sigemptyset(&act.sa_mask);
@@ -104,42 +75,42 @@ set_sig_handlers(void)
 
     if(sigaction(SIGHUP, &act, NULL) < 0)
     {
-        log_msg(LOG_ERR, "* Error setting SIGHUP handler: %s",
+        log_msg(LOG_ERR, "* 设置 SIGHUP 处理程序时出错：%s",
             strerror(errno));
         err++;
     }
 
     if(sigaction(SIGINT, &act, NULL) < 0)
     {
-        log_msg(LOG_ERR, "* Error setting SIGINT handler: %s",
+        log_msg(LOG_ERR, "* 设置 SIGINT 处理程序时出错：%s",
             strerror(errno));
         err++;
     }
 
     if(sigaction(SIGTERM, &act, NULL) < 0)
     {
-        log_msg(LOG_ERR, "* Error setting SIGTERM handler: %s",
+        log_msg(LOG_ERR, "* 设置 SIGTERM 处理程序时出错：%s",
             strerror(errno));
         err++;
     }
 
     if(sigaction(SIGUSR1, &act, NULL) < 0)
     {
-        log_msg(LOG_ERR, "* Error setting SIGUSR1 handler: %s",
+        log_msg(LOG_ERR, "* 设置 SIGUSR1 处理程序时出错：%s",
             strerror(errno));
         err++;
     }
 
     if(sigaction(SIGUSR2, &act, NULL) < 0)
     {
-        log_msg(LOG_ERR, "* Error setting SIGUSR2 handler: %s",
+        log_msg(LOG_ERR, "* 设置 SIGUSR2 处理程序时出错：%s",
             strerror(errno));
         err++;
     }
 
     if(sigaction(SIGCHLD, &act, NULL) < 0)
     {
-        log_msg(LOG_ERR, "* Error setting SIGCHLD handler: %s",
+        log_msg(LOG_ERR, "* 设置 SIGCHLD 处理程序时出错：%s",
             strerror(errno));
         err++;
     }
@@ -150,7 +121,7 @@ set_sig_handlers(void)
 int
 sig_do_stop(void)
 {
-    /* Any signal except USR1, USR2, and SIGCHLD mean break the loop.
+    /* 任何信号，除了 USR1、USR2 和 SIGCHLD，都意味着中断循环。
     */
     if(got_signal != 0)
     {
@@ -160,7 +131,7 @@ sig_do_stop(void)
         }
         else if(got_sigusr1 || got_sigusr2)
         {
-            /* Not doing anything with these yet.
+            /* 目前对这些信号不执行任何操作。
             */
             got_sigusr1 = got_sigusr2 = 0;
             got_signal = 0;
