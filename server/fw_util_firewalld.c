@@ -1,32 +1,9 @@
 /**
  * \file server/fw_util_firewalld.c
  *
- * \brief Fwknop routines for managing firewalld firewall rules.
+ * \brief 用于管理firewalld防火墙规则
  */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 
 #include "fwknopd_common.h"
 
@@ -43,8 +20,7 @@ static char   cmd_buf[CMD_BUFSIZE];
 static char   err_buf[CMD_BUFSIZE];
 static char   cmd_out[STANDARD_CMD_OUT_BUFSIZE];
 
-/* assume 'firewall-cmd --direct --passthrough ipv4 -C' is offered
- * (see firewd_chk_support()).
+/* 假定提供了'firewall-cmd --direct --passthrough ipv4 -C'（请参见firewd_chk_support())。
 */
 static int have_firewd_chk_support = 1;
 
@@ -88,10 +64,8 @@ rule_exists_no_chk_support(const fko_srv_options_t * const opts,
     );
 
 #if CODE_COVERAGE
-    /* If we're maximizing code coverage, then exercise the run_extcmd_write()
-     * function which is normally only used for the PF firewall. This is to
-     * maximize code coverage in conjunction with the test suite, and is never
-     * compiled in for a production release of fwknop.
+    /* 如果我们正在最大化代码覆盖率，那么使用run_extcmd_write()函数，通常只用于PF防火墙。
+    * 这是为了与测试套件一起最大化代码覆盖率，永远不会编译为fwknop的生产发布
     */
     if(run_extcmd_write("/bin/grep -v test", "/bin/echo test", &pid_status, opts) == 0)
         log_msg(LOG_WARNING, "[ignore] Code coverage: Executed command");
@@ -121,17 +95,14 @@ rule_exists_no_chk_support(const fko_srv_options_t * const opts,
 
     snprintf(exp_ts_search, CMD_BUFSIZE-1, "%u ", exp_ts);
 
-    /* search for each of the substrings - the rule expiration time is the
-     * primary search method
+    /* 对于每个子字符串，搜索规则到期时间是主要的搜索方法。
     */
     if(search_extcmd_getline(cmd_buf, fw_line_buf,
                 CMD_BUFSIZE, NO_TIMEOUT, exp_ts_search, &pid_status, opts))
     {
         chop_newline(fw_line_buf);
-        /* we have an iptables policy rule that matches the
-         * expiration time, so make sure this rule matches the
-         * other fields too. If not, then it is for different
-         * access requested by a separate SPA packet.
+        /* 我们有一个匹配到期时间的iptables策略规则，因此确保此规则还匹配其他字段。
+        * 如果不匹配，那么它可能是由另一个SPA数据包请求的不同访问。
         */
         if(((proto == ANY_PROTO) ? 1 : (strstr(fw_line_buf, proto_search) != NULL))
             && ((srcip == NULL) ? 1 : (strstr(fw_line_buf, srcip_search) != NULL))
@@ -144,14 +115,12 @@ rule_exists_no_chk_support(const fko_srv_options_t * const opts,
         }
     }
 
-    /* If there is a nat port, we have to qualify it as part
-     * of the 'to:<ip>:<port>' portion of the rule (at the end)
+    /* 如果有NAT端口，我们必须将其作为规则中的'to:<ip>:<port>'部分（在末尾）的一部分来标识。
     */
     if(rule_exists && nat_port != NAT_ANY_PORT)
     {
         ndx = strstr(fw_line_buf, " to:");
-        /* Make sure there isn't a duplicate " to:" string (i.e. if someone
-         * was trying to be tricky with the iptables comment match).
+        /* 确保没有重复的 "to:" 字符串（即，如果有人试图通过iptables注释匹配来捣乱）
         */
         if(ndx != NULL && (strstr((ndx+strlen(" to:")), " to:") == NULL))
         {
@@ -260,9 +229,8 @@ firewd_chk_support(const fko_srv_options_t * const opts)
 
     zero_cmd_buffers();
 
-    /* Add a harmless rule to the firewalld INPUT chain and see if firewalld
-     * supports '-C' to check for it.  Set "have_firewd_chk_support" accordingly,
-     * delete the rule, and return.
+    /* 向firewalld的INPUT链中添加一个无害的规则，然后查看firewalld是否支持'-C'来检查它。
+    * 相应地设置"have_firewd_chk_support"，删除规则，然后返回。
     */
     snprintf(cmd_buf, CMD_BUFSIZE-1, "%s " FIREWD_TMP_CHK_RULE_ARGS,
         opts->fw_config->fw_command,
@@ -281,7 +249,7 @@ firewd_chk_support(const fko_srv_options_t * const opts)
 
     zero_cmd_buffers();
 
-    /* Now see if '-C' works
+    /* 现在查看是否'-C'起作用。
     */
     snprintf(cmd_buf, CMD_BUFSIZE-1, "%s " FIREWD_TMP_VERIFY_CHK_ARGS,
         opts->fw_config->fw_command,
@@ -308,7 +276,7 @@ firewd_chk_support(const fko_srv_options_t * const opts)
         have_firewd_chk_support = 0;
     }
 
-    /* Delete the tmp rule
+    /* 删除临时规则
     */
     zero_cmd_buffers();
 
@@ -333,9 +301,8 @@ comment_match_exists(const fko_srv_options_t * const opts)
 
     zero_cmd_buffers();
 
-    /* Add a harmless rule to the firewalld INPUT chain that uses the comment
-     * match and make sure it exists.  If not, return zero.  Otherwise, delete
-     * the rule and return true.
+    /*向firewalld的INPUT链中添加一个无害的规则，该规则使用注释匹配，并确保它存在。
+    * 如果不存在，返回零。否则，删除规则并返回true。
     */
     snprintf(cmd_buf, CMD_BUFSIZE-1, "%s " FIREWD_TMP_COMMENT_ARGS,
         opts->fw_config->fw_command,
@@ -375,13 +342,13 @@ comment_match_exists(const fko_srv_options_t * const opts)
 
     ndx = strstr(cmd_out, TMP_COMMENT);
     if(ndx == NULL)
-        res = 0;  /* did not find the tmp comment */
+        res = 0;  /* 没有找到临时注释。 */
     else
         res = 1;
 
     if(res == 1)
     {
-        /* Delete the tmp comment rule
+        /* 删除临时注释规则。
         */
         zero_cmd_buffers();
 
@@ -503,7 +470,7 @@ jump_rule_exists_no_chk_support(const fko_srv_options_t * const opts,
         fwc.chain[chain_num].from_chain
     );
 
-    /* include spaces on either side as produced by 'firewalld -L' output
+    /* 在删除时包括由'firewalld -L'输出产生的两侧的空格。
     */
     snprintf(chain_search, CMD_BUFSIZE-1, " %s ",
         fwc.chain[chain_num].to_chain);
@@ -535,9 +502,7 @@ jump_rule_exists(const fko_srv_options_t * const opts, const int chain_num)
     return exists;
 }
 
-/* Print all firewall rules currently instantiated by the running fwknopd
- * daemon to stdout.
-*/
+/* 打印当前正在运行的fwknopd守护进程实例化的所有防火墙规则到标准输出。 */
 int
 fw_dump_rules(const fko_srv_options_t * const opts)
 {
@@ -558,8 +523,7 @@ fw_dump_rules(const fko_srv_options_t * const opts)
 
             zero_cmd_buffers();
 
-            /* Create the list command
-            */
+            /* 创建列表命令 */
             snprintf(cmd_buf, CMD_BUFSIZE-1, "%s " FIREWD_LIST_ALL_RULES_ARGS,
                 opts->fw_config->fw_command,
                 ch[i].table
@@ -571,7 +535,7 @@ fw_dump_rules(const fko_srv_options_t * const opts)
             log_msg(LOG_DEBUG, "fw_dump_rules() CMD: '%s' (res: %d)",
                 cmd_buf, res);
 
-            /* Expect full success on this */
+            /* 预期完全成功 */
             if(! EXTCMD_IS_SUCCESS(res))
             {
                 log_msg(LOG_ERR, "fw_dump_rules() Error %i from cmd:'%s': %s",
@@ -592,8 +556,7 @@ fw_dump_rules(const fko_srv_options_t * const opts)
 
             zero_cmd_buffers();
 
-            /* Create the list command
-            */
+            /* 创建列表命令 */
             snprintf(cmd_buf, CMD_BUFSIZE-1, "%s " FIREWD_LIST_RULES_ARGS,
                 opts->fw_config->fw_command,
                 ch[i].table,
@@ -609,7 +572,7 @@ fw_dump_rules(const fko_srv_options_t * const opts)
             log_msg(LOG_DEBUG, "fw_dump_rules() CMD: '%s' (res: %d)",
                 cmd_buf, res);
 
-            /* Expect full success on this */
+            /* 预期此操作完全成功 */
             if(! EXTCMD_IS_SUCCESS(res))
             {
                 log_msg(LOG_ERR, "fw_dump_rules() Error %i from cmd:'%s': %s",
@@ -622,8 +585,7 @@ fw_dump_rules(const fko_srv_options_t * const opts)
     return(got_err);
 }
 
-/* Quietly flush and delete all fwknop custom chains.
-*/
+/* 静默清空并删除所有 fwknop 自定义链。 */
 static void
 delete_all_chains(const fko_srv_options_t * const opts)
 {
@@ -634,9 +596,7 @@ delete_all_chains(const fko_srv_options_t * const opts)
         if(fwc.chain[i].target[0] == '\0')
             continue;
 
-        /* First look for a jump rule to this chain and remove it if it
-         * is there.
-        */
+        /* 首先查找跳转到此链的规则，如果存在则移除它。 */
         cmd_ctr = 0;
         while(cmd_ctr < CMD_LOOP_TRIES && (jump_rule_exists(opts, i) == 1))
         {
@@ -656,7 +616,7 @@ delete_all_chains(const fko_srv_options_t * const opts)
             log_msg(LOG_DEBUG, "delete_all_chains() CMD: '%s' (res: %d, err: %s)",
                 cmd_buf, res, err_buf);
 
-            /* Expect full success on this */
+            /* 预期此操作完全成功 */
             if(! EXTCMD_IS_SUCCESS(res))
                 log_msg(LOG_ERR, "delete_all_chains() Error %i from cmd:'%s': %s",
                         res, cmd_buf, err_buf);
@@ -666,7 +626,7 @@ delete_all_chains(const fko_srv_options_t * const opts)
 
         zero_cmd_buffers();
 
-        /* Now flush and remove the chain.
+        /* 现在清空并移除该链
         */
         snprintf(cmd_buf, CMD_BUFSIZE-1, "%s " FIREWD_FLUSH_CHAIN_ARGS,
             fwc.fw_command,
@@ -681,7 +641,7 @@ delete_all_chains(const fko_srv_options_t * const opts)
         log_msg(LOG_DEBUG, "delete_all_chains() CMD: '%s' (res: %d, err: %s)",
             cmd_buf, res, err_buf);
 
-        /* Expect full success on this */
+        /* 预期此操作完全成功。 */
         if(! EXTCMD_IS_SUCCESS(res))
             log_msg(LOG_ERR, "delete_all_chains() Error %i from cmd:'%s': %s",
                     res, cmd_buf, err_buf);
@@ -701,7 +661,7 @@ delete_all_chains(const fko_srv_options_t * const opts)
         log_msg(LOG_DEBUG, "delete_all_chains() CMD: '%s' (res: %d, err: %s)",
             cmd_buf, res, err_buf);
 
-        /* Expect full success on this */
+        /* 预期此操作完全成功。 */
         if(! EXTCMD_IS_SUCCESS(res))
             log_msg(LOG_ERR, "delete_all_chains() Error %i from cmd:'%s': %s",
                     res, cmd_buf, err_buf);
@@ -711,7 +671,7 @@ delete_all_chains(const fko_srv_options_t * const opts)
         {
             zero_cmd_buffers();
 
-            /* Delete the rule to direct traffic to the NFQ chain.
+            /* 删除用于将流量定向到 NFQ 链的规则。
             */
             snprintf(cmd_buf, CMD_BUFSIZE-1, "%s " FIREWD_DEL_RULE_ARGS,
                 fwc.fw_command,
@@ -726,13 +686,13 @@ delete_all_chains(const fko_srv_options_t * const opts)
                 log_msg(LOG_INFO, "delete_all_chains() CMD: '%s' (res: %d, err: %s)",
                         cmd_buf, res, err_buf);
 
-            /* Expect full success on this */
+            /* 预期完全成功 */
             if(! EXTCMD_IS_SUCCESS(res))
                 log_msg(LOG_ERR, "Error %i from cmd:'%s': %s", res, cmd_buf, err_buf);
 
             zero_cmd_buffers();
 
-            /* Flush the NFQ chain
+            /* 清空 NFQ 链
             */
             snprintf(cmd_buf, CMD_BUFSIZE-1, "%s " FIREWD_FLUSH_CHAIN_ARGS,
                 fwc.fw_command,
@@ -746,13 +706,13 @@ delete_all_chains(const fko_srv_options_t * const opts)
                 log_msg(LOG_INFO, "delete_all_chains() CMD: '%s' (res: %d, err: %s)",
                     cmd_buf, res, err_buf);
 
-            /* Expect full success on this */
+            /* 预期此操作完全成功  */
             if(! EXTCMD_IS_SUCCESS(res))
                 log_msg(LOG_ERR, "Error %i from cmd:'%s': %s", res, cmd_buf, err_buf);
 
             zero_cmd_buffers();
 
-            /* Delete the NF_QUEUE chains and rules
+            /* 删除 NF_QUEUE 链和规则
             */
             snprintf(cmd_buf, CMD_BUFSIZE-1, "%s " FIREWD_DEL_CHAIN_ARGS,
                 fwc.fw_command,
@@ -766,7 +726,7 @@ delete_all_chains(const fko_srv_options_t * const opts)
                 log_msg(LOG_INFO, "delete_all_chains() CMD: '%s' (res: %d, err: %s)",
                     cmd_buf, res, err_buf);
 
-            /* Expect full success on this */
+            /* 预期完全成功 */
             if(! EXTCMD_IS_SUCCESS(res))
                 log_msg(LOG_ERR, "Error %i from cmd:'%s': %s", res, cmd_buf, err_buf);
         }
@@ -782,7 +742,7 @@ create_chain(const fko_srv_options_t * const opts, const int chain_num)
 
     zero_cmd_buffers();
 
-    /* Create the custom chain.
+    /* 创建自定义链
     */
     snprintf(cmd_buf, CMD_BUFSIZE-1, "%s " FIREWD_NEW_CHAIN_ARGS,
         fwc.fw_command,
@@ -797,7 +757,7 @@ create_chain(const fko_srv_options_t * const opts, const int chain_num)
     log_msg(LOG_DEBUG, "create_chain() CMD: '%s' (res: %d, err: %s)",
         cmd_buf, res, err_buf);
 
-    /* Expect full success on this */
+    /* 预期完全成功 */
     if(EXTCMD_IS_SUCCESS(res))
         rv = 1;
     else
@@ -812,7 +772,7 @@ mk_chain(const fko_srv_options_t * const opts, const int chain_num)
 {
     int err = 0;
 
-    /* Make sure the required chain and jump rule exist
+    /* 确保所需的链和跳转规则存在
     */
     if(! chain_exists(opts, chain_num))
         if(! create_chain(opts, chain_num))
@@ -825,7 +785,7 @@ mk_chain(const fko_srv_options_t * const opts, const int chain_num)
     return err;
 }
 
-/* Create the fwknop custom chains (at least those that are configured).
+/* 创建 fwknop 自定义链（至少创建已配置的链）
 */
 static int
 create_fw_chains(const fko_srv_options_t * const opts)
@@ -847,7 +807,7 @@ create_fw_chains(const fko_srv_options_t * const opts)
     {
         zero_cmd_buffers();
 
-        /* Create the NF_QUEUE chains and rules
+        /* 创建 NF_QUEUE 链和规则
         */
         snprintf(cmd_buf, CMD_BUFSIZE-1, "%s " FIREWD_NEW_CHAIN_ARGS,
             fwc.fw_command,
@@ -861,7 +821,7 @@ create_fw_chains(const fko_srv_options_t * const opts)
             log_msg(LOG_INFO, "create_fw_chains() CMD: '%s' (res: %d, err: %s)",
                 cmd_buf, res, err_buf);
 
-        /* Expect full success on this */
+        /* 预期完全成功 */
         if(! EXTCMD_IS_SUCCESS(res))
         {
             log_msg(LOG_ERR, "Error %i from cmd:'%s': %s", res, cmd_buf, err_buf);
@@ -870,7 +830,7 @@ create_fw_chains(const fko_srv_options_t * const opts)
 
         zero_cmd_buffers();
 
-        /* Create the rule to direct traffic to the NFQ chain.
+        /* 创建规则以将流量定向到 NFQ 链
         */
         snprintf(cmd_buf, CMD_BUFSIZE-1, "%s " FIREWD_ADD_JUMP_RULE_ARGS,
             fwc.fw_command,
@@ -886,7 +846,7 @@ create_fw_chains(const fko_srv_options_t * const opts)
             log_msg(LOG_INFO, "create_fw_chains() CMD: '%s' (res: %d, err: %s)",
                 cmd_buf, res, err_buf);
 
-        /* Expect full success on this */
+        /* 预期完全成功 */
         if(! EXTCMD_IS_SUCCESS(res))
         {
             log_msg(LOG_ERR, "Error %i from cmd:'%s': %s", res, cmd_buf, err_buf);
@@ -895,9 +855,8 @@ create_fw_chains(const fko_srv_options_t * const opts)
 
         zero_cmd_buffers();
 
-        /* Create the rule to direct SPA packets to the queue.
-         * If an interface is specified use the "_WITH_IF" version
-         * of the command.
+        /* 创建规则以将 SPA 数据包定向到队列。
+        *  如果指定了接口，请使用命令的 "_WITH_IF" 版本。
         */
         if(strlen(opts->config[CONF_NFQ_INTERFACE]) > 0)
         {
@@ -927,7 +886,7 @@ create_fw_chains(const fko_srv_options_t * const opts)
             log_msg(LOG_INFO, "create_fw_chains() CMD: '%s' (res: %d, err: %s)",
                 cmd_buf, res, err_buf);
 
-        /* Expect full success on this */
+        /* 预期完全成功 */
         if(! EXTCMD_IS_SUCCESS(res))
         {
             log_msg(LOG_ERR, "Error %i from cmd:'%s': %s", res, cmd_buf, err_buf);
@@ -988,8 +947,7 @@ set_fw_chain_conf(const int type, const char * const conf_str)
         ndx++;
     }
 
-    /* Sanity check - j should be the number of chain fields
-     * (excluding the type).
+    /* 健全性检查 - j 应该是链字段的数量（不包括类型）。
     */
     if(j != FW_NUM_CHAIN_FIELDS)
     {
@@ -999,16 +957,16 @@ set_fw_chain_conf(const int type, const char * const conf_str)
         return 0;
     }
 
-    /* Pull and set Target */
+    /*  提取并设置目标 */
     strlcpy(chain->target, chain_fields[0], sizeof(chain->target));
 
-    /* Pull and set Table */
+    /* 提取并设置表格 */
     strlcpy(chain->table, chain_fields[1], sizeof(chain->table));
 
-    /* Pull and set From_chain */
+    /* 提取并设置来源链 */
     strlcpy(chain->from_chain, chain_fields[2], sizeof(chain->from_chain));
 
-    /* Pull and set Jump_rule_position */
+    /* 提取并设置跳转规则位置 */
     chain->jump_rule_pos = strtol_wrapper(chain_fields[3],
             0, RCHK_MAX_FIREWD_RULE_NUM, NO_EXIT_UPON_ERR, &is_err);
     if(is_err != FKO_SUCCESS)
@@ -1018,10 +976,10 @@ set_fw_chain_conf(const int type, const char * const conf_str)
         return 0;
     }
 
-    /* Pull and set To_chain */
+    /* 提取并设置目标链 */
     strlcpy(chain->to_chain, chain_fields[4], sizeof(chain->to_chain));
 
-    /* Pull and set to_chain rule position */
+    /* 提取并设置到达链的规则位置 */
     chain->rule_pos = strtol_wrapper(chain_fields[5],
             0, RCHK_MAX_FIREWD_RULE_NUM, NO_EXIT_UPON_ERR, &is_err);
     if(is_err != FKO_SUCCESS)
@@ -1038,7 +996,7 @@ fw_config_init(fko_srv_options_t * const opts)
 {
     memset(&fwc, 0x0, sizeof(struct fw_config));
 
-    /* Set our firewall exe command path (firewall-cmd or iptables in most cases).
+    /* 设置我们的防火墙执行命令路径（在大多数情况下为 firewall-cmd 或 iptables）.
     */
 #if FIREWALL_FIREWALLD
     char cmd_passthru[512];
@@ -1053,21 +1011,19 @@ fw_config_init(fko_srv_options_t * const opts)
     fiu_return_on("fw_config_init", 0);
 #endif
 
-    /* Pull the fwknop chain config info and setup our internal
-     * config struct.  The FIREWD_INPUT is the only one that is
-     * required. The rest are optional.
+    /* 提取 fwknop 链配置信息并设置我们的内部配置结构。
+    *FIREWD_INPUT 是唯一必需的，其余是可选的
     */
     if(set_fw_chain_conf(FIREWD_INPUT_ACCESS, opts->config[CONF_FIREWD_INPUT_ACCESS]) != 1)
         return 0;
 
-    /* The FWKNOP_OUTPUT_ACCESS requires ENABLE_FIREWD_OUTPUT_ACCESS == Y
+    /* FWKNOP_OUTPUT_ACCESS 需要启用 ENABLE_FIREWD_OUTPUT_ACCESS == Y。
     */
     if(strncasecmp(opts->config[CONF_ENABLE_FIREWD_OUTPUT], "Y", 1)==0)
         if(set_fw_chain_conf(FIREWD_OUTPUT_ACCESS, opts->config[CONF_FIREWD_OUTPUT_ACCESS]) != 1)
             return 0;
 
-    /* The remaining access chains require ENABLE_FIREWD_FORWARDING
-     * or ENABLE_FIREWD_LOCAL_NAT
+    /* 剩余的访问链需要启用 ENABLE_FIREWD_FORWARDING 或 ENABLE_FIREWD_LOCAL_NAT
     */
     if(strncasecmp(opts->config[CONF_ENABLE_FIREWD_FORWARDING], "Y", 1)==0
             || strncasecmp(opts->config[CONF_ENABLE_FIREWD_LOCAL_NAT], "Y", 1)==0)
@@ -1078,12 +1034,11 @@ fw_config_init(fko_srv_options_t * const opts)
         if(set_fw_chain_conf(FIREWD_DNAT_ACCESS, opts->config[CONF_FIREWD_DNAT_ACCESS]) != 1)
             return 0;
 
-        /* Requires ENABLE_FIREWD_SNAT = Y
+        /* 需要启用 ENABLE_FIREWD_SNAT = Y
         */
         if(strncasecmp(opts->config[CONF_ENABLE_FIREWD_SNAT], "Y", 1)==0)
         {
-            /* Support both SNAT and MASQUERADE - this will be controlled
-             * via the access.conf configuration for individual rules
+            /* 同时支持 SNAT 和 MASQUERADE - 这将通过 individual rules 的 access.conf 配置来控制。
             */
             if(set_fw_chain_conf(FIREWD_MASQUERADE_ACCESS,
                         opts->config[CONF_FIREWD_MASQUERADE_ACCESS]) != 1)
@@ -1100,7 +1055,7 @@ fw_config_init(fko_srv_options_t * const opts)
         fwc.use_destination = 1;
     }
 
-    /* Let us find it via our opts struct as well.
+    /* 让我们也通过我们的 opts 结构找到它。
     */
     opts->fw_config = &fwc;
 
@@ -1112,20 +1067,20 @@ fw_initialize(const fko_srv_options_t * const opts)
 {
     int res = 1;
 
-    /* See if firewalld offers the '-C' argument (older versions don't).  If not,
-     * then switch to parsing firewalld -L output to find rules.
+    /* 查看 firewalld 是否提供 '-C' 参数（较旧版本没有）。
+     *如果没有，那么切换到解析 firewalld -L 输出以查找规则。
     */
     if(opts->firewd_disable_check_support)
         have_firewd_chk_support = 0;
     else
         firewd_chk_support(opts);
 
-    /* Flush the chains (just in case) so we can start fresh.
+    /* 清空链（以防万一），以便我们可以重新开始。
     */
     if(strncasecmp(opts->config[CONF_FLUSH_FIREWD_AT_INIT], "Y", 1) == 0)
         delete_all_chains(opts);
 
-    /* Now create any configured chains.
+    /* 现在创建任何配置的链。
     */
     if(create_fw_chains(opts) != 0)
     {
@@ -1134,7 +1089,7 @@ fw_initialize(const fko_srv_options_t * const opts)
         res = 0;
     }
 
-    /* Make sure that the 'comment' match is available
+    /* 确保 'comment' 匹配可用
     */
     if(strncasecmp(opts->config[CONF_ENABLE_FIREWD_COMMENT_CHECK], "Y", 1) == 0)
     {
@@ -1235,7 +1190,7 @@ firewd_rule(const fko_srv_options_t * const opts,
         );
     }
 
-    /* Check to make sure that the chain and jump rule exists
+    /* 检查确保链和跳转规则存在
     */
     mk_chain(opts, chain->type);
 
@@ -1251,8 +1206,7 @@ firewd_rule(const fko_srv_options_t * const opts,
 
             chain->active_rules++;
 
-            /* Reset the next expected expire time for this chain if it
-            * is warranted.
+            /* 如果有必要，重置此链的下一个预期过期时间
             */
             if(chain->next_expire < now || exp_ts < chain->next_expire)
                 chain->next_expire = exp_ts;
@@ -1290,7 +1244,7 @@ static void forward_access_rule(const fko_srv_options_t * const opts,
             fwd_chain->target
         );
 
-        /* Make a global ACCEPT rule for all ports/protocols
+        /* 创建一个全局的接受规则，用于所有端口和协议
         */
         firewd_rule(opts, rule_buf, NULL, spadat->use_src_ip,
             NULL, ANY_PROTO, ANY_PORT, NULL, NAT_ANY_PORT,
@@ -1298,7 +1252,7 @@ static void forward_access_rule(const fko_srv_options_t * const opts,
     }
     else
     {
-        /* Make the FORWARD access rule
+        /* 创建转发访问规则
         */
         snprintf(rule_buf, CMD_BUFSIZE-1, FIREWD_FWD_RULE_ARGS,
             fwd_chain->table,
@@ -1344,7 +1298,7 @@ static void dnat_rule(const fko_srv_options_t * const opts,
             nat_ip
         );
 
-        /* Make a global DNAT rule for all ports/protocols
+        /* 创建一个全局的 DNAT 规则，用于所有端口和协议
         */
         firewd_rule(opts, rule_buf, NULL, spadat->use_src_ip,
             NULL, ANY_PROTO, ANY_PORT, NULL, NAT_ANY_PORT,
@@ -1396,15 +1350,15 @@ static void snat_rule(const fko_srv_options_t * const opts,
 
     if(acc->forward_all)
     {
-        /* Default to MASQUERADE */
+        /* 默认使用 MASQUERADE */
         snat_chain = &(opts->fw_config->chain[FIREWD_MASQUERADE_ACCESS]);
         snprintf(snat_target, SNAT_TARGET_BUFSIZE-1, " ");
 
-        /* Add SNAT or MASQUERADE rules.
+        /* 添加 SNAT 或 MASQUERADE 规则.
         */
         if(acc->force_snat && acc->force_snat_ip != NULL && is_valid_ipv4_addr(acc->force_snat_ip, strlen(acc->force_snat_ip)))
         {
-            /* Using static SNAT */
+            /* 使用静态 SNAT */
             snat_chain = &(opts->fw_config->chain[FIREWD_SNAT_ACCESS]);
             snprintf(snat_target, SNAT_TARGET_BUFSIZE-1,
                 "--to-source %s", acc->force_snat_ip);
@@ -1412,7 +1366,7 @@ static void snat_rule(const fko_srv_options_t * const opts,
         else if((opts->config[CONF_SNAT_TRANSLATE_IP] != NULL)
             && is_valid_ipv4_addr(opts->config[CONF_SNAT_TRANSLATE_IP], strlen(opts->config[CONF_SNAT_TRANSLATE_IP])))
         {
-            /* Using static SNAT */
+            /* 使用静态 SNAT */
             snat_chain = &(opts->fw_config->chain[FIREWD_SNAT_ACCESS]);
             snprintf(snat_target, SNAT_TARGET_BUFSIZE-1,
                 "--to-source %s", opts->config[CONF_SNAT_TRANSLATE_IP]);
@@ -1434,18 +1388,18 @@ static void snat_rule(const fko_srv_options_t * const opts,
     }
     else
     {
-        /* Add SNAT or MASQUERADE rules.
+        /* 添加 SNAT 或 MASQUERADE 规则.
         */
         if(acc->force_snat && acc->force_snat_ip != NULL && is_valid_ipv4_addr(acc->force_snat_ip, strlen(acc->force_snat_ip)))
         {
-            /* Using static SNAT */
+            /* 使用静态 SNAT */
             snat_chain = &(opts->fw_config->chain[FIREWD_SNAT_ACCESS]);
             snprintf(snat_target, SNAT_TARGET_BUFSIZE-1,
                 "--to-source %s", acc->force_snat_ip);
         }
         else if(acc->force_snat && acc->force_masquerade)
         {
-            /* Using MASQUERADE */
+            /* 使用 MASQUERADE */
             snat_chain = &(opts->fw_config->chain[FIREWD_MASQUERADE_ACCESS]);
             snprintf(snat_target, SNAT_TARGET_BUFSIZE-1,
                 "--to-ports %i", fst_port);
@@ -1453,14 +1407,14 @@ static void snat_rule(const fko_srv_options_t * const opts,
         else if((opts->config[CONF_SNAT_TRANSLATE_IP] != NULL)
             && is_valid_ipv4_addr(opts->config[CONF_SNAT_TRANSLATE_IP], strlen(opts->config[CONF_SNAT_TRANSLATE_IP])))
         {
-            /* Using static SNAT */
+            /* 使用静态 SNAT */
             snat_chain = &(opts->fw_config->chain[FIREWD_SNAT_ACCESS]);
             snprintf(snat_target, SNAT_TARGET_BUFSIZE-1,
                 "--to-source %s", opts->config[CONF_SNAT_TRANSLATE_IP]);
         }
         else
         {
-            /* Using MASQUERADE */
+            /* 使用 MASQUERADE */
             snat_chain = &(opts->fw_config->chain[FIREWD_MASQUERADE_ACCESS]);
             snprintf(snat_target, SNAT_TARGET_BUFSIZE-1,
                 "--to-ports %i", fst_port);
@@ -1488,7 +1442,7 @@ static void snat_rule(const fko_srv_options_t * const opts,
 
 /****************************************************************************/
 
-/* Rule Processing - Create an access request...
+/* 规则处理 - 创建一个访问请求...
 */
 int
 process_spa_request(const fko_srv_options_t * const opts,
@@ -1514,34 +1468,32 @@ process_spa_request(const fko_srv_options_t * const opts,
     time_t          now;
     unsigned int    exp_ts;
 
-    /* Parse and expand our access message.
+    /*解析和展开我们的访问消息。
     */
     if(expand_acc_port_list(&port_list, spadat->spa_message_remain) != 1)
     {
-        /* technically we would already have exited with an error if there were
-         * any memory allocation errors (see the add_port_list() function), but
-         * for completeness...
+        /* 在技术上，如果有任何内存分配错误（请参见 add_port_list() 函数），
+        * 我们将已经退出并显示错误，但为了完整性...
         */
         free_acc_port_list(port_list);
         return res;
     }
 
-    /* Start at the top of the proto-port list...
+    /* 从协议端口列表的顶部开始...
     */
     ple = port_list;
 
-    /* Remember the first proto/port combo in case we need them
-     * for NAT access requests.
+    /* 记住第一个协议/端口组合，以备在需要时用于 NAT 访问请求.
     */
     fst_proto = ple->proto;
     fst_port  = ple->port;
 
-    /* Set our expire time value.
+    /* 设置我们的过期时间值。
     */
     time(&now);
     exp_ts = now + spadat->fw_access_timeout;
 
-    /* deal with SPA packets that themselves request a NAT operation
+    /* 处理自身请求 NAT 操作的 SPA 数据包。
     */
     if(spadat->message_type == FKO_LOCAL_NAT_ACCESS_MSG
       || spadat->message_type == FKO_CLIENT_TIMEOUT_LOCAL_NAT_ACCESS_MSG
@@ -1623,27 +1575,27 @@ process_spa_request(const fko_srv_options_t * const opts,
         }
         else if(strlen(fwd_chain->to_chain))
         {
-            /* FORWARD access rule
+            /* FORWARD 访问规则。
             */
             forward_access_rule(opts, acc, fwd_chain, nat_ip,
                     nat_port, fst_proto, fst_port, spadat, exp_ts, now);
         }
 
-        /* DNAT rule
+        /* DNAT 规则
         */
         if(strlen(dnat_chain->to_chain) && !acc->disable_dnat)
             dnat_rule(opts, acc, dnat_chain, nat_ip,
                     nat_port, fst_proto, fst_port, spadat, exp_ts, now);
 
-        /* SNAT rule
+        /* SNAT 规则
         */
         if(acc->force_snat || strncasecmp(opts->config[CONF_ENABLE_FIREWD_SNAT], "Y", 1) == 0)
             snat_rule(opts, acc, nat_ip, nat_port,
                     fst_proto, fst_port, spadat, exp_ts, now);
     }
-    else /* Non-NAT request - this is the typical case. */
-    {
-        /* Create an access command for each proto/port for the source ip.
+    else /* 非 NAT 请求 - 这是典型情况。*/
+
+        /* 为源 IP 的每个协议/端口创建一个访问命令
         */
         while(ple != NULL)
         {
@@ -1652,8 +1604,7 @@ process_spa_request(const fko_srv_options_t * const opts,
                 ple->proto, ple->port, NULL, NAT_ANY_PORT,
                 in_chain, exp_ts, now, "access", spadat->spa_message_remain);
 
-            /* We need to make a corresponding OUTPUT rule if out_chain target
-             * is not NULL.
+            /* 如果 out_chain 目标不为 NULL，我们需要创建相应的 OUTPUT 规则。
             */
             if(strlen(out_chain->to_chain))
             {
@@ -1666,8 +1617,7 @@ process_spa_request(const fko_srv_options_t * const opts,
         }
     }
 
-    /* Done with the port list for access rules.
-    */
+    /* 完成访问规则的端口列表。 */
     free_acc_port_list(port_list);
 
     return(res);
@@ -1685,16 +1635,12 @@ rm_expired_rules(const fko_srv_options_t * const opts,
     int         res, is_err, rn_offset=0, rule_num;
     time_t      rule_exp, min_exp = 0;
 
-    /* walk the list and process rules as needed.
-    */
+    /* 遍历列表并根据需要处理规则。 */
     while (ndx != NULL) {
-        /* Jump forward and extract the timestamp
-        */
+       /* 跳转前进并提取时间戳 */
         ndx += strlen(EXPIRE_COMMENT_PREFIX);
 
-        /* remember this spot for when we look for the next
-         * rule.
-        */
+        /* 为查找下一个规则记住这个位置。 */
         tmp_mark = ndx;
 
         strlcpy(exp_str, ndx, sizeof(exp_str));
@@ -1704,8 +1650,7 @@ rm_expired_rules(const fko_srv_options_t * const opts,
         chop_spaces(exp_str);
         if(!is_digits(exp_str))
         {
-            /* go to the next rule if it exists
-            */
+            /* 转到下一个规则，如果存在的话 */
             ndx = strstr(tmp_mark, EXPIRE_COMMENT_PREFIX);
             continue;
         }
@@ -1714,8 +1659,7 @@ rm_expired_rules(const fko_srv_options_t * const opts,
 
         if(rule_exp <= now)
         {
-            /* Backtrack and get the rule number and delete it.
-            */
+            /* 转到下一个规则，如果存在的话 */
             rn_start = ndx;
             while(--rn_start > fw_output_buf)
             {
@@ -1725,9 +1669,7 @@ rm_expired_rules(const fko_srv_options_t * const opts,
 
             if(*rn_start != '\n')
             {
-                /* This should not happen. But if it does, complain,
-                 * decrement the active rule value, and go on.
-                */
+                /* 这不应该发生，但如果发生了，请提出投诉，减少活动规则值，然后继续。 */
                 log_msg(LOG_ERR,
                     "Rule parse error while finding rule line start in chain %i",
                     cpos);
@@ -1742,9 +1684,7 @@ rm_expired_rules(const fko_srv_options_t * const opts,
             rn_end = strchr(rn_start, ' ');
             if(rn_end == NULL)
             {
-                /* This should not happen. But if it does, complain,
-                 * decrement the active rule value, and go on.
-                */
+                /* 这不应该发生，但如果发生了，请报告问题，减少活动规则值，然后继续。 */
                 log_msg(LOG_ERR,
                     "Rule parse error while finding rule number in chain %i",
                     cpos);
@@ -1777,8 +1717,7 @@ rm_expired_rules(const fko_srv_options_t * const opts,
                 opts->fw_config->fw_command,
                 ch[cpos].table,
                 ch[cpos].to_chain,
-                rule_num - rn_offset /* account for position of previously
-                                        deleted rule with rn_offset */
+                rule_num - rn_offset /* 考虑先前删除的规则的位置，带有 rn_offset 偏移量 */
             );
 
             res = run_extcmd(cmd_buf, err_buf, CMD_BUFSIZE,
@@ -1811,14 +1750,14 @@ rm_expired_rules(const fko_srv_options_t * const opts,
             min_exp = (min_exp < rule_exp) ? min_exp : rule_exp;
         }
 
-        /* Push our tracking index forward beyond (just processed) _exp_
-         * string so we can continue to the next rule in the list.
+        /* 将我们的跟踪索引推向 exp 字符串之外，
+         * 以便我们可以继续处理列表中的下一个规则。
         */
         ndx = strstr(tmp_mark, EXPIRE_COMMENT_PREFIX);
     }
 
-    /* Set the next pending expire time accordingly. 0 if there are no
-     * more rules, or whatever the next expected (min_exp) time will be.
+    /* 根据情况设置下一个待处理的过期时间。如果没有更多规则，则为0，
+     * 否则为下一个预期的（最小的）时间。
     */
     if(ch[cpos].active_rules < 1)
         ch[cpos].next_expire = 0;
@@ -1828,8 +1767,7 @@ rm_expired_rules(const fko_srv_options_t * const opts,
     return;
 }
 
-/* Iterate over the configure firewall access chains and purge expired
- * firewall rules.
+/* 迭代配置的防火墙访问链并清除过期的防火墙规则
 */
 void
 check_firewall_rules(const fko_srv_options_t * const opts,
@@ -1845,12 +1783,11 @@ check_firewall_rules(const fko_srv_options_t * const opts,
 
     time(&now);
 
-    /* Iterate over each chain and look for active rules to delete.
+    /* 迭代每个链并查找要删除的活动规则。
     */
     for(i=0; i < NUM_FWKNOP_ACCESS_TYPES; i++)
     {
-        /* If there are no active rules or we have not yet
-         * reached our expected next expire time, continue.
+        /* 如果没有活动规则或者我们还没有达到预期的下一个过期时间，请继续。
         */
         if(!chk_rm_all && (ch[i].active_rules == 0 || ch[i].next_expire > now))
             continue;
@@ -1861,12 +1798,10 @@ check_firewall_rules(const fko_srv_options_t * const opts,
         zero_cmd_buffers();
         memset(fw_output_buf, 0x0, STANDARD_CMD_OUT_BUFSIZE);
 
-        /* Get the current list of rules for this chain and delete
-         * any that have expired. Note that chk_rm_all puts us in
-         * garbage collection mode, and allows any rules that have
-         * been manually added (potentially by a program separate
-         * from fwknopd) to take advantage of fwknopd's timeout
-         * mechanism.
+        /* 获取该链的当前规则列表并删除任何已过期的规则。请注意，
+         * chk_rm_all 使我们处于垃圾收集模式，并允许任何已手动添加的规则
+         * （可能是由 fwknopd 以外的程序添加的）利用 fwknopd 的超时机制
+         * 
         */
         snprintf(cmd_buf, CMD_BUFSIZE-1, "%s " FIREWD_LIST_RULES_ARGS,
             opts->fw_config->fw_command,
@@ -1896,8 +1831,8 @@ check_firewall_rules(const fko_srv_options_t * const opts,
         ndx = strstr(fw_output_buf, EXPIRE_COMMENT_PREFIX);
         if(ndx == NULL)
         {
-            /* we did not find a candidate rule to expire
-            */
+            
+            /* 我们没有找到要过期的候选规则 */
             log_msg(LOG_DEBUG,
                 "Did not find expire comment in rules list %i", i);
 
@@ -1936,9 +1871,7 @@ validate_firewd_chain_conf(const char * const chain_str)
         ndx++;
     }
 
-    /* Sanity check - j should be the number of chain fields
-     * (excluding the type).
-    */
+    /* 健全性检查 - j 应该是链字段的数量（不包括类型）。 */
     if(j != FW_NUM_CHAIN_FIELDS)
         rv = 0;
 
