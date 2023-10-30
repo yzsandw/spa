@@ -11,7 +11,7 @@
 # =============================================================================
 
 # =============================================================================
-# Project: untitled5
+# Project: Server
 # Configurations: Debug
 # =============================================================================
 
@@ -50,7 +50,7 @@ cmake_ninja_workdir = /home/catlee/work/server/cmake-build-debug/
 build cmake_object_order_depends_target_main: phony || CMakeFiles/main.dir
 
 build CMakeFiles/main.dir/server/access.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/server/access.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/server/access.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -58,7 +58,7 @@ build CMakeFiles/main.dir/server/access.c.o: C_COMPILER__main_unscanned_Debug /h
   OBJECT_FILE_DIR = CMakeFiles/main.dir/server
 
 build CMakeFiles/main.dir/server/cmd_cycle.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/server/cmd_cycle.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/server/cmd_cycle.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -66,7 +66,7 @@ build CMakeFiles/main.dir/server/cmd_cycle.c.o: C_COMPILER__main_unscanned_Debug
   OBJECT_FILE_DIR = CMakeFiles/main.dir/server
 
 build CMakeFiles/main.dir/server/config_init.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/server/config_init.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/server/config_init.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -74,7 +74,7 @@ build CMakeFiles/main.dir/server/config_init.c.o: C_COMPILER__main_unscanned_Deb
   OBJECT_FILE_DIR = CMakeFiles/main.dir/server
 
 build CMakeFiles/main.dir/server/extcmd.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/server/extcmd.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/server/extcmd.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -82,7 +82,7 @@ build CMakeFiles/main.dir/server/extcmd.c.o: C_COMPILER__main_unscanned_Debug /h
   OBJECT_FILE_DIR = CMakeFiles/main.dir/server
 
 build CMakeFiles/main.dir/server/fw_util.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/server/fw_util.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/server/fw_util.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -90,7 +90,7 @@ build CMakeFiles/main.dir/server/fw_util.c.o: C_COMPILER__main_unscanned_Debug /
   OBJECT_FILE_DIR = CMakeFiles/main.dir/server
 
 build CMakeFiles/main.dir/server/fw_util_firewalld.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/server/fw_util_firewalld.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/server/fw_util_firewalld.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -98,7 +98,7 @@ build CMakeFiles/main.dir/server/fw_util_firewalld.c.o: C_COMPILER__main_unscann
   OBJECT_FILE_DIR = CMakeFiles/main.dir/server
 
 build CMakeFiles/main.dir/server/fw_util_ipf.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/server/fw_util_ipf.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/server/fw_util_ipf.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -106,7 +106,7 @@ build CMakeFiles/main.dir/server/fw_util_ipf.c.o: C_COMPILER__main_unscanned_Deb
   OBJECT_FILE_DIR = CMakeFiles/main.dir/server
 
 build CMakeFiles/main.dir/server/fw_util_ipfw.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/server/fw_util_ipfw.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/server/fw_util_ipfw.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -114,7 +114,7 @@ build CMakeFiles/main.dir/server/fw_util_ipfw.c.o: C_COMPILER__main_unscanned_De
   OBJECT_FILE_DIR = CMakeFiles/main.dir/server
 
 build CMakeFiles/main.dir/server/fw_util_iptables.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/server/fw_util_iptables.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/server/fw_util_iptables.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -122,7 +122,7 @@ build CMakeFiles/main.dir/server/fw_util_iptables.c.o: C_COMPILER__main_unscanne
   OBJECT_FILE_DIR = CMakeFiles/main.dir/server
 
 build CMakeFiles/main.dir/server/fw_util_pf.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/server/fw_util_pf.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/server/fw_util_pf.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -130,7 +130,7 @@ build CMakeFiles/main.dir/server/fw_util_pf.c.o: C_COMPILER__main_unscanned_Debu
   OBJECT_FILE_DIR = CMakeFiles/main.dir/server
 
 build CMakeFiles/main.dir/server/fwknopd.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/server/fwknopd.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/server/fwknopd.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -138,7 +138,7 @@ build CMakeFiles/main.dir/server/fwknopd.c.o: C_COMPILER__main_unscanned_Debug /
   OBJECT_FILE_DIR = CMakeFiles/main.dir/server
 
 build CMakeFiles/main.dir/server/fwknopd_errors.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/server/fwknopd_errors.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/server/fwknopd_errors.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -146,7 +146,7 @@ build CMakeFiles/main.dir/server/fwknopd_errors.c.o: C_COMPILER__main_unscanned_
   OBJECT_FILE_DIR = CMakeFiles/main.dir/server
 
 build CMakeFiles/main.dir/server/fwknopd_utests.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/server/fwknopd_utests.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/server/fwknopd_utests.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -154,7 +154,7 @@ build CMakeFiles/main.dir/server/fwknopd_utests.c.o: C_COMPILER__main_unscanned_
   OBJECT_FILE_DIR = CMakeFiles/main.dir/server
 
 build CMakeFiles/main.dir/server/incoming_spa.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/server/incoming_spa.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/server/incoming_spa.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -162,7 +162,7 @@ build CMakeFiles/main.dir/server/incoming_spa.c.o: C_COMPILER__main_unscanned_De
   OBJECT_FILE_DIR = CMakeFiles/main.dir/server
 
 build CMakeFiles/main.dir/server/log_msg.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/server/log_msg.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/server/log_msg.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -170,7 +170,7 @@ build CMakeFiles/main.dir/server/log_msg.c.o: C_COMPILER__main_unscanned_Debug /
   OBJECT_FILE_DIR = CMakeFiles/main.dir/server
 
 build CMakeFiles/main.dir/server/nfq_capture.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/server/nfq_capture.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/server/nfq_capture.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -178,7 +178,7 @@ build CMakeFiles/main.dir/server/nfq_capture.c.o: C_COMPILER__main_unscanned_Deb
   OBJECT_FILE_DIR = CMakeFiles/main.dir/server
 
 build CMakeFiles/main.dir/server/pcap_capture.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/server/pcap_capture.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/server/pcap_capture.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -186,7 +186,7 @@ build CMakeFiles/main.dir/server/pcap_capture.c.o: C_COMPILER__main_unscanned_De
   OBJECT_FILE_DIR = CMakeFiles/main.dir/server
 
 build CMakeFiles/main.dir/server/process_packet.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/server/process_packet.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/server/process_packet.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -194,7 +194,7 @@ build CMakeFiles/main.dir/server/process_packet.c.o: C_COMPILER__main_unscanned_
   OBJECT_FILE_DIR = CMakeFiles/main.dir/server
 
 build CMakeFiles/main.dir/server/replay_cache.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/server/replay_cache.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/server/replay_cache.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -202,7 +202,7 @@ build CMakeFiles/main.dir/server/replay_cache.c.o: C_COMPILER__main_unscanned_De
   OBJECT_FILE_DIR = CMakeFiles/main.dir/server
 
 build CMakeFiles/main.dir/server/sig_handler.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/server/sig_handler.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/server/sig_handler.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -210,7 +210,7 @@ build CMakeFiles/main.dir/server/sig_handler.c.o: C_COMPILER__main_unscanned_Deb
   OBJECT_FILE_DIR = CMakeFiles/main.dir/server
 
 build CMakeFiles/main.dir/server/tcp_server.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/server/tcp_server.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/server/tcp_server.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -218,7 +218,7 @@ build CMakeFiles/main.dir/server/tcp_server.c.o: C_COMPILER__main_unscanned_Debu
   OBJECT_FILE_DIR = CMakeFiles/main.dir/server
 
 build CMakeFiles/main.dir/server/udp_server.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/server/udp_server.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/server/udp_server.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -226,7 +226,7 @@ build CMakeFiles/main.dir/server/udp_server.c.o: C_COMPILER__main_unscanned_Debu
   OBJECT_FILE_DIR = CMakeFiles/main.dir/server
 
 build CMakeFiles/main.dir/server/utils.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/server/utils.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/server/utils.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -234,7 +234,7 @@ build CMakeFiles/main.dir/server/utils.c.o: C_COMPILER__main_unscanned_Debug /ho
   OBJECT_FILE_DIR = CMakeFiles/main.dir/server
 
 build CMakeFiles/main.dir/common/cunit_common.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/common/cunit_common.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/common/cunit_common.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -242,7 +242,7 @@ build CMakeFiles/main.dir/common/cunit_common.c.o: C_COMPILER__main_unscanned_De
   OBJECT_FILE_DIR = CMakeFiles/main.dir/common
 
 build CMakeFiles/main.dir/common/fko_util.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/common/fko_util.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/common/fko_util.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -250,7 +250,7 @@ build CMakeFiles/main.dir/common/fko_util.c.o: C_COMPILER__main_unscanned_Debug 
   OBJECT_FILE_DIR = CMakeFiles/main.dir/common
 
 build CMakeFiles/main.dir/common/strlcat.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/common/strlcat.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/common/strlcat.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -258,7 +258,7 @@ build CMakeFiles/main.dir/common/strlcat.c.o: C_COMPILER__main_unscanned_Debug /
   OBJECT_FILE_DIR = CMakeFiles/main.dir/common
 
 build CMakeFiles/main.dir/common/strlcpy.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/common/strlcpy.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/common/strlcpy.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -266,7 +266,7 @@ build CMakeFiles/main.dir/common/strlcpy.c.o: C_COMPILER__main_unscanned_Debug /
   OBJECT_FILE_DIR = CMakeFiles/main.dir/common
 
 build CMakeFiles/main.dir/lib/base64.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/base64.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/base64.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -274,7 +274,7 @@ build CMakeFiles/main.dir/lib/base64.c.o: C_COMPILER__main_unscanned_Debug /home
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/cipher_funcs.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/cipher_funcs.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/cipher_funcs.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -282,7 +282,7 @@ build CMakeFiles/main.dir/lib/cipher_funcs.c.o: C_COMPILER__main_unscanned_Debug
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/digest.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/digest.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/digest.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -290,7 +290,7 @@ build CMakeFiles/main.dir/lib/digest.c.o: C_COMPILER__main_unscanned_Debug /home
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/fko_client_timeout.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/fko_client_timeout.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/fko_client_timeout.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -298,7 +298,7 @@ build CMakeFiles/main.dir/lib/fko_client_timeout.c.o: C_COMPILER__main_unscanned
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/fko_decode.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/fko_decode.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/fko_decode.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -306,7 +306,7 @@ build CMakeFiles/main.dir/lib/fko_decode.c.o: C_COMPILER__main_unscanned_Debug /
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/fko_digest.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/fko_digest.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/fko_digest.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -314,7 +314,7 @@ build CMakeFiles/main.dir/lib/fko_digest.c.o: C_COMPILER__main_unscanned_Debug /
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/fko_encode.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/fko_encode.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/fko_encode.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -322,7 +322,7 @@ build CMakeFiles/main.dir/lib/fko_encode.c.o: C_COMPILER__main_unscanned_Debug /
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/fko_encryption.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/fko_encryption.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/fko_encryption.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -330,7 +330,7 @@ build CMakeFiles/main.dir/lib/fko_encryption.c.o: C_COMPILER__main_unscanned_Deb
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/fko_error.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/fko_error.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/fko_error.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -338,7 +338,7 @@ build CMakeFiles/main.dir/lib/fko_error.c.o: C_COMPILER__main_unscanned_Debug /h
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/fko_funcs.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/fko_funcs.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/fko_funcs.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -346,7 +346,7 @@ build CMakeFiles/main.dir/lib/fko_funcs.c.o: C_COMPILER__main_unscanned_Debug /h
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/fko_hmac.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/fko_hmac.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/fko_hmac.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -354,7 +354,7 @@ build CMakeFiles/main.dir/lib/fko_hmac.c.o: C_COMPILER__main_unscanned_Debug /ho
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/fko_message.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/fko_message.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/fko_message.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -362,7 +362,7 @@ build CMakeFiles/main.dir/lib/fko_message.c.o: C_COMPILER__main_unscanned_Debug 
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/fko_nat_access.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/fko_nat_access.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/fko_nat_access.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -370,7 +370,7 @@ build CMakeFiles/main.dir/lib/fko_nat_access.c.o: C_COMPILER__main_unscanned_Deb
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/fko_rand_value.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/fko_rand_value.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/fko_rand_value.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -378,7 +378,7 @@ build CMakeFiles/main.dir/lib/fko_rand_value.c.o: C_COMPILER__main_unscanned_Deb
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/fko_server_auth.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/fko_server_auth.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/fko_server_auth.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -386,7 +386,7 @@ build CMakeFiles/main.dir/lib/fko_server_auth.c.o: C_COMPILER__main_unscanned_De
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/fko_timestamp.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/fko_timestamp.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/fko_timestamp.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -394,7 +394,7 @@ build CMakeFiles/main.dir/lib/fko_timestamp.c.o: C_COMPILER__main_unscanned_Debu
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/fko_user.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/fko_user.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/fko_user.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -402,7 +402,7 @@ build CMakeFiles/main.dir/lib/fko_user.c.o: C_COMPILER__main_unscanned_Debug /ho
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/fko_utests.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/fko_utests.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/fko_utests.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -410,7 +410,7 @@ build CMakeFiles/main.dir/lib/fko_utests.c.o: C_COMPILER__main_unscanned_Debug /
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/gpgme_funcs.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/gpgme_funcs.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/gpgme_funcs.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -418,7 +418,7 @@ build CMakeFiles/main.dir/lib/gpgme_funcs.c.o: C_COMPILER__main_unscanned_Debug 
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/hmac.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/hmac.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/hmac.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -426,7 +426,7 @@ build CMakeFiles/main.dir/lib/hmac.c.o: C_COMPILER__main_unscanned_Debug /home/c
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/md5.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/md5.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/md5.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -434,7 +434,7 @@ build CMakeFiles/main.dir/lib/md5.c.o: C_COMPILER__main_unscanned_Debug /home/ca
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/rijndael.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/rijndael.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/rijndael.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -442,7 +442,7 @@ build CMakeFiles/main.dir/lib/rijndael.c.o: C_COMPILER__main_unscanned_Debug /ho
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/sha1.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/sha1.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/sha1.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -450,7 +450,7 @@ build CMakeFiles/main.dir/lib/sha1.c.o: C_COMPILER__main_unscanned_Debug /home/c
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/sha2.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/sha2.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/sha2.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib
@@ -458,7 +458,7 @@ build CMakeFiles/main.dir/lib/sha2.c.o: C_COMPILER__main_unscanned_Debug /home/c
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
 
 build CMakeFiles/main.dir/lib/sha3.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/server/lib/sha3.c || cmake_object_order_depends_target_main
-  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"lmy\"
+  DEFINES = -DFIREWALL_EXE=\"iptables\" -DFIREWALL_FIREWALLD=0 -DFIREWALL_IPF=0 -DFIREWALL_IPFW=0 -DFIREWALL_IPTABLES=1 -DFIREWALL_PF=0 -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_LOCALE_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DPACKAGE_NAME=\"myconfig\" -DSTDC_HEADERS=1 -DSYSCONFDIR="\"~/fko_test\"" -DSYSRUNDIR="\"~/fko_test\"" -DUSE_FILE_CACHE=1 -DUSE_LIBNETFILTER_QUEUE=1 -DVERSION=\"0.0.1\"
   DEP_FILE = CMakeFiles/main.dir/lib/sha3.c.o.d
   FLAGS = -g -std=gnu90 -fdiagnostics-color=always
   INCLUDES = -I/home/catlee/work/server/server -I/home/catlee/work/server/common -I/home/catlee/work/server/lib

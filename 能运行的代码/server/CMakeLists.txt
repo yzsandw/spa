@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(untitled5 C)
+project(Server C)
 
 set(CMAKE_C_STANDARD 90)
 set(CMAKE_BUILD_TYPE Debug)
@@ -27,7 +27,7 @@ target_compile_definitions(main PRIVATE
         HAVE_CTYPE_H=1
         HAVE_TIME_H=1
         HAVE_LOCALE_H=1
-        VERSION="lmy"
+        VERSION="0.0.1"
         # 防火墙的执行文件？
         FIREWALL_EXE="iptables"
         # 引入LIBNETFILTER库

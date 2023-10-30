@@ -29,18 +29,9 @@
 */
 #ifndef FKO_COMMON_H
 #define FKO_COMMON_H 1
-//导入系统库
-#define HAVE_SYS_TYPES_H 1
-#define HAVE_ERRNO_H 1
-#define STDC_HEADERS 1
-#define HAVE_UNISTD_H 1
-#define HAVE_SYS_STAT_H 1
-#define HAVE_NETINET_IN_H 1
-#define HAVE_CTYPE_H 1
-#define HAVE_TIME_H 1
 
-//版本号 我测试时改成lmy了，注意要是字符串
-#define VERSION "lmy"
+
+
 #if HAVE_CONFIG_H
   #include "config.h"
 #endif

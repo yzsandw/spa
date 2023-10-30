@@ -8,6 +8,7 @@
 
 /* 基本目录/二进制文件检查（使用stat()并检查路径是目录还是可执行文件）。
 */
+//
 static int
 is_valid_path(const char *path, const int file_type)
 {
