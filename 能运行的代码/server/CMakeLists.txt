@@ -13,7 +13,8 @@ aux_source_directory(lib SRC_LIST2)
 
 add_executable(main ${SRC_LIST} ${SRC_LIST1} ${SRC_LIST2})
 
-target_link_libraries(main PRIVATE -lnfnetlink -lnetfilter_queue)
+
+target_link_libraries(main PRIVATE -lnfnetlink -lnetfilter_queue -lpcap)
 
 # 添加宏定义及其注释
 target_compile_definitions(main PRIVATE
@@ -41,9 +42,11 @@ target_compile_definitions(main PRIVATE
         FIREWALL_PF=0
         FIREWALL_IPF=0
         # 配置文件的位置和执行文件的地址
-        SYSCONFDIR="~/fko_test"
+        SYSCONFDIR="/home/catlee/fko_test"
         PACKAGE_NAME="myconfig"
-        SYSRUNDIR="~/fko_test"
+        SYSRUNDIR="/home/catlee/fko_test"
+        #使用pcap
+        USE_LIBPCAP=1
 )
 
 
