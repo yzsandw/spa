@@ -4,43 +4,19 @@
  * \brief Header file for fwknop config_init.
  */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- ******************************************************************************
-*/
+
 #ifndef FWKNOP_COMMON_H
 #define FWKNOP_COMMON_H
 
 #include "common.h"
 #include "log_msg.h"
 
-/* My Name and Version
-*/
+
 //名字和版本
 #define MY_NAME     "fwknop"
 #define MY_DESC     "Single Packet Authorization client"
 
-/* Get our program version from VERSION (defined in config.h).
-*/
+
 //从VERSION（在config.h中定义）获取我们的程序版本。
 #define MY_VERSION VERSION
 
@@ -76,8 +52,6 @@
 #define MAX_URL_HOST_LEN            256
 #define MAX_URL_PATH_LEN            1024
 
-/* fwknop client configuration parameters and values
-*/
 //fwknop客户端配置参数和值
 typedef struct fko_cli_options
 {
@@ -108,8 +82,6 @@ typedef struct fko_cli_options
     char fault_injection_tag[MAX_FAULT_TAG_LEN];
 #endif
 
-    /* Encryption keys read from a .fwknoprc stanza
-    */
    //从.fwknoprc读取的加密密钥
     char key[MAX_KEY_LEN+1]; //加密密钥
     char key_base64[MAX_B64_KEY_LEN+1]; //加密密钥base64编码

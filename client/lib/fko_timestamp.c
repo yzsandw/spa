@@ -1,38 +1,9 @@
-/**
- * \file lib/fko_timestamp.c
- *
- * \brief Get the current timestamp with optional offset applied.
- */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #include "fko_common.h"
 #include "fko.h"
 
 
-/* Set the timestamp.
-*/
+/* 设置时间戳。 */
 int
 fko_set_timestamp(fko_ctx_t ctx, const int offset)
 {
@@ -42,8 +13,7 @@ fko_set_timestamp(fko_ctx_t ctx, const int offset)
     fiu_return_on("fko_set_timestamp_init", FKO_ERROR_CTX_NOT_INITIALIZED);
 #endif
 
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return FKO_ERROR_CTX_NOT_INITIALIZED;
 
@@ -63,8 +33,7 @@ fko_set_timestamp(fko_ctx_t ctx, const int offset)
     return(FKO_SUCCESS);
 }
 
-/* Return the current timestamp.
-*/
+/* 返回当前时间戳。 */
 int
 fko_get_timestamp(fko_ctx_t ctx, time_t *timestamp)
 {
@@ -73,8 +42,7 @@ fko_get_timestamp(fko_ctx_t ctx, time_t *timestamp)
     fiu_return_on("fko_get_timestamp_init", FKO_ERROR_CTX_NOT_INITIALIZED);
 #endif
 
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -90,4 +58,4 @@ fko_get_timestamp(fko_ctx_t ctx, time_t *timestamp)
     return(FKO_SUCCESS);
 }
 
-/***EOF***/
+/* **EOF** */

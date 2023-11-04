@@ -1,32 +1,4 @@
-/**
- * \file lib/fko_error.c
- *
- * \brief Error handling functions for libfko
- */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #include "fko_common.h"
 #include "fko.h"
 
@@ -39,8 +11,7 @@ fko_errstr(const int err_code)
 {
     switch (err_code)
     {
-        /* Start base FKO errors
-        */
+        /* 起始基准FKO错误 */
         case FKO_SUCCESS:
             return("Success");
 
@@ -384,8 +355,7 @@ fko_errstr(const int err_code)
             return("Unknown/Unclassified error");
 
 #if HAVE_LIBGPGME
-        /* Start GPGME-related errors
-        */
+        /* 启动GPGME相关错误 */
         case FKO_ERROR_MISSING_GPG_KEY_DATA:
             return("Missing GPG key data (signer or recipient not set)");
 
@@ -477,8 +447,7 @@ fko_gpg_errstr(fko_ctx_t ctx)
 {
 #if HAVE_LIBGPGME
 
-    /* Must be initialized
-     */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return("");
 
@@ -489,4 +458,4 @@ fko_gpg_errstr(fko_ctx_t ctx)
     return("");
 }
 
-/***EOF***/
+/* **EOF** */

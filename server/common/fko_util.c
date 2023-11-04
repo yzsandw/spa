@@ -1,72 +1,39 @@
-/**
- * \file common/fko_util.c
- *
- * \brief Provide a set of common utility functions that fwknop can use.
- */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #include "fko_common.h"
 #include "fko_util.h"
 #include <errno.h>
 #include <stdarg.h>
 
 #ifndef WIN32
-  /* for inet_aton() IP validation
-  */
+  /* 用于inet_aton（）IP验证 */
   #include <sys/socket.h>
   #include <netinet/in.h>
   #include <arpa/inet.h>
 #endif
 
-/* Check for a FKO error returned by a function an return the error code */
+/* 检查函数是否返回FKO错误并返回错误代码 */
 #define RETURN_ON_FKO_ERROR(e, f)   do { if (((e)=(f)) != FKO_SUCCESS) { return (e); } } while(0);
 
-#define FKO_ENCRYPTION_MODE_BUFSIZE 16                      /*!< Maximum size of an encryption mode string */
-#define FKO_ENC_MODE_SUPPORTED      0                       /*!< Defined a supported fko encryption mode */
-#define FKO_ENC_MODE_NOT_SUPPORTED  !FKO_ENC_MODE_SUPPORTED /*!< Defined an unsupported fko encryption mode */
+#define FKO_ENCRYPTION_MODE_BUFSIZE 16                      /* ！<加密模式字符串的最大大小 */
+#define FKO_ENC_MODE_SUPPORTED      0                       /* ！<定义了支持的fko加密模式 */
+#define FKO_ENC_MODE_NOT_SUPPORTED  !FKO_ENC_MODE_SUPPORTED /* ！<定义了不受支持的fko加密模式 */
 
-#define NULL_STRING                 "<NULL>"                /*!< String which represents a NULL buffer */
+#define NULL_STRING                 "<NULL>"                /* ！<表示NULL缓冲区的字符串 */
 
 #ifdef HAVE_C_UNIT_TESTS /* LCOV_EXCL_START */
 #include "cunit_common.h"
 DECLARE_TEST_SUITE(utils_test, "Utility functions test suite");
 #endif /* LCOV_EXCL_STOP */
 
-/**
- * Structure to handle an encryption mode string string and its associated integer value
- */
+/* * */
 typedef struct fko_enc_mode_str
 {
-    const char  str[FKO_ENCRYPTION_MODE_BUFSIZE];   /*!< String which represents an encryption mode value for the FKO library */
-    int         val;                                /*!< Value of the encryption mode according to the FKO library */
-    int         supported;                          /*!< SUPPORTED or NOT_SUPPORTED */
+    const char  str[FKO_ENCRYPTION_MODE_BUFSIZE];   /* ！<表示FKO库的加密模式值的字符串 */
+    int         val;                                /* ！<根据FKO库的加密模式值 */
+    int         supported;                          /* ！<支持或不支持 */
 } fko_enc_mode_str_t;
 
-/**
- * Array to associate all of encryption modes with their respective string
- */
+/* * */
 static fko_enc_mode_str_t fko_enc_mode_strs[] =
 {
     { "CBC",            FKO_ENC_MODE_CBC,           FKO_ENC_MODE_SUPPORTED      },
@@ -79,12 +46,7 @@ static fko_enc_mode_str_t fko_enc_mode_strs[] =
     { "legacy",         FKO_ENC_MODE_CBC_LEGACY_IV, FKO_ENC_MODE_SUPPORTED      }
 };
 
-/* Compare all bytes with constant run time regardless of
- * input characteristics (i.e. don't return early if a difference
- * is found before comparing all bytes).  This code was adapted
- * from YaSSL which is GPLv2 after a timing bug was reported by
- * Ryman through github (#85)
-*/
+/* 将所有字节与恒定运行时间进行比较，无论 */
 int
 constant_runtime_cmp(const char *a, const char *b, int len)
 {
@@ -105,8 +67,7 @@ constant_runtime_cmp(const char *a, const char *b, int len)
         return 0 - bad;
 }
 
-/* Validate encoded message length
-*/
+/* 验证编码消息长度 */
 int
 is_valid_encoded_msg_len(const int len)
 {
@@ -119,8 +80,7 @@ is_valid_encoded_msg_len(const int len)
     return(1);
 }
 
-/* Validate an IPv4 address
-*/
+/* 验证IPv4地址 */
 int
 is_valid_ipv4_addr(const char * const ip_str, const int len)
 {
@@ -140,7 +100,7 @@ is_valid_ipv4_addr(const char * const ip_str, const int len)
 
     while(char_ctr < len)
     {
-        /* If we've hit a null within the given length, then not valid regardless */
+        /* 如果我们在给定的长度内命中了一个null，那么不管怎样都是无效的 */
         if(*ndx == '\0')
             return 0;
 
@@ -160,9 +120,7 @@ is_valid_ipv4_addr(const char * const ip_str, const int len)
         res = 0;
 
 #if HAVE_SYS_SOCKET_H
-    /* Stronger IP validation now that we have a candidate that looks
-     * close enough
-    */
+    /* 现在我们有了一个看起来 */
     if(res == 1) {
         strncpy(tmp_ip_str, ip_str, len);
         if (inet_aton(tmp_ip_str, &in) == 0)
@@ -172,8 +130,7 @@ is_valid_ipv4_addr(const char * const ip_str, const int len)
     return(res);
 }
 
-/* Validate a hostname
-*/
+/* 验证主机名 */
 int
 is_valid_hostname(const char * const hostname_str, const int len)
 {
@@ -217,8 +174,7 @@ is_valid_hostname(const char * const hostname_str, const int len)
 
         ndx++; //move to next character
     }
-    /* At this point, we're pointing at the null.  Decrement ndx for simplicity
-    */
+    /* 在这一点上，我们指向的是null。递减ndx以简化 */
     ndx--;
     if (*ndx == '-')
         return 0;
@@ -229,13 +185,11 @@ is_valid_hostname(const char * const hostname_str, const int len)
     if (label_size > 63)
         return 0;
 
-    /* By now we've bailed if invalid
-    */
+    /* 到目前为止，如果无效，我们已经保释 */
     return 1;
 }
 
-/* Convert a digest_type string to its integer value.
-*/
+/* 将digest_type字符串转换为其整数值。 */
 short
 digest_strtoint(const char *dt_str)
 {
@@ -257,18 +211,7 @@ digest_strtoint(const char *dt_str)
         return(-1);
 }
 
-/**
- * \brief Return a digest string according to a digest integer value
- *
- * This function checks the digest integer is valid, and write the digest
- * string associated.
- *
- * \param digest Digest inetger value (FKO_DIGEST_MD5, FKO_DIGEST_SHA1 ...)
- * \param digest_str Buffer to write the digest string
- * \param digest_size size of the digest string buffer
- *
- * \return -1 if the digest integer value is not supported, 0 otherwise
- */
+/* * */
 short
 digest_inttostr(int digest, char* digest_str, size_t digest_size)
 {
@@ -329,8 +272,7 @@ hmac_digest_strtoint(const char *dt_str)
         return(-1);
 }
 
-/* Return encryption type string representation
-*/
+/* 返回加密类型字符串表示形式 */
 const char *
 enc_type_inttostr(const int type)
 {
@@ -344,8 +286,7 @@ enc_type_inttostr(const int type)
     return("Unknown encryption type");
 }
 
-/* Return message type string representation
-*/
+/* 返回消息类型字符串表示 */
 const char *
 msg_type_inttostr(const int type)
 {
@@ -367,18 +308,7 @@ msg_type_inttostr(const int type)
     return("Unknown message type");
 }
 
-/**
- * \brief Return a hmac digest string according to a hmac digest integer value
- *
- * This function checks if the digest integer is valid, and write the digest
- * string associated.
- *
- * \param digest Digest inetger value (FKO_HMAC_MD5, FKO_HMAC_SHA1 ...)
- * \param digest_str Buffer to write the digest string
- * \param digest_size size of the digest string buffer
- *
- * \return -1 if the digest integer value is not supported, 0 otherwise
- */
+/* * */
 short
 hmac_digest_inttostr(int digest, char* digest_str, size_t digest_size)
 {
@@ -418,8 +348,7 @@ hmac_digest_inttostr(int digest, char* digest_str, size_t digest_size)
     return digest_not_valid;
 }
 
-/* Validate plaintext input size
-*/
+/* 验证明文输入大小 */
 int
 is_valid_pt_msg_len(const int len)
 {
@@ -432,27 +361,20 @@ is_valid_pt_msg_len(const int len)
     return(1);
 }
 
-/**
- * @brief Convert an encryption mode string to its integer value.
- *
- * @param enc_mode_str Encryption mode string (CBC,ECB...)
- *
- * @return -1 if the encryption mode string is not supported,
- *         otherwise the encryption mode value
- */
+/* * */
 int
 enc_mode_strtoint(const char *enc_mode_str)
 {
     unsigned char           ndx_enc_mode;
-    int                     enc_mode_int = -1;     /* Encryption mode integer value */
+    int                     enc_mode_int = -1;     /* 加密模式整数值 */
     fko_enc_mode_str_t     *enc_mode_str_pt;
 
-    /* Look into the fko_enc_mode_strs array to find out the right encryption mode */
+    /* 查看fko_ec_mode_strs数组以找出正确的加密模式 */
     for (ndx_enc_mode = 0 ; ndx_enc_mode < ARRAY_SIZE(fko_enc_mode_strs) ; ndx_enc_mode++)
     {
         enc_mode_str_pt = &(fko_enc_mode_strs[ndx_enc_mode]);
 
-        /* If the encryption mode matches, grab it */
+        /* 如果加密模式匹配，请获取它 */
         if (   (strcasecmp(enc_mode_str, enc_mode_str_pt->str) == 0)
             && (enc_mode_str_pt->supported == FKO_ENC_MODE_SUPPORTED) )
         {
@@ -464,18 +386,7 @@ enc_mode_strtoint(const char *enc_mode_str)
     return enc_mode_int;
 }
 
-/**
- * @brief Return an encryption mode string according to an enc_mode integer value
- *
- * This function checks if the encryption mode integer is valid, and write the
- * encryption mode string associated.
- *
- * @param enc_mode Encryption mode integer value (FKO_ENC_MODE_CBC, FKO_ENC_MODE_ECB ...)
- * @param enc_mode_str Buffer to write the encryption mode string to
- * @param enc_mode_size Size of the encryption mode string buffer
- *
- * @return -1 if the encryption mode integer value is not supported, 0 otherwise
- */
+/* * */
 short
 enc_mode_inttostr(int enc_mode, char* enc_mode_str, size_t enc_mode_size)
 {
@@ -483,15 +394,15 @@ enc_mode_inttostr(int enc_mode, char* enc_mode_str, size_t enc_mode_size)
     unsigned char           ndx_enc_mode;
     fko_enc_mode_str_t     *enc_mode_str_pt;
 
-    /* Initialize the protocol string */
+    /* 初始化协议字符串 */
     memset(enc_mode_str, 0, enc_mode_size);
 
-    /* Look into the fko_enc_mode_strs array to find out the right protocol */
+    /* 查看fko_ec_mode_strs数组以找到正确的协议 */
     for (ndx_enc_mode = 0 ; ndx_enc_mode < ARRAY_SIZE(fko_enc_mode_strs) ; ndx_enc_mode++)
     {
         enc_mode_str_pt = &(fko_enc_mode_strs[ndx_enc_mode]);
 
-        /* If the encryption mode matches, grab it */
+        /* 如果加密模式匹配，请获取它 */
         if (   (enc_mode_str_pt->val == enc_mode)
             && (enc_mode_str_pt->supported == FKO_ENC_MODE_SUPPORTED) )
         {
@@ -538,9 +449,7 @@ strtol_wrapper(const char * const str, const int min,
         }
     }
 
-    /* allow max == -1 to be an exception where we don't care about the
-     * maximum - note that the ERANGE check is still in place above
-    */
+    /* 允许max==-1作为一个例外，在这里我们不关心 */
     if((max >= 0) && (val > max))
     {
         *err = FKO_ERROR_INVALID_DATA_UTIL_STRTOL_GT_MAX;
@@ -562,8 +471,7 @@ strtol_wrapper(const char * const str, const int min,
     return val;
 }
 
-/* Chop whitespace off the end of a string (must be NULL-terminated)
-*/
+/* 从字符串末尾剪掉空白（必须以NULL结尾） */
 void
 chop_whitespace(char *str)
 {
@@ -580,8 +488,7 @@ chop_whitespace(char *str)
     return;
 }
 
-/* zero out a buffer before free()
-*/
+/* free（）之前清空缓冲区 */
 int zero_free(char *buf, int len)
 {
     int res = FKO_SUCCESS;
@@ -591,7 +498,7 @@ int zero_free(char *buf, int len)
 
     if(len == 0)
     {
-        free(buf);  /* always free() if buf != NULL */
+        free(buf);  /* 如果buf！=则始终为free（）NULL */
         return res;
     }
 
@@ -606,10 +513,7 @@ int zero_free(char *buf, int len)
     return res;
 }
 
-/* zero out sensitive information in a way that isn't optimized out by the compiler
- * since we force a comparison and return an error if there is a problem (though
- * the caller should do something with this information too).
-*/
+/* 以编译器未优化的方式清除敏感信息 */
 int
 zero_buf(char *buf, int len)
 {
@@ -636,9 +540,7 @@ zero_buf(char *buf, int len)
 }
 
 #if defined(WIN32) || !defined(HAVE_STRNDUP)
-/* Windows does not have strndup, so we well implement it here.
- * This was the Public Domain C Library (PDCLib).
-*/
+/* Windows没有strndup，所以我们在这里很好地实现了它。 */
 char
 *strndup( const char * s, size_t len )
 {
@@ -656,59 +558,42 @@ char
 }
 #endif
 
-/**
- * @brief Add a printf style message to a buffer
- *
- * This function allows to append a printf style message to a buffer
- * and prevents buffer overflow by taking care of the size the buffer.
- * It returns the number of bytes really written to the buffer.
- * Thus if an error is encoutered during the process the number of bytes
- * written is set to 0. This way the user knows exactly how many bytes
- * can be appended afterwards.
- *
- * @param buf       Buffer to write the formatted message to
- * @param buf_size  Maximum number of bytes to write to the buffer
- * @param msg       Message to format and to append to the buffer
- *
- * @return the number of bytes written to the buffer
- */
+/* * */
 static int
 append_msg_to_buf(char *buf, size_t buf_size, const char* msg, ...)
 {
-    int     bytes_written = 0;  /* Number of bytes written to buf */
+    int     bytes_written = 0;  /* 写入buf的字节数 */
     va_list ap;
 
-    /* Check if the buffer is valid */
+    /* 检查缓冲区是否有效 */
     if (buf_size > 0)
     {
         va_start(ap, msg);
 
-        /* Format the message like a printf message */
+        /* 将消息格式化为printf消息 */
         bytes_written = vsnprintf(buf, buf_size, msg, ap);
 
-        /* It looks like the message has been truncated or an error occurred*/
+        /* 消息似乎已被截断或出现错误 */
         if (bytes_written < 0)
             bytes_written = 0;
 
         else if (bytes_written >= buf_size)
             bytes_written = buf_size;
 
-        /* The messsage has been formatted correctly */
+        /* 消息格式已正确 */
         else;
 
         va_end(ap);
     }
 
-    /* No valid buffer has been supplied, thus we do not write anything */
+    /* 没有提供有效的缓冲区，因此我们不写任何内容 */
     else;
 
-    /* Return the number of bytes written to the buffer */
+    /* 返回写入缓冲区的字节数 */
     return bytes_written;
 }
 
-/* Determine if a buffer contains only characters from the base64
- * encoding set
-*/
+/* 确定缓冲区是否只包含base64中的字符 */
 int
 is_base64(const unsigned char * const buf, const unsigned short int len)
 {
@@ -732,7 +617,7 @@ chop_char(char *str, const char chop)
 {
     if(str != NULL
             && str[0] != 0x0
-            && strlen(str) > 1 /* don't truncate a single-char string */
+            && strlen(str) > 1 /* 不要截断单个字符字符串 */
             && str[strlen(str)-1] == chop)
         str[strlen(str)-1] = 0x0;
     return;
@@ -782,7 +667,7 @@ add_argv(char **argv_new, int *argc_new, const char *new_arg)
 
     return 1;
 }
-
+//用于将字符串解析为命令行参数数组
 int
 strtoargv(const char * const args_str, char **argv_new, int *argc_new)
 {
@@ -811,8 +696,7 @@ strtoargv(const char * const args_str, char **argv_new, int *argc_new)
         }
     }
 
-    /* pick up the last argument in the string
-    */
+    /* 拾取字符串中的最后一个参数 */
     if(current_arg_ctr > 0)
     {
         arg_tmp[current_arg_ctr] = '\0';
@@ -845,8 +729,7 @@ free_argv(char **argv_new, int *argc_new)
 
 #define ASCII_LEN 16
 
-/* Generic hex dump function.
-*/
+/* 通用十六进制转储函数。 */
 void
 hex_dump(const unsigned char *data, const int size)
 {
@@ -870,8 +753,7 @@ hex_dump(const unsigned char *data, const int size)
             printf(" ");
     }
 
-    /* Remainder...
-    */
+    /* 余数 */
     ln = strlen(ascii_str);
     if(ln > 0)
     {
@@ -885,33 +767,23 @@ hex_dump(const unsigned char *data, const int size)
     return;
 }
 
-/**
- * @brief Dump a FKO context to a buffer
- *
- * This function parses a FKO context and decodes each field to dump them to a
- * buffer in a comprehensible way.
- *
- * @param ctx           FKO context to dump
- * @param dump_buf      Buffer where to store the dump of the context
- * @param dump_buf_len  Number of bytes available in the dump_buf array
- *
- * @return a FKO error code. FKO_SUCCESS if successful.
- */
+/* * */
+//将FKO上下文转储到缓冲区
 int
 dump_ctx_to_buffer(fko_ctx_t ctx, char *dump_buf, size_t dump_buf_len)
 {
     int         cp = 0;
     int         err = FKO_LAST_ERROR;
 
-    char       *rand_val        = NULL;
-    char       *username        = NULL;
-    char       *version         = NULL;
-    char       *spa_message     = NULL;
-    char       *nat_access      = NULL;
-    char       *server_auth     = NULL;
+    char       *rand_val        = NULL;//随机值
+    char       *username        = NULL;//用户名
+    char       *version         = NULL;//版本
+    char       *spa_message     = NULL;//spa消息
+    char       *nat_access      = NULL;//nat访问
+    char       *server_auth     = NULL;//服务器认证
     char       *enc_data        = NULL;
     char       *hmac_data       = NULL;
-    char       *spa_digest      = NULL;
+    char       *spa_digest      = NULL;//spa摘要
 #if HAVE_LIBGPGME
     char          *gpg_signer        = NULL;
     char          *gpg_recip         = NULL;
@@ -937,16 +809,16 @@ dump_ctx_to_buffer(fko_ctx_t ctx, char *dump_buf, size_t dump_buf_len)
     int         encryption_mode = -1;
     int         client_timeout  = -1;
 
-    /* Zero-ed the buffer */
+    /* 将缓冲区归零 */
     memset(dump_buf, 0, dump_buf_len);
 
-    /* Make sure the FKO context is initialized before printing it */
+    /* 确保FKO上下文在打印之前已初始化 */
     if(!CTX_INITIALIZED(ctx))
         err = FKO_ERROR_CTX_NOT_INITIALIZED;
 
     else
     {
-        /* Parse the FKO context and collect data */
+        /* 分析FKO上下文并收集数据 */
         RETURN_ON_FKO_ERROR(err, fko_get_rand_value(ctx, &rand_val));
         RETURN_ON_FKO_ERROR(err, fko_get_username(ctx, &username));
         RETURN_ON_FKO_ERROR(err, fko_get_timestamp(ctx, &timestamp));
@@ -968,8 +840,7 @@ dump_ctx_to_buffer(fko_ctx_t ctx, char *dump_buf, size_t dump_buf_len)
 #if HAVE_LIBGPGME
         if(encryption_mode == FKO_ENC_MODE_ASYMMETRIC)
         {
-            /* Populate GPG variables
-            */
+            /* 填充GPG变量 */
             RETURN_ON_FKO_ERROR(err, fko_get_gpg_signer(ctx, &gpg_signer));
             RETURN_ON_FKO_ERROR(err, fko_get_gpg_recipient(ctx, &gpg_recip));
             RETURN_ON_FKO_ERROR(err, fko_get_gpg_signature_verify(ctx, &gpg_sig_verify));
@@ -987,22 +858,22 @@ dump_ctx_to_buffer(fko_ctx_t ctx, char *dump_buf, size_t dump_buf_len)
         }
 #endif
 
-        /* Convert the digest integer to a string */
+        /* 将摘要整数转换为字符串 */
         if (digest_inttostr(digest_type, digest_str, sizeof(digest_str)) != 0)
             return (FKO_ERROR_INVALID_DIGEST_TYPE);
 
-        /* Convert the encryption mode integer to a string */
+        /* 将加密模式整数转换为字符串 */
         if (enc_mode_inttostr(encryption_mode, enc_mode_str, sizeof(enc_mode_str)) != 0)
             return (FKO_ERROR_INVALID_ENCRYPTION_TYPE);
 
-        /* Convert the HMAC digest integer to a string if a HMAC message is available */
+        /* 如果HMAC消息可用，请将HMAC摘要整数转换为字符串 */
         if (ctx->msg_hmac_len != 0)
         {
             if (hmac_digest_inttostr(hmac_type, hmac_str, sizeof(hmac_str)) != 0)
                 return (FKO_ERROR_UNSUPPORTED_HMAC_MODE);
         }
 
-        /* Fill in the buffer to dump */
+        /* 填充要转储的缓冲区 */
         cp  = append_msg_to_buf(dump_buf,    dump_buf_len,    "SPA Field Values:\n=================\n");
         cp += append_msg_to_buf(dump_buf+cp, dump_buf_len-cp, "   Random Value: %s\n", rand_val == NULL ? NULL_STRING : rand_val);
         cp += append_msg_to_buf(dump_buf+cp, dump_buf_len-cp, "       Username: %s\n", username == NULL ? NULL_STRING : username);
@@ -1043,17 +914,7 @@ dump_ctx_to_buffer(fko_ctx_t ctx, char *dump_buf, size_t dump_buf_len)
     return (err);
 }
 
-/**
- * @brief Grab the sin address from the sockaddr structure.
- *
- * This function returns the sin address as a sockaddr_in or sockaddr_in6
- * structure according to the family set (ipv4 or ipv6) in the sockaddr
- * structure.
- *
- * @param sa sockaddr strcuture
- *
- * @return the sin addr if the sa family is AF_INET or the sin6_addr otherwise.
- */
+/* * */
 static void *
 get_in_addr(struct sockaddr *sa)
 {
@@ -1068,31 +929,21 @@ get_in_addr(struct sockaddr *sa)
   }
 }
 
-/**
- * @brief  Resolve a domain name as an IP address.
- *
- * @param dns_str    Name of the host to resolve.
- * @param hints      Hints to reduce the number of result from getaddrinfo()
- * @param ip_str     String where to store the resolve ip address
- * @param ip_bufsize Number of bytes available in the ip_str buffer
- * @param opts       Client command line options
- *
- * @return 0 if successful, 1 if an error occurred.
- */
+/* * */
 int
 ipv4_resolve(const char *dns_str, char *ip_str)
 {
-    int                 error;      /* Function error return code */
+    int                 error;      /* 函数错误返回代码 */
     size_t ip_bufsize = MAX_IPV4_STR_LEN;
     struct addrinfo     hints;
-    struct addrinfo    *result;     /* Result of getaddrinfo() */
-    struct addrinfo    *rp;         /* Element of the linked list returned by getaddrinfo() */
+    struct addrinfo    *result;     /* getaddrinfo（）的结果 */
+    struct addrinfo    *rp;         /* getaddrinfo（）返回的链表的元素 */
 
 #if WIN32 && WINVER <= 0x0600
     struct sockaddr_in *in;
     char               *win_ip;
 #else
-    struct sockaddr_in *sai_remote; /* Remote host information as a sockaddr_in structure */
+    struct sockaddr_in *sai_remote; /* 作为sockaddr_in结构的远程主机信息 */
 #endif
 
 #if WIN32 
@@ -1110,7 +961,7 @@ ipv4_resolve(const char *dns_str, char *ip_str)
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
 
-    /* Try to resolve the host name */
+    /* 尝试解析主机名 */
     error = getaddrinfo(dns_str, NULL, &hints, &result);
     if (error != 0)
         fprintf(stderr, "ipv4_resolve() : %s\n", gai_strerror(error));
@@ -1119,15 +970,13 @@ ipv4_resolve(const char *dns_str, char *ip_str)
     {
         error = 1;
 
-        /* Go through the linked list of addrinfo structures */
+        /* 浏览addrinfo结构的链接列表 */
         for (rp = result; rp != NULL; rp = rp->ai_next)
         {
             memset(ip_str, 0, ip_bufsize);
 
 #if WIN32 && WINVER <= 0x0600
-                        /* On older Windows systems (anything before Vista?),
-                         * we use inet_ntoa for now.
-                        */
+                        /* 在较旧的Windows系统上（Vista之前的任何系统？）， */
                         in = (struct sockaddr_in*)(rp->ai_addr);
                         win_ip = inet_ntoa(in->sin_addr);
 
@@ -1142,7 +991,7 @@ ipv4_resolve(const char *dns_str, char *ip_str)
             }
         }
 
-        /* Free our result from getaddrinfo() */
+        /* 从getaddrinfo（）释放我们的结果 */
         freeaddrinfo(result);
     }
 
@@ -1222,4 +1071,4 @@ int register_utils_test(void)
     return register_ts(&TEST_SUITE(utils_test));
 }
 #endif /* LCOV_EXCL_STOP */
-/***EOF***/
+/* **EOF** */

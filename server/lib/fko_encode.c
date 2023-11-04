@@ -1,46 +1,15 @@
-/**
- * \file lib/fko_encode.c
- *
- * \brief Encodes some pieces of the spa data then puts together all of
- *          the necessary pieces to gether to create the single encoded
- *          message string.
- */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #include "fko_common.h"
 #include "fko.h"
 #include "base64.h"
 #include "digest.h"
 
-/* Take a given string, base64-encode it and append it to the given
- * buffer.
-*/
+/* 取一个给定的字符串，对其进行base64编码并将其附加到给定的 */
+//获取给定的字符串，对其进行 base64 编码并将其附加到给定的缓冲区。
 static int
 append_b64(char* tbuf, char *str)
 {
-    int   len = strnlen(str, MAX_SPA_ENCODED_MSG_SIZE);
+    int   len = strnlen(str, MAX_SPA_ENCODED_MSG_SIZE); //计算字符串的长度，不超过1500
     char *bs;
 
 #if HAVE_LIBFIU
@@ -54,27 +23,25 @@ append_b64(char* tbuf, char *str)
 #if HAVE_LIBFIU
     fiu_return_on("append_b64_calloc", FKO_ERROR_MEMORY_ALLOCATION);
 #endif
-
-    bs = calloc(1, ((len/3)*4)+8);
+    
+    bs = calloc(1, ((len/3)*4)+8); //为bs分配内存空间并初始化为0
     if(bs == NULL)
         return(FKO_ERROR_MEMORY_ALLOCATION);
 
-    b64_encode((unsigned char*)str, bs, len);
+    b64_encode((unsigned char*)str, bs, len); //进行base64编码
 
-    /* --DSS XXX: make sure to check here if later decoding
-     *            becomes a problem.
-    */
-    strip_b64_eq(bs);
+    /* --DSS XXX：如果以后解码，请务必在此处检查 */
+    strip_b64_eq(bs); //将base64编码后的'='符号去除
 
-    strlcat(tbuf, bs, FKO_ENCODE_TMP_BUF_SIZE);
+    strlcat(tbuf, bs, FKO_ENCODE_TMP_BUF_SIZE); //将base64编码附加到缓冲区后
 
-    free(bs);
+    free(bs); //释放bs缓冲区
 
     return(FKO_SUCCESS);
 }
 
-/* Set the SPA encryption type.
-*/
+/* 设置SPA加密类型。 */
+//加密spa数据包
 int
 fko_encode_spa_data(fko_ctx_t ctx)
 {
@@ -82,18 +49,15 @@ fko_encode_spa_data(fko_ctx_t ctx)
     char   *tbuf;
 
 #if HAVE_LIBFIU
+//libfiu是什么？
+    //如果 libfiu 选择注入 "fko_encode_spa_data_init" 故障，就会返回错误码
     fiu_return_on("fko_encode_spa_data_init", FKO_ERROR_CTX_NOT_INITIALIZED);
 #endif
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
-    /* Check prerequisites.
-     * --DSS XXX:  Needs review.  Also, we could make this more robust (or
-     *             (at leaset expand the error reporting for the missing
-     *             data).
-    */
+    /* 检查先决条件。 */
 #if HAVE_LIBFIU
     fiu_return_on("fko_encode_spa_data_valid", FKO_ERROR_INCOMPLETE_SPA_DATA);
 #endif
@@ -113,63 +77,55 @@ fko_encode_spa_data(fko_ctx_t ctx)
 #if HAVE_LIBFIU
     fiu_return_on("fko_encode_spa_data_calloc", FKO_ERROR_MEMORY_ALLOCATION);
 #endif
-    /* Allocate our initial tmp buffer.
-    */
+    /* 分配我们的初始tmp缓冲区。 */
     tbuf = calloc(1, FKO_ENCODE_TMP_BUF_SIZE);
     if(tbuf == NULL)
         return(FKO_ERROR_MEMORY_ALLOCATION);
 
-    /* Put it together a piece at a time, starting with the rand val.
-    */
+    /* 从兰特价值开始，一次把它拼成一块。 */
+   //随机值
     strlcpy(tbuf, ctx->rand_val, FKO_ENCODE_TMP_BUF_SIZE);
 
-    /* Add the base64-encoded username.
-    */
+    /* 添加base64编码的用户名。 */
     strlcat(tbuf, ":", FKO_ENCODE_TMP_BUF_SIZE);
+    //对username进行base64编码，附加到tbuf缓冲区中
     if((res = append_b64(tbuf, ctx->username)) != FKO_SUCCESS)
     {
         free(tbuf);
         return(res);
     }
 
-    /* Add the timestamp.
-    */
+    /* 添加时间戳。 */
+   //获取当前的tbuf的长度
     offset = strlen(tbuf);
+    //在tbuf缓冲区后加上时间戳
     snprintf(((char*)tbuf+offset), FKO_ENCODE_TMP_BUF_SIZE - offset,
             ":%u:", (unsigned int) ctx->timestamp);
 
-    /* Add the version string.
-    */
+    /* 添加版本字符串。 */
+   //添加版本信息
     strlcat(tbuf, ctx->version, FKO_ENCODE_TMP_BUF_SIZE);
 
-    /* Before we add the message type value, we will once again
-     * check for whether or not a client_timeout was specified
-     * since the message_type was set.  If this is the case, then
-     * we want to adjust the message_type first.  The easy way
-     * to do this is simply call fko_set_spa_client_timeout and set
-     * it to its current value.  This will force a re-check and
-     * possible reset of the message type.
-     *
-    */
+    /* 在添加消息类型值之前，我们将再次 */
+   //设置超时值以便服务端验证数据包有效期
     fko_set_spa_client_timeout(ctx, ctx->client_timeout);
 
-    /* Add the message type value.
-    */
+    /* 添加消息类型值。 */
+   //添加消息类型(TIMEOUT或者没超时)
     offset = strlen(tbuf);
     snprintf(((char*)tbuf+offset), FKO_ENCODE_TMP_BUF_SIZE - offset,
             ":%i:", ctx->message_type);
-
-    /* Add the base64-encoded SPA message.
-    */
+ 
+    /* 添加base64编码的SPA消息。 */
+   //将spa message进行base64编码，附加到tbuf后
     if((res = append_b64(tbuf, ctx->message)) != FKO_SUCCESS)
     {
         free(tbuf);
         return(res);
     }
 
-    /* If a nat_access message was given, add it to the SPA
-     * message.
-    */
+    /* 如果给定了nat_access消息，请将其添加到SPA */
+   //如果有访问NAT字符串，将其编码添加到tubf后
     if(ctx->nat_access != NULL)
     {
         strlcat(tbuf, ":", FKO_ENCODE_TMP_BUF_SIZE);
@@ -180,9 +136,8 @@ fko_encode_spa_data(fko_ctx_t ctx)
         }
     }
 
-    /* If we have a server_auth field set.  Add it here.
-     *
-    */
+    /* 如果我们有一个server_auth字段集。将其添加到此处。 */
+   //将服务器认证信息编码，添加到tbuf后
     if(ctx->server_auth != NULL)
     {
         strlcat(tbuf, ":", FKO_ENCODE_TMP_BUF_SIZE);
@@ -193,9 +148,8 @@ fko_encode_spa_data(fko_ctx_t ctx)
         }
     }
 
-    /* If a client timeout is specified and we are not dealing with a
-     * SPA command message, add the timeout here.
-    */
+    /* 如果指定了客户端超时，而我们没有处理 */
+   //如果指定了客户端超时，而我们没有处理SPA命令消息，在此处添加超时。
     if(ctx->client_timeout > 0 && ctx->message_type != FKO_COMMAND_MSG)
     {
         offset = strlen(tbuf);
@@ -203,14 +157,13 @@ fko_encode_spa_data(fko_ctx_t ctx)
                 ":%i", ctx->client_timeout);
     }
 
-    /* If encoded_msg is not null, then we assume it needs to
-     * be freed before re-assignment.
-    */
+    /* 如果encoded_msg不为null，那么我们假设它需要 */
+   //先清理encoded_msg
     if(ctx->encoded_msg != NULL)
         free(ctx->encoded_msg);
 
-    /* Copy our encoded data into the context.
-    */
+    /* 将我们的编码数据复制到上下文中。 */
+   //把编码后的数据赋值给encoded_msg
     ctx->encoded_msg = strdup(tbuf);
     free(tbuf);
 
@@ -222,25 +175,22 @@ fko_encode_spa_data(fko_ctx_t ctx)
     if(! is_valid_encoded_msg_len(ctx->encoded_msg_len))
         return(FKO_ERROR_INVALID_DATA_ENCODE_MSGLEN_VALIDFAIL);
 
-    /* At this point we can compute the digest for this SPA data.
-    */
+    /* 在这一点上，我们可以计算这个SPA数据的摘要。 */
+   //设置消息摘要
     if((res = fko_set_spa_digest(ctx)) != FKO_SUCCESS)
         return(res);
 
-    /* Here we can clear the modified flags on the SPA data fields.
-    */
+    /* 在这里，我们可以清除SPA数据字段上的修改标志。 */
     FKO_CLEAR_SPA_DATA_MODIFIED(ctx);
 
     return(FKO_SUCCESS);
 }
 
-/* Return the fko SPA encrypted data.
-*/
+/* 返回fko SPA加密数据。 */
 int
 fko_get_encoded_data(fko_ctx_t ctx, char **enc_msg)
 {
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -252,9 +202,7 @@ fko_get_encoded_data(fko_ctx_t ctx, char **enc_msg)
     return(FKO_SUCCESS);
 }
 
-/* Set the fko SPA encoded data (this is a convenience
- * function mostly used for tests that involve fuzzing).
-*/
+/* 设置fko SPA编码数据（这是一种方便 */
 #if FUZZING_INTERFACES
 int
 fko_set_encoded_data(fko_ctx_t ctx,
@@ -264,8 +212,7 @@ fko_set_encoded_data(fko_ctx_t ctx,
     char *tbuf   = NULL;
     int          res = FKO_SUCCESS, mlen;
 
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -279,9 +226,7 @@ fko_set_encoded_data(fko_ctx_t ctx,
     if(ctx->encoded_msg == NULL)
         return(FKO_ERROR_MEMORY_ALLOCATION);
 
-    /* allow arbitrary length (i.e. let the decode routines validate
-     * SPA message length).
-    */
+    /* 允许任意长度（即，让解码例程验证 */
     ctx->encoded_msg_len = msg_len;
 
     if(require_digest)
@@ -292,16 +237,13 @@ fko_set_encoded_data(fko_ctx_t ctx,
             return res;
         }
 
-        /* append the digest to the encoded message buffer
-        */
+        /* 将摘要附加到编码消息缓冲区 */
         mlen = ctx->encoded_msg_len + ctx->digest_len + 2;
         tbuf = calloc(1, mlen);
         if(tbuf == NULL)
             return(FKO_ERROR_MEMORY_ALLOCATION);
 
-        /* memcpy since the provided encoded buffer might
-         * have an embedded NULL?
-        */
+        /* memcpy，因为提供的编码缓冲区可能 */
         mlen = snprintf(tbuf, mlen, "%s:%s", ctx->encoded_msg, ctx->digest);
 
         if(ctx->encoded_msg != NULL)
@@ -322,4 +264,4 @@ fko_set_encoded_data(fko_ctx_t ctx,
 }
 #endif
 
-/***EOF***/
+/* **EOF** */

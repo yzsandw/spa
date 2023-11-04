@@ -1,32 +1,4 @@
-/**
- * \file lib/fko_encryption.c
- *
- * \brief Set/Get the spa encryption type.
- */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #include "fko_common.h"
 #include "fko.h"
 #include "cipher_funcs.h"
@@ -40,8 +12,7 @@
   #endif
 #endif
 
-/* Prep and encrypt using Rijndael
-*/
+/* 使用Rijndael进行准备和加密 */
 //AES是Rijndael算法的标准化，其实本质差不多
 static int
 _rijndael_encrypt(fko_ctx_t ctx, const char *enc_key, const int enc_key_len)
@@ -77,9 +48,7 @@ _rijndael_encrypt(fko_ctx_t ctx, const char *enc_key, const int enc_key_len)
 
     pt_len = ctx->encoded_msg_len + ctx->digest_len + RIJNDAEL_BLOCKSIZE + 2;
 
-    /* Make a bucket big enough to hold the enc msg + digest (plaintext)
-     * and populate it appropriately.
-    */
+    /* 制作一个足够大的桶来容纳enc msg+摘要（明文） */
    //明文长度=编码长度+摘要长度+16+2 ？？可能是适当填充
     plaintext = calloc(1, pt_len);
 
@@ -97,9 +66,8 @@ _rijndael_encrypt(fko_ctx_t ctx, const char *enc_key, const int enc_key_len)
             return(FKO_ERROR_ZERO_OUT_DATA);
     }
 
-    /* Make a bucket for the encrypted version and populate it.
-    */
-    ciphertext = calloc(1, pt_len + 32); /* Plus padding for salt and Block */ //填充加盐
+    /* 为加密版本制作一个bucket并填充它。 */
+    ciphertext = calloc(1, pt_len + 32); /* 加上填充盐和块 */ //填充加盐
     if(ciphertext == NULL)
     {
         if(zero_free(plaintext, pt_len) == FKO_SUCCESS)
@@ -114,8 +82,7 @@ _rijndael_encrypt(fko_ctx_t ctx, const char *enc_key, const int enc_key_len)
         ciphertext, ctx->encryption_mode
     );
 
-    /* Now make a bucket for the base64-encoded version and populate it.
-    */
+    /* 现在为base64编码的版本制作一个bucket并填充它。 */
    //初始化缓冲区
     b64ciphertext = calloc(1, ((cipher_len / 3) * 4) + 8);
     if(b64ciphertext == NULL)
@@ -139,8 +106,7 @@ _rijndael_encrypt(fko_ctx_t ctx, const char *enc_key, const int enc_key_len)
     //将base64编码后的密文数据赋值给encrypted_msg
     ctx->encrypted_msg = strdup(b64ciphertext);
 
-    /* Clean-up
-    */
+    /* 清理 */
     if(zero_free(plaintext, pt_len) != FKO_SUCCESS)
         zero_free_rv = FKO_ERROR_ZERO_OUT_DATA;
 
@@ -162,8 +128,7 @@ _rijndael_encrypt(fko_ctx_t ctx, const char *enc_key, const int enc_key_len)
     return(zero_free_rv);
 }
 
-/* Decode, decrypt, and parse SPA data into the context.
-*/
+/* 将SPA数据解码、解密并解析到上下文中。 */
 static int
 _rijndael_decrypt(fko_ctx_t ctx,
     const char *dec_key, const int key_len, int encryption_mode)
@@ -176,9 +141,7 @@ _rijndael_decrypt(fko_ctx_t ctx,
     if(key_len < 0 || key_len > RIJNDAEL_MAX_KEYSIZE)
         return(FKO_ERROR_INVALID_KEY_LEN);
 
-    /* Now see if we need to add the "Salted__" string to the front of the
-     * encrypted data.
-    */
+    /* 现在看看我们是否需要将“Salted__”字符串添加到 */
     if(! ctx->added_salted_str)
     {
         res = add_salted_str(ctx);
@@ -186,9 +149,7 @@ _rijndael_decrypt(fko_ctx_t ctx,
             return res;
     }
 
-    /* Create a bucket for the (base64) decoded encrypted data and get the
-     * raw cipher data.
-    */
+    /* 为（base64）解码的加密数据创建一个bucket，并获取 */
     cipher = calloc(1, ctx->encrypted_msg_len);
     if(cipher == NULL)
         return(FKO_ERROR_MEMORY_ALLOCATION);
@@ -206,9 +167,7 @@ _rijndael_decrypt(fko_ctx_t ctx,
     }
 #endif
 
-    /* Since we're using AES, make sure the incoming data is a multiple of
-     * the blocksize
-    */
+    /* 由于我们使用AES，请确保传入数据是 */
     if((cipher_len % RIJNDAEL_BLOCKSIZE) != 0)
     {
         if(zero_free((char *)cipher, ctx->encrypted_msg_len) == FKO_SUCCESS)
@@ -221,9 +180,7 @@ _rijndael_decrypt(fko_ctx_t ctx,
         zero_free_rv = zero_free(ctx->encoded_msg,
                 strnlen(ctx->encoded_msg, MAX_SPA_ENCODED_MSG_SIZE));
 
-    /* Create a bucket for the plaintext data and decrypt the message
-     * data into it.
-    */
+    /* 为明文数据创建一个bucket并解密消息 */
     ctx->encoded_msg = calloc(1, cipher_len);
     if(ctx->encoded_msg == NULL)
     {
@@ -236,14 +193,11 @@ _rijndael_decrypt(fko_ctx_t ctx,
     pt_len = rij_decrypt(cipher, cipher_len, dec_key, key_len,
                 (unsigned char*)ctx->encoded_msg, encryption_mode);
 
-    /* Done with cipher...
-    */
+    /* 密码已完成。。。 */
     if(zero_free((char *)cipher, ctx->encrypted_msg_len) != FKO_SUCCESS)
         zero_free_rv = FKO_ERROR_ZERO_OUT_DATA;
 
-    /* The length of the decrypted data should be within 32 bytes of the
-     * length of the encrypted version.
-    */
+    /* 解密数据的长度应在 */
     if(pt_len < (cipher_len - 32) || pt_len <= 0)
         return(FKO_ERROR_DECRYPTION_SIZE);
 
@@ -258,11 +212,7 @@ _rijndael_decrypt(fko_ctx_t ctx,
 
     ctx->encoded_msg_len = pt_len;
 
-    /* At this point we can check the data to see if we have a good
-     * decryption by ensuring the first field (16-digit random decimal
-     * value) is valid and is followed by a colon.  Additional checks
-     * are made in fko_decode_spa_data().
-    */
+    /* 在这一点上，我们可以检查数据，看看我们是否有一个好的 */
     ndx = (unsigned char *)ctx->encoded_msg;
     for(i=0; i<FKO_RAND_VAL_SIZE; i++)
         if(!isdigit(*(ndx++)))
@@ -271,16 +221,14 @@ _rijndael_decrypt(fko_ctx_t ctx,
     if(err > 0 || *ndx != ':')
         return(FKO_ERROR_DECRYPTION_FAILURE);
 
-    /* Call fko_decode and return the results.
-    */
+    /* 调用fko_decode并返回结果。 */
     return(fko_decode_spa_data(ctx));
 }
 
 
 #if HAVE_LIBGPGME
 
-/* Prep and encrypt using gpgme
-*/
+/* 使用gpgme进行准备和加密 */
 static int
 gpg_encrypt(fko_ctx_t ctx, const char *enc_key)
 {
@@ -311,16 +259,13 @@ gpg_encrypt(fko_ctx_t ctx, const char *enc_key)
             return(FKO_ERROR_INVALID_DATA_ENCRYPT_GPG_DIGEST_VALIDFAIL);
     }
 
-    /* First make sure we have a recipient key set.
-    */
+    /* 首先确保我们有一个收件人密钥集。 */
     if(ctx->gpg_recipient == NULL)
         return(FKO_ERROR_MISSING_GPG_KEY_DATA);
 
     pt_len = ctx->encoded_msg_len + ctx->digest_len + 2;
 
-    /* Make a bucket big enough to hold the enc msg + digest (plaintext)
-     * and populate it appropriately.
-    */
+    /* 制作一个足够大的桶来容纳enc msg+摘要（明文） */
     plain = calloc(1, ctx->encoded_msg_len + ctx->digest_len + 2);
     if(plain == NULL)
         return(FKO_ERROR_MEMORY_ALLOCATION);
@@ -348,8 +293,7 @@ gpg_encrypt(fko_ctx_t ctx, const char *enc_key)
         );
     }
 
-    /* --DSS XXX: Better parsing of what went wrong would be nice :)
-    */
+    /* --DSS XXX：更好地分析出了什么问题会很好：） */
     if(res != FKO_SUCCESS)
     {
         zero_free_rv = zero_free(plain, pt_len);
@@ -364,8 +308,7 @@ gpg_encrypt(fko_ctx_t ctx, const char *enc_key)
             return(zero_free_rv);
     }
 
-    /* Now make a bucket for the base64-encoded version and populate it.
-    */
+    /* 现在为base64编码的版本制作一个bucket并填充它。 */
     b64cipher = calloc(1, ((cipher_len / 3) * 4) + 8);
     if(b64cipher == NULL)
     {
@@ -391,8 +334,7 @@ gpg_encrypt(fko_ctx_t ctx, const char *enc_key)
 
     ctx->encrypted_msg = strdup(b64cipher);
 
-    /* Clean-up
-    */
+    /* 清理 */
     if(zero_free(plain, pt_len) != FKO_SUCCESS)
         zero_free_rv = FKO_ERROR_ZERO_OUT_DATA;
 
@@ -414,8 +356,7 @@ gpg_encrypt(fko_ctx_t ctx, const char *enc_key)
     return(zero_free_rv);
 }
 
-/* Prep and decrypt using gpgme
-*/
+/* 使用gpgme准备和解密 */
 static int
 gpg_decrypt(fko_ctx_t ctx, const char *dec_key)
 {
@@ -423,15 +364,11 @@ gpg_decrypt(fko_ctx_t ctx, const char *dec_key)
     size_t          cipher_len;
     int             res, pt_len, b64_decode_len;
 
-    /* Now see if we need to add the "hQ" string to the front of the
-     * base64-encoded-GPG-encrypted data.
-    */
+    /* 现在看看我们是否需要将“hQ”字符串添加到 */
     if(! ctx->added_gpg_prefix)
         add_gpg_prefix(ctx);
 
-    /* Create a bucket for the (base64) decoded encrypted data and get the
-     * raw cipher data.
-    */
+    /* 为（base64）解码的加密数据创建一个bucket，并获取 */
     cipher = calloc(1, ctx->encrypted_msg_len);
     if(cipher == NULL)
         return(FKO_ERROR_MEMORY_ALLOCATION);
@@ -447,26 +384,18 @@ gpg_decrypt(fko_ctx_t ctx, const char *dec_key)
 
     cipher_len = b64_decode_len;
 
-    /* Create a bucket for the plaintext data and decrypt the message
-     * data into it.
-    */
-    /* --DSS Actually, the needed memory will be malloced in the gpgme_decrypt
-    //       function. Just leaving this here for reference (for now).
-    //ctx->encoded_msg = malloc(cipher_len);
-    //if(ctx->encoded_msg == NULL)
-    //    return(FKO_ERROR_MEMORY_ALLOCATION);
-    */
+    /* 为明文数据创建一个bucket并解密消息 */
+    /* --DSS实际上，所需的内存将在gpgme_decrypt中被mallocated */
 
     res = gpgme_decrypt(ctx, cipher, cipher_len,
         dec_key, (unsigned char**)&ctx->encoded_msg, &cipher_len
     );
 
-    /* Done with cipher...
-    */
+    /* 密码已完成。。。 */
     if(zero_free((char *) cipher, ctx->encrypted_msg_len) != FKO_SUCCESS)
         return(FKO_ERROR_ZERO_OUT_DATA);
     else
-        if(res != FKO_SUCCESS) /* bail if there was some other problem */
+        if(res != FKO_SUCCESS) /* 如果有其他问题，请保释 */
             return(res);
 
     if(ctx->encoded_msg == NULL)
@@ -479,15 +408,13 @@ gpg_decrypt(fko_ctx_t ctx, const char *dec_key)
 
     ctx->encoded_msg_len = pt_len;
 
-    /* Call fko_decode and return the results.
-    */
+    /* 调用fko_decode并返回结果。 */
     return(fko_decode_spa_data(ctx));
 }
 
 #endif /* HAVE_LIBGPGME */
 
-/* Set the SPA encryption type.
-*/
+/* 设置SPA加密类型。 */
 //设置spa加密模式
 
 int
@@ -497,8 +424,7 @@ fko_set_spa_encryption_type(fko_ctx_t ctx, const short encrypt_type)
     fiu_return_on("fko_set_spa_encryption_type_init",
             FKO_ERROR_CTX_NOT_INITIALIZED);
 #endif
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))//有没有经过初始化
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -517,13 +443,11 @@ fko_set_spa_encryption_type(fko_ctx_t ctx, const short encrypt_type)
     return(FKO_SUCCESS);
 }
 
-/* Return the SPA encryption type.
-*/
+/* 返回SPA加密类型。 */
 int
 fko_get_spa_encryption_type(fko_ctx_t ctx, short *enc_type)
 {
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -532,8 +456,7 @@ fko_get_spa_encryption_type(fko_ctx_t ctx, short *enc_type)
     return(FKO_SUCCESS);
 }
 
-/* Set the SPA encryption mode.
-*/
+/* 设置SPA加密模式。 */
 int
 fko_set_spa_encryption_mode(fko_ctx_t ctx, const int encrypt_mode)
 {
@@ -541,8 +464,7 @@ fko_set_spa_encryption_mode(fko_ctx_t ctx, const int encrypt_mode)
     fiu_return_on("fko_set_spa_encryption_mode_init",
             FKO_ERROR_CTX_NOT_INITIALIZED);
 #endif
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -560,14 +482,12 @@ fko_set_spa_encryption_mode(fko_ctx_t ctx, const int encrypt_mode)
     return(FKO_SUCCESS);
 }
 
-/* Return the SPA encryption mode.
-*/
+/* 返回SPA加密模式。 */
 //设置SPA数据包加密格式，这种格式是指用哪种加密算法，例如AES、DES等
 int
 fko_get_spa_encryption_mode(fko_ctx_t ctx, int *enc_mode)
 {
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -579,16 +499,14 @@ fko_get_spa_encryption_mode(fko_ctx_t ctx, int *enc_mode)
     return(FKO_SUCCESS);
 }
 
-/* Encrypt the encoded SPA data.
-*/
+/* 对编码的SPA数据进行加密。 */
 int
 fko_encrypt_spa_data(fko_ctx_t ctx, const char * const enc_key,
         const int enc_key_len)
 {
     int             res = 0;
 
-    /* Must be initialized
-    */
+    /* 必须初始化 */
    //必须初始化过
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
@@ -596,9 +514,7 @@ fko_encrypt_spa_data(fko_ctx_t ctx, const char * const enc_key,
     if(enc_key_len < 0)
         return(FKO_ERROR_INVALID_KEY_LEN);
 
-    /* If there is no encoded data or the SPA data has been modified,
-     * go ahead and re-encode here.
-    */
+    /* 如果没有编码数据或者SPA数据已经被修改， */
    //还没有加密数据或者spa数据被修改
     if(ctx->encoded_msg == NULL || FKO_IS_SPA_DATA_MODIFIED(ctx))
         //编码spa数据包并生成消息摘要
@@ -607,15 +523,11 @@ fko_encrypt_spa_data(fko_ctx_t ctx, const char * const enc_key,
     if(res != FKO_SUCCESS)
         return(res);
 
-    /* Croak on invalid encoded message as well. At present this is a
-     * check for a somewhat arbitrary minimum length for the encoded
-     * data.
-    */
+    /* 也会对无效的编码消息进行篡改。目前这是一个 */
     if (! is_valid_encoded_msg_len(ctx->encoded_msg_len))
         return(FKO_ERROR_MISSING_ENCODED_DATA);
 
-    /* Encrypt according to type and return...
-    */
+    /* 根据类型加密并返回。。。 */
    //加密类型是RIJNDAEL
     if(ctx->encryption_type == FKO_ENCRYPTION_RIJNDAEL)
     {
@@ -636,8 +548,7 @@ fko_encrypt_spa_data(fko_ctx_t ctx, const char * const enc_key,
     return(res);
 }
 
-/* Decode, decrypt, and parse SPA data into the context.
-*/
+/* 将SPA数据解码、解密并解析到上下文中。 */
 int
 fko_decrypt_spa_data(fko_ctx_t ctx, const char * const dec_key, const int key_len)
 {
@@ -649,9 +560,7 @@ fko_decrypt_spa_data(fko_ctx_t ctx, const char * const dec_key, const int key_le
     if(key_len < 0)
         return(FKO_ERROR_INVALID_KEY_LEN);
 
-    /* Get the (assumed) type of encryption used. This will also provide
-     * some data validation.
-    */
+    /* 获取所使用的（假定的）加密类型。这也将提供 */
     enc_type = fko_encryption_type(ctx->encrypted_msg);
 
     if(enc_type == FKO_ENCRYPTION_GPG
@@ -676,17 +585,13 @@ fko_decrypt_spa_data(fko_ctx_t ctx, const char * const dec_key, const int key_le
     return(res);
 }
 
-/* Return the assumed encryption type based on the raw encrypted data.
- *根据原始加密数据返回假定的加密类型。
-*/
+/* 返回基于原始加密数据的假定加密类型。 */
 int
 fko_encryption_type(const char * const enc_data)
 {
     int enc_data_len;
 
-    /* Sanity check the data.
-     * 对数据进行合理性检查。
-    */
+    /* 卫生检查数据。 */
     if(enc_data == NULL)
         return(FKO_ENCRYPTION_INVALID_DATA);
 
@@ -706,8 +611,7 @@ fko_encryption_type(const char * const enc_data)
         return(FKO_ENCRYPTION_UNKNOWN);
 }
 
-/* Set the GPG recipient key name.
-*/
+/* 设置GPG收件人密钥名称。 */
 //设置GPG加密的收件人，并获取相应的GPG密钥
 int
 fko_set_gpg_recipient(fko_ctx_t ctx, const char * const recip)
@@ -716,8 +620,7 @@ fko_set_gpg_recipient(fko_ctx_t ctx, const char * const recip)
     int             res;
     gpgme_key_t     key     = NULL;
 
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -731,8 +634,7 @@ fko_set_gpg_recipient(fko_ctx_t ctx, const char * const recip)
     if(ctx->gpg_recipient == NULL)
         return(FKO_ERROR_MEMORY_ALLOCATION);
 
-    /* Get the key.
-    */
+    /* 拿到钥匙。 */
     res = get_gpg_key(ctx, &key, 0);
     if(res != FKO_SUCCESS)
     {
@@ -751,8 +653,7 @@ fko_set_gpg_recipient(fko_ctx_t ctx, const char * const recip)
 #endif  /* HAVE_LIBGPGME */
 }
 
-/* Set the GPG home dir.
-*/
+/* 设置GPG主目录。 */
 //设置gpg可执行文件的目录
 int
 fko_set_gpg_exe(fko_ctx_t ctx, const char * const gpg_exe)
@@ -760,14 +661,11 @@ fko_set_gpg_exe(fko_ctx_t ctx, const char * const gpg_exe)
 #if HAVE_LIBGPGME
     struct stat     st;
 
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
-    /* If we are unable to stat the given path/file and determine if it
-     * is a regular file or symbolic link, then return with error.
-    */
+    /* 如果我们无法统计给定的路径/文件并确定它是否 */
     if(stat(gpg_exe, &st) != 0)
         return(FKO_ERROR_GPGME_BAD_GPG_EXE);
 
@@ -787,14 +685,12 @@ fko_set_gpg_exe(fko_ctx_t ctx, const char * const gpg_exe)
 #endif  /* HAVE_LIBGPGME */
 }
 
-/* Get the GPG home dir.
-*/
+/* 获取GPG主目录。 */
 int
 fko_get_gpg_exe(fko_ctx_t ctx, char **gpg_exe)
 {
 #if HAVE_LIBGPGME
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -806,14 +702,12 @@ fko_get_gpg_exe(fko_ctx_t ctx, char **gpg_exe)
 #endif  /* HAVE_LIBGPGME */
 }
 
-/* Get the GPG recipient key name.
-*/
+/* 获取GPG收件人密钥名称。 */
 int
 fko_get_gpg_recipient(fko_ctx_t ctx, char **recipient)
 {
 #if HAVE_LIBGPGME
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -825,8 +719,7 @@ fko_get_gpg_recipient(fko_ctx_t ctx, char **recipient)
 #endif  /* HAVE_LIBGPGME */
 }
 
-/* Set the GPG signer key name.
-*/
+/* 设置GPG签名者密钥名称。 */
 int
 fko_set_gpg_signer(fko_ctx_t ctx, const char * const signer)
 {
@@ -834,8 +727,7 @@ fko_set_gpg_signer(fko_ctx_t ctx, const char * const signer)
     int             res;
     gpgme_key_t     key     = NULL;
 
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -849,8 +741,7 @@ fko_set_gpg_signer(fko_ctx_t ctx, const char * const signer)
     if(ctx->gpg_signer == NULL)
         return(FKO_ERROR_MEMORY_ALLOCATION);
 
-    /* Get the key.
-    */
+    /* 拿到钥匙。 */
     res = get_gpg_key(ctx, &key, 1);
     if(res != FKO_SUCCESS)
     {
@@ -869,14 +760,12 @@ fko_set_gpg_signer(fko_ctx_t ctx, const char * const signer)
 #endif  /* HAVE_LIBGPGME */
 }
 
-/* Get the GPG signer key name.
-*/
+/* 获取GPG签名者密钥名称。 */
 int
 fko_get_gpg_signer(fko_ctx_t ctx, char **signer)
 {
 #if HAVE_LIBGPGME
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -888,21 +777,18 @@ fko_get_gpg_signer(fko_ctx_t ctx, char **signer)
 #endif  /* HAVE_LIBGPGME */
 }
 
-/* Set the GPG home dir.
-*/
+/* 设置GPG主目录。 */
 int
 fko_set_gpg_home_dir(fko_ctx_t ctx, const char * const gpg_home_dir)
 {
 #if HAVE_LIBGPGME
     struct stat     st;
 
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
-    /* If we are unable to stat the given dir, then return with error.
-    */
+    /* 如果我们无法统计给定的目录，那么返回错误。 */
     if(stat(gpg_home_dir, &st) != 0) //获取文件状态信息
         return(FKO_ERROR_GPGME_BAD_HOME_DIR);
 
@@ -922,14 +808,12 @@ fko_set_gpg_home_dir(fko_ctx_t ctx, const char * const gpg_home_dir)
 #endif  /* HAVE_LIBGPGME */
 }
 
-/* Get the GPG home dir.
-*/
+/* 获取GPG主目录。 */
 int
 fko_get_gpg_home_dir(fko_ctx_t ctx, char **home_dir)
 {
 #if HAVE_LIBGPGME
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -945,8 +829,7 @@ int
 fko_set_gpg_signature_verify(fko_ctx_t ctx, const unsigned char val)
 {
 #if HAVE_LIBGPGME
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -962,8 +845,7 @@ int
 fko_get_gpg_signature_verify(fko_ctx_t ctx, unsigned char * const val)
 {
 #if HAVE_LIBGPGME
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -979,8 +861,7 @@ int
 fko_set_gpg_ignore_verify_error(fko_ctx_t ctx, const unsigned char val)
 {
 #if HAVE_LIBGPGME
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -996,8 +877,7 @@ int
 fko_get_gpg_ignore_verify_error(fko_ctx_t ctx, unsigned char * const val)
 {
 #if HAVE_LIBGPGME
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -1014,23 +894,19 @@ int
 fko_get_gpg_signature_fpr(fko_ctx_t ctx, char **fpr)
 {
 #if HAVE_LIBGPGME
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
-    /* Must be using GPG encryption.
-    */
+    /* 必须使用GPG加密。 */
     if(ctx->encryption_type != FKO_ENCRYPTION_GPG)
         return(FKO_ERROR_WRONG_ENCRYPTION_TYPE);
 
-    /* Make sure we are supposed to verify signatures.
-    */
+    /* 确保我们应该验证签名。 */
     if(ctx->verify_gpg_sigs == 0)
         return(FKO_ERROR_GPGME_SIGNATURE_VERIFY_DISABLED);
 
-    /* Make sure we have a signature to work with.
-    */
+    /* 请确保我们有可供使用的签名。 */
     if(ctx->gpg_sigs == NULL)
         return(FKO_ERROR_GPGME_NO_SIGNATURE);
 
@@ -1046,23 +922,19 @@ int
 fko_get_gpg_signature_id(fko_ctx_t ctx, char **id)
 {
 #if HAVE_LIBGPGME
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
-    /* Must be using GPG encryption.
-    */
+    /* 必须使用GPG加密。 */
     if(ctx->encryption_type != FKO_ENCRYPTION_GPG)
         return(FKO_ERROR_WRONG_ENCRYPTION_TYPE);
 
-    /* Make sure we are supposed to verify signatures.
-    */
+    /* 确保我们应该验证签名。 */
     if(ctx->verify_gpg_sigs == 0)
         return(FKO_ERROR_GPGME_SIGNATURE_VERIFY_DISABLED);
 
-    /* Make sure we have a signature to work with.
-    */
+    /* 请确保我们有可供使用的签名。 */
     if(ctx->gpg_sigs == NULL)
         return(FKO_ERROR_GPGME_NO_SIGNATURE);
 
@@ -1078,23 +950,19 @@ int
 fko_get_gpg_signature_summary(fko_ctx_t ctx, int *sigsum)
 {
 #if HAVE_LIBGPGME
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
-    /* Must be using GPG encryption.
-    */
+    /* 必须使用GPG加密。 */
     if(ctx->encryption_type != FKO_ENCRYPTION_GPG)
         return(FKO_ERROR_WRONG_ENCRYPTION_TYPE);
 
-    /* Make sure we are supposed to verify signatures.
-    */
+    /* 确保我们应该验证签名。 */
     if(ctx->verify_gpg_sigs == 0)
         return(FKO_ERROR_GPGME_SIGNATURE_VERIFY_DISABLED);
 
-    /* Make sure we have a signature to work with.
-    */
+    /* 请确保我们有可供使用的签名。 */
     if(ctx->gpg_sigs == NULL)
         return(FKO_ERROR_GPGME_NO_SIGNATURE);
 
@@ -1110,23 +978,19 @@ int
 fko_get_gpg_signature_status(fko_ctx_t ctx, int *sigstat)
 {
 #if HAVE_LIBGPGME
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
-    /* Must be using GPG encryption.
-    */
+    /* 必须使用GPG加密。 */
     if(ctx->encryption_type != FKO_ENCRYPTION_GPG)
         return(FKO_ERROR_WRONG_ENCRYPTION_TYPE);
 
-    /* Make sure we are supposed to verify signatures.
-    */
+    /* 确保我们应该验证签名。 */
     if(ctx->verify_gpg_sigs == 0)
         return(FKO_ERROR_GPGME_SIGNATURE_VERIFY_DISABLED);
 
-    /* Make sure we have a signature to work with.
-    */
+    /* 请确保我们有可供使用的签名。 */
     if(ctx->gpg_sigs == NULL)
         return(FKO_ERROR_GPGME_NO_SIGNATURE);
 
@@ -1146,23 +1010,19 @@ fko_gpg_signature_id_match(fko_ctx_t ctx, const char * const id,
     char *curr_id;
     int   rv = FKO_SUCCESS;
 
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
-    /* Must be using GPG encryption.
-    */
+    /* 必须使用GPG加密。 */
     if(ctx->encryption_type != FKO_ENCRYPTION_GPG)
         return(FKO_ERROR_WRONG_ENCRYPTION_TYPE);
 
-    /* Make sure we are supposed to verify signatures.
-    */
+    /* 确保我们应该验证签名。 */
     if(ctx->verify_gpg_sigs == 0)
         return(FKO_ERROR_GPGME_SIGNATURE_VERIFY_DISABLED);
 
-    /* Make sure we have a signature to work with.
-    */
+    /* 请确保我们有可供使用的签名。 */
     if(ctx->gpg_sigs == NULL)
         return(FKO_ERROR_GPGME_NO_SIGNATURE);
 
@@ -1183,23 +1043,19 @@ fko_gpg_signature_fpr_match(fko_ctx_t ctx, const char * const id,
         unsigned char * const result)
 {
 #if HAVE_LIBGPGME
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
-    /* Must be using GPG encryption.
-    */
+    /* 必须使用GPG加密。 */
     if(ctx->encryption_type != FKO_ENCRYPTION_GPG)
         return(FKO_ERROR_WRONG_ENCRYPTION_TYPE);
 
-    /* Make sure we are supposed to verify signatures.
-    */
+    /* 确保我们应该验证签名。 */
     if(ctx->verify_gpg_sigs == 0)
         return(FKO_ERROR_GPGME_SIGNATURE_VERIFY_DISABLED);
 
-    /* Make sure we have a signature to work with.
-    */
+    /* 请确保我们有可供使用的签名。 */
     if(ctx->gpg_sigs == NULL)
         return(FKO_ERROR_GPGME_NO_SIGNATURE);
 
@@ -1211,4 +1067,4 @@ fko_gpg_signature_fpr_match(fko_ctx_t ctx, const char * const id,
 #endif  /* HAVE_LIBGPGME */
 }
 
-/***EOF***/
+/* **EOF** */

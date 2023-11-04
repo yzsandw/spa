@@ -1,34 +1,4 @@
-/**
- * \file common/netinet_common.h
- *
- * \brief Header file for common network packet structures.  We roll our
- *          own (actually copy) here in an effort to reduce the cross-
- *          platform "hoop-jumping" we would need to do.
- */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #ifndef NETINET_COMMON_H
 #define NETINET_COMMON_H
 
@@ -45,7 +15,7 @@
   #if HAVE_NETINET_IN_H
     #include <netinet/in.h>
   #endif
-  #if PLATFORM_NETBSD || PLATFORM_OPENBSD  /* for autoconf net/if.h difficulties */
+  #if PLATFORM_NETBSD || PLATFORM_OPENBSD  /* 对于autoconf-net/if.h困难 */
     #include <net/if.h>
     #include <net/ethertypes.h>
     #include <netinet/if_ether.h>
@@ -60,8 +30,8 @@
   #if HAVE_NET_ETHERNET_H
     #include <net/ethernet.h>
   #elif HAVE_SYS_ETHERNET_H
-    #include <sys/ethernet.h> /* Seems to be where Solaris puts it. */
-    /* Also probably need to define ETHER_IS_VALID_LEN here */
+    #include <sys/ethernet.h> /* 似乎就是Solaris的用武之地。 */
+    /* 可能还需要在此处定义ETHER_IS_VALID_LEN */
     #ifndef ETHER_IS_VALID_LEN
       #define ETHER_IS_VALID_LEN(x) \
         ((x) >= ETHERMIN && (x) <= ETHERMAX)
@@ -69,10 +39,9 @@
   #endif
 #endif
 
-/* We will roll our own packet header structs. */
+/* 我们将推出我们自己的包头结构。 */
 
-/* The IP header
-*/
+/* IP标头 */
 struct iphdr
 {
 #if __BYTE_ORDER == __LITTLE_ENDIAN
@@ -95,8 +64,7 @@ struct iphdr
     unsigned int daddr;
 };
 
-/* The TCP header
-*/
+/* TCP标头 */
 struct tcphdr
 {
     unsigned short source;
@@ -131,21 +99,19 @@ struct tcphdr
     unsigned short urg_ptr;
 };
 
-/* The UDP header
-*/
+/* UDP标头 */
 struct udphdr {
-    unsigned short source;              /* source port */
-    unsigned short dest;                /* destination port */
-    unsigned short len;                 /* udp length */
-    unsigned short check;               /* udp checksum */
+    unsigned short source;              /* 源端口 */
+    unsigned short dest;                /* 目的港 */
+    unsigned short len;                 /* udp长度 */
+    unsigned short check;               /* udp校验和 */
 };
 
-/* The ICMP header
-*/
+/* ICMP标头 */
 struct icmphdr
 {
-    unsigned char type;                 /* message type */
-    unsigned char code;                 /* type sub-code */
+    unsigned char type;                 /* 消息类型 */
+    unsigned char code;                 /* 类型子代码 */
     unsigned short checksum;
     union
     {
@@ -153,28 +119,28 @@ struct icmphdr
         {
             unsigned short  id;
             unsigned short  sequence;
-        } echo;                         /* echo datagram */
-        unsigned int    gateway;        /* gateway address */
+        } echo;                         /* 回波数据报 */
+        unsigned int    gateway;        /* 网关地址 */
         struct
         {
             unsigned short  __notused;
             unsigned short  mtu;
-        } frag;                         /* path mtu discovery */
+        } frag;                         /* 路径mtu发现 */
     } un;
 };
 
-#define ICMP_ECHOREPLY          0   /* Echo Reply */
-#define ICMP_DEST_UNREACH       3   /* Destination Unreachable */
-#define ICMP_SOURCE_QUENCH      4   /* Source Quench */
-#define ICMP_REDIRECT           5   /* Redirect (change route) */
-#define ICMP_ECHO               8   /* Echo Request */
-#define ICMP_TIME_EXCEEDED      11  /* Time Exceeded */
-#define ICMP_PARAMETERPROB      12  /* Parameter Problem */
-#define ICMP_TIMESTAMP          13  /* Timestamp Request */
-#define ICMP_TIMESTAMPREPLY     14  /* Timestamp Reply */
-#define ICMP_INFO_REQUEST       15  /* Information Request */
-#define ICMP_INFO_REPLY         16  /* Information Reply */
-#define ICMP_ADDRESS            17  /* Address Mask Request */
-#define ICMP_ADDRESSREPLY       18  /* Address Mask Reply */
+#define ICMP_ECHOREPLY          0   /* 回显答复 */
+#define ICMP_DEST_UNREACH       3   /* 无法访问目标 */
+#define ICMP_SOURCE_QUENCH      4   /* 源淬火 */
+#define ICMP_REDIRECT           5   /* 重定向（更改路由） */
+#define ICMP_ECHO               8   /* 回显请求 */
+#define ICMP_TIME_EXCEEDED      11  /* 超过的时间 */
+#define ICMP_PARAMETERPROB      12  /* 参数问题 */
+#define ICMP_TIMESTAMP          13  /* 时间戳请求 */
+#define ICMP_TIMESTAMPREPLY     14  /* 时间戳回复 */
+#define ICMP_INFO_REQUEST       15  /* 信息请求 */
+#define ICMP_INFO_REPLY         16  /* 信息回复 */
+#define ICMP_ADDRESS            17  /* 地址掩码请求 */
+#define ICMP_ADDRESSREPLY       18  /* 地址掩码答复 */
 
 #endif  /* NETINET_COMMON_H */

@@ -1,32 +1,4 @@
-/**
- * \file lib/fko_decode.c
- *
- * \brief Decode an FKO SPA message after decryption.
- */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #include "fko_common.h"
 #include "fko.h"
 #include "cipher_funcs.h"
@@ -35,7 +7,7 @@
 
 #define FIELD_PARSERS 9
 
-/* Char used to separate SPA fields in an SPA packet */
+/* 用于分隔SPA数据包中SPA字段的字符 */
 #define SPA_FIELD_SEPARATOR    ":"
 
 #ifdef HAVE_C_UNIT_TESTS /* LCOV_EXCL_START */
@@ -48,8 +20,7 @@ num_fields(char *str)
     int    i=0;
     char   *tmp = NULL;
 
-    /* Count the number of remaining SPA packet fields
-    */
+    /* 统计剩余SPA数据包字段的数量 */
     for (i=0; i <= MAX_SPA_FIELDS+1; i++)
     {
         if ((tmp = strchr(str, ':')) == NULL)
@@ -65,8 +36,7 @@ last_field(char *str)
     int    i=0, pos_last=0;
     char   *tmp = NULL;
 
-    /* Count the number of bytes to the last ':' char
-    */
+    /* 计算最后一个“：”字符的字节数 */
     for (i=0; i <= MAX_SPA_FIELDS+1; i++)
     {
         if ((tmp = strchr(str, ':')) == NULL)
@@ -107,23 +77,16 @@ verify_digest(char *tbuf, int t_size, fko_ctx_t ctx)
             sha512_base64(tbuf, (unsigned char*)ctx->encoded_msg, ctx->encoded_msg_len);
             break;
 
-        /* Note that we check SHA3_256 and SHA3_512 below because the
-         * digest lengths for these are the same as SHA256 and SHA512
-         * respectively, and setting the digest type for an incoming
-         * decrypted SPA packet is done initially by looking at the
-         * length.
-         */
+        /* 请注意，我们在下面检查SHA3_256和SHA3_512，因为 */
 
-        default: /* Invalid or unsupported digest */
+        default: /* 无效或不受支持的摘要 */
             return(FKO_ERROR_INVALID_DIGEST_TYPE);
     }
 
-    /* We give up here if the computed digest does not match the
-     * digest in the message data.
-    */
+    /* 如果计算的摘要与 */
     if(constant_runtime_cmp(ctx->digest, tbuf, t_size) != 0)
     {
-        /* Could potentially also have been SHA3_256 or SHA3_512 */
+        /* 也可能是SHA3_256或SHA3_512 */
         if(ctx->digest_type == FKO_DIGEST_SHA256)
         {
             memset(tbuf, 0, FKO_ENCODE_TMP_BUF_SIZE);
@@ -176,7 +139,7 @@ is_valid_digest_len(int t_size, fko_ctx_t ctx)
             ctx->digest_len  = SHA1_B64_LEN;
             break;
 
-        /* Could also match SHA3_256_B64_LEN, handled in verify_digest() */
+        /* 也可以匹配在verify_edigest（）中处理的SHA3_256_B64_LEN */
         case SHA256_B64_LEN:
             ctx->digest_type = FKO_DIGEST_SHA256;
             ctx->digest_len  = SHA256_B64_LEN;
@@ -187,13 +150,13 @@ is_valid_digest_len(int t_size, fko_ctx_t ctx)
             ctx->digest_len  = SHA384_B64_LEN;
             break;
 
-        /* Could also match SHA3_512_B64_LEN, handled in verify_digest() */
+        /* 也可以匹配在verify_edigest（）中处理的SHA3_512_B64_LEN */
         case SHA512_B64_LEN:
             ctx->digest_type = FKO_DIGEST_SHA512;
             ctx->digest_len  = SHA512_B64_LEN;
             break;
 
-        default: /* Invalid or unsupported digest */
+        default: /* 无效或不受支持的摘要 */
             return(FKO_ERROR_INVALID_DIGEST_TYPE);
     }
 
@@ -217,7 +180,7 @@ parse_msg(char *tbuf, char **ndx, int *t_size, fko_ctx_t ctx)
     if(ctx->message != NULL)
         free(ctx->message);
 
-    ctx->message = calloc(1, *t_size+1); /* Yes, more than we need */
+    ctx->message = calloc(1, *t_size+1); /* 是的，比我们需要的还多 */
 
     if(ctx->message == NULL)
         return(FKO_ERROR_MEMORY_ALLOCATION);
@@ -227,8 +190,7 @@ parse_msg(char *tbuf, char **ndx, int *t_size, fko_ctx_t ctx)
 
     if(ctx->message_type == FKO_COMMAND_MSG)
     {
-        /* Require a message similar to: 1.2.3.4,<command>
-        */
+        /* 需要类似于以下内容的消息：1.2.3.4，＜command＞ */
         if(validate_cmd_msg(ctx->message) != FKO_SUCCESS)
         {
             return(FKO_ERROR_INVALID_DATA_DECODE_MESSAGE_VALIDFAIL);
@@ -236,8 +198,7 @@ parse_msg(char *tbuf, char **ndx, int *t_size, fko_ctx_t ctx)
     }
     else
     {
-        /* Require a message similar to: 1.2.3.4,tcp/22
-        */
+        /* 需要类似于以下内容的消息：1.2.3.4，tcp/22 */
         if(validate_access_msg(ctx->message) != FKO_SUCCESS)
         {
             return(FKO_ERROR_INVALID_DATA_DECODE_ACCESS_VALIDFAIL);
@@ -267,7 +228,7 @@ parse_nat_msg(char *tbuf, char **ndx, int *t_size, fko_ctx_t ctx)
         if(ctx->nat_access != NULL)
             free(ctx->nat_access);
 
-        ctx->nat_access = calloc(1, *t_size+1); /* Yes, more than we need */
+        ctx->nat_access = calloc(1, *t_size+1); /* 是的，比我们需要的还多 */
         if(ctx->nat_access == NULL)
             return(FKO_ERROR_MEMORY_ALLOCATION);
 
@@ -300,11 +261,7 @@ parse_server_auth(char *tbuf, char **ndx, int *t_size, fko_ctx_t ctx)
       || ctx->message_type == FKO_CLIENT_TIMEOUT_NAT_ACCESS_MSG
       || ctx->message_type == FKO_CLIENT_TIMEOUT_LOCAL_NAT_ACCESS_MSG)
     {
-        /* If we are here then we may still have a server_auth string,
-         * or a timeout, or both. So we look for a ':' delimiter.  If
-         * it is there we have both, if not we check the message_type
-         * again.
-        */
+        /* 如果我们在这里，那么我们可能仍然有一个server_auth字符串， */
         if(strchr(*ndx, ':'))
         {
             *t_size = strcspn(*ndx, ":");
@@ -317,7 +274,7 @@ parse_server_auth(char *tbuf, char **ndx, int *t_size, fko_ctx_t ctx)
             if(ctx->server_auth != NULL)
                 free(ctx->server_auth);
 
-            ctx->server_auth = calloc(1, *t_size+1); /* Yes, more than we need */
+            ctx->server_auth = calloc(1, *t_size+1); /* 是的，比我们需要的还多 */
             if(ctx->server_auth == NULL)
                 return(FKO_ERROR_MEMORY_ALLOCATION);
 
@@ -334,7 +291,7 @@ parse_server_auth(char *tbuf, char **ndx, int *t_size, fko_ctx_t ctx)
         if(ctx->server_auth != NULL)
             free(ctx->server_auth);
 
-        ctx->server_auth = calloc(1, *t_size+1); /* Yes, more than we need */
+        ctx->server_auth = calloc(1, *t_size+1); /* 是的，比我们需要的还多 */
         if(ctx->server_auth == NULL)
             return(FKO_ERROR_MEMORY_ALLOCATION);
 
@@ -360,8 +317,7 @@ parse_client_timeout(char *tbuf, char **ndx, int *t_size, fko_ctx_t ctx)
         if (*t_size > MAX_SPA_MESSAGE_SIZE)
             return(FKO_ERROR_INVALID_DATA_DECODE_TIMEOUT_TOOBIG);
 
-        /* Should be a number only.
-        */
+        /* 应该只是一个数字。 */
         if(strspn(*ndx, "0123456789") != *t_size)
             return(FKO_ERROR_INVALID_DATA_DECODE_TIMEOUT_VALIDFAIL);
 
@@ -393,21 +349,19 @@ parse_msg_type(char *tbuf, char **ndx, int *t_size, fko_ctx_t ctx)
     if(is_err != FKO_SUCCESS)
         return(FKO_ERROR_INVALID_DATA_DECODE_MSGTYPE_DECODEFAIL);
 
-    /* Now that we have a valid type, ensure that the total
-     * number of SPA fields is also valid for the type
-    */
+    /* 现在我们有了一个有效的类型，请确保 */
     remaining_fields = num_fields(*ndx);
 
     switch(ctx->message_type)
     {
-        /* optional server_auth + digest */
+        /* 可选server_auth+摘要 */
         case FKO_COMMAND_MSG:
         case FKO_ACCESS_MSG:
             if(remaining_fields > 2)
                 return FKO_ERROR_INVALID_DATA_DECODE_WRONG_NUM_FIELDS;
             break;
 
-        /* nat or client timeout + optional server_auth + digest */
+        /* nat或客户端超时+可选服务器身份验证+摘要 */
         case FKO_NAT_ACCESS_MSG:
         case FKO_LOCAL_NAT_ACCESS_MSG:
         case FKO_CLIENT_TIMEOUT_ACCESS_MSG:
@@ -415,14 +369,14 @@ parse_msg_type(char *tbuf, char **ndx, int *t_size, fko_ctx_t ctx)
                 return FKO_ERROR_INVALID_DATA_DECODE_WRONG_NUM_FIELDS;
             break;
 
-        /* client timeout + nat + optional server_auth + digest */
+        /* 客户端超时+nat+可选服务器身份验证+摘要 */
         case FKO_CLIENT_TIMEOUT_NAT_ACCESS_MSG:
         case FKO_CLIENT_TIMEOUT_LOCAL_NAT_ACCESS_MSG:
             if(remaining_fields > 4)
                 return FKO_ERROR_INVALID_DATA_DECODE_WRONG_NUM_FIELDS;
             break;
 
-        default: /* Should not reach here */
+        default: /* 不应该到达这里 */
             return(FKO_ERROR_INVALID_DATA_DECODE_MSGTYPE_DECODEFAIL);
     }
 
@@ -489,7 +443,7 @@ parse_username(char *tbuf, char **ndx, int *t_size, fko_ctx_t ctx)
     if(ctx->username != NULL)
         free(ctx->username);
 
-    ctx->username = calloc(1, *t_size+1); /* Yes, more than we need */
+    ctx->username = calloc(1, *t_size+1); /* 是的，比我们需要的还多 */
     if(ctx->username == NULL)
         return(FKO_ERROR_MEMORY_ALLOCATION);
 
@@ -524,40 +478,35 @@ parse_rand_val(char *tbuf, char **ndx, int *t_size, fko_ctx_t ctx)
     return FKO_SUCCESS;
 }
 
-/* Decode the encoded SPA data.
-*/
+/* 对编码的SPA数据进行解码。 */
 int
 fko_decode_spa_data(fko_ctx_t ctx)
 {
     char       *tbuf, *ndx;
     int         t_size, i, res;
 
-    /* Array of function pointers to SPA field parsing functions
-    */
+    /* 指向SPA字段解析函数的函数指针数组 */
     int (*field_parser[FIELD_PARSERS])(char *tbuf, char **ndx, int *t_size, fko_ctx_t ctx)
-        = { parse_rand_val,       /* Extract random value */
-            parse_username,       /* Extract username */
-            parse_timestamp,      /* Client timestamp */
-            parse_version,        /* SPA version */
-            parse_msg_type,       /* SPA msg type */
-            parse_msg,            /* SPA msg string */
-            parse_nat_msg,        /* SPA NAT msg string */
-            parse_server_auth,    /* optional server authentication method */
-            parse_client_timeout  /* client defined timeout */
+        = { parse_rand_val,       /* 提取随机值 */
+            parse_username,       /* 提取用户名 */
+            parse_timestamp,      /* 客户端时间戳 */
+            parse_version,        /* SPA版本 */
+            parse_msg_type,       /* SPA消息类型 */
+            parse_msg,            /* SPA消息字符串 */
+            parse_nat_msg,        /* SPA NAT消息字符串 */
+            parse_server_auth,    /* 可选的服务器身份验证方法 */
+            parse_client_timeout  /* 客户端定义的超时 */
           };
 
     if (! is_valid_encoded_msg_len(ctx->encoded_msg_len))
         return(FKO_ERROR_INVALID_DATA_DECODE_MSGLEN_VALIDFAIL);
 
-    /* Make sure there are no non-ascii printable chars
-    */
+    /* 确保没有非ascii可打印字符 */
     for (i=0; i < (int)strnlen(ctx->encoded_msg, MAX_SPA_ENCODED_MSG_SIZE); i++)
         if(isprint((int)(unsigned char)ctx->encoded_msg[i]) == 0)
             return(FKO_ERROR_INVALID_DATA_DECODE_NON_ASCII);
 
-    /* Make sure there are enough fields in the SPA packet
-     * delimited with ':' chars
-    */
+    /* 确保SPA数据包中有足够的字段 */
     ndx = ctx->encoded_msg;
 
     if (num_fields(ndx) < MIN_SPA_FIELDS)
@@ -567,8 +516,7 @@ fko_decode_spa_data(fko_ctx_t ctx)
 
     t_size = strnlen(ndx, SHA512_B64_LEN+1);
 
-    /* Validate digest length
-    */
+    /* 验证摘要长度 */
     res = is_valid_digest_len(t_size, ctx);
     if(res != FKO_SUCCESS)
         return res;
@@ -576,29 +524,22 @@ fko_decode_spa_data(fko_ctx_t ctx)
     if(ctx->digest != NULL)
         free(ctx->digest);
 
-    /* Copy the digest into the context and terminate the encoded data
-     * at that point so the original digest is not part of the
-     * encoded string.
-    */
+    /* 将摘要复制到上下文中并终止编码数据 */
     ctx->digest = strdup(ndx);
     if(ctx->digest == NULL)
         return(FKO_ERROR_MEMORY_ALLOCATION);
 
-    /* Chop the digest off of the encoded_msg bucket...
-    */
+    /* 从encoded_msg存储桶中剪切摘要。。。 */
     bzero((ndx-1), t_size);
 
     ctx->encoded_msg_len -= t_size+1;
 
-    /* Make a tmp bucket for processing base64 encoded data and
-     * other general use.
-    */
+    /* 制作一个tmp存储桶，用于处理base64编码的数据和 */
     tbuf = calloc(1, FKO_ENCODE_TMP_BUF_SIZE);
     if(tbuf == NULL)
         return(FKO_ERROR_MEMORY_ALLOCATION);
 
-    /* Can now verify the digest.
-    */
+    /* 现在可以验证摘要。 */
     res = verify_digest(tbuf, t_size, ctx);
     if(res != FKO_SUCCESS)
     {
@@ -606,9 +547,7 @@ fko_decode_spa_data(fko_ctx_t ctx)
         return(FKO_ERROR_DIGEST_VERIFICATION_FAILED);
     }
 
-    /* Now we will work through the encoded data and extract (and base64-
-     * decode where necessary), the SPA data fields and populate the context.
-    */
+    /* 现在我们将处理编码数据并提取（和base64- */
     ndx = ctx->encoded_msg;
 
     for (i=0; i < FIELD_PARSERS; i++)
@@ -621,12 +560,10 @@ fko_decode_spa_data(fko_ctx_t ctx)
         }
     }
 
-    /* Done with the tmp buffer.
-    */
+    /* 使用tmp缓冲区完成。 */
     free(tbuf);
 
-    /* Call the context initialized.
-    */
+    /* 调用已初始化的上下文。 */
     ctx->initval = FKO_CTX_INITIALIZED;
     FKO_SET_CTX_INITIALIZED(ctx);
 
@@ -640,10 +577,10 @@ DECLARE_UTEST(num_fields, "Count the number of SPA fields in a SPA packet")
     int ix_field=0;
     char spa_packet[(MAX_SPA_FIELDS+1)*3];
 
-    /* Zeroing the spa packet */
+    /* 将水疗包归零 */
     memset(spa_packet, 0, sizeof(spa_packet));
 
-    /* Check we are able to count the number of SPA fields */
+    /* 检查我们是否能够统计SPA字段的数量 */
     for(ix_field=0 ; ix_field<=MAX_SPA_FIELDS+2 ; ix_field++)
     {
         strcat(spa_packet, "x");
@@ -651,7 +588,7 @@ DECLARE_UTEST(num_fields, "Count the number of SPA fields in a SPA packet")
         strcat(spa_packet, SPA_FIELD_SEPARATOR);
     }
 
-    /* Check for possible overflow */
+    /* 检查是否存在可能的溢出 */
     strcat(spa_packet, "x");
     CU_ASSERT(num_fields(spa_packet) == MAX_SPA_FIELDS + 2);
     strcat(spa_packet, "x");
@@ -664,10 +601,10 @@ DECLARE_UTEST(last_field, "Count the number of bytes to the last :")
     int ix_field;
     char spa_packet[(MAX_SPA_FIELDS+1)*3];
 
-    /* Zeroing the spa packet */
+    /* 将水疗包归零 */
     memset(spa_packet, 0, sizeof(spa_packet));
 
-    /* Check for a valid count when the number of field is less than MAX_SPA_FIELDS  */
+    /* 当字段数小于MAX_SPA_FIELDS时，检查有效计数 */
     CU_ASSERT(last_field("a:") == 2);
     CU_ASSERT(last_field("ab:abc:") == 7);
     CU_ASSERT(last_field("abc:abcd:") == 9);
@@ -692,5 +629,5 @@ int register_ts_fko_decode(void)
     return register_ts(&TEST_SUITE(fko_decode));
 }
 
-#endif /* HAVE_C_UNIT_TESTS */ /* LCOV_EXCL_STOP */
-/***EOF***/
+#endif /* 有_单元_测试 */ /* LCOV_EXCL_STOP */
+/* **EOF** */

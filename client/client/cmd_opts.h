@@ -1,37 +1,7 @@
-/**
- * \file client/cmd_opts.h
- *
- * \brief Header file for fwknop command line options.
- */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- ******************************************************************************
-*/
 #ifndef CMD_OPTS_H
 #define CMD_OPTS_H
 
-/* Long options values (for those without a short option).
-*/
 /*
 
     FKO_DIGEST_NAME：摘要算法名称。
@@ -133,14 +103,11 @@ enum {
 };
 
 
-/* Our getopt_long options string.
-*/
+
 //具体来说，这个字符串包含了多个字母和冒号，每个字母都代表一个命令行选项。冒号表示该选项需要接收一个参数。
 //通过解析命令行参数时，可以使用这个字符串常量来指定可接受的选项和它们是否需要参数。
 #define GETOPTS_OPTION_STRING "a:A:bB:C:D:E:f:gG:hH:kK:lm:M:n:N:p:P:Q:rRsS:Tu:U:vVw:"
 
-/* Our program command-line options...
-*/
 
 /*
 当我们编写一个需要处理命令行参数的程序时，可以使用cmd_opts数组来定义可接受的命令行选项及其相关信息。

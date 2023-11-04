@@ -1,46 +1,31 @@
-/**
- * \file lib/sha1.c
- *
- * \brief Implementation of the SHA1 message-digest algorithm for libfwknop.
- */
 
-/* NIST Secure Hash Algorithm
- *   Heavily modified by Uwe Hollerbach <uh@alumni.caltech edu>
- *   from Peter C. Gutmann's implementation as found in
- *   Applied Cryptography by Bruce Schneier
- *   Further modifications to include the "UNRAVEL" stuff, below
- *
- * This code is in the public domain
- *
- *****************************************************************************
-*/
 #include "sha1.h"
 #include "fko_common.h"
 
-/* SHA f()-functions */
+/* SHA f（）-函数 */
 #define f1(x,y,z)    ((x & y) | (~x & z))
 #define f2(x,y,z)    (x ^ y ^ z)
 #define f3(x,y,z)    ((x & y) | (x & z) | (y & z))
 #define f4(x,y,z)    (x ^ y ^ z)
 
-/* SHA constants */
+/* SHA常量 */
 #define CONST1        0x5a827999L
 #define CONST2        0x6ed9eba1L
 #define CONST3        0x8f1bbcdcL
 #define CONST4        0xca62c1d6L
 
-/* truncate to 32 bits -- should be a null op on 32-bit machines */
+/* 截断为32位--在32位计算机上应该是null操作 */
 #define T32(x)    ((x) & 0xffffffffL)
 
-/* 32-bit rotate */
+/* 32位旋转 */
 #define R32(x,n)    T32(((x << n) | (x >> (32 - n))))
 
-/* the generic case, for when the overall rotation is not unraveled */
+/* 一般情况下，当整体旋转没有被解开时 */
 #define FG(n)    \
     T = T32(R32(A,5) + f##n(B,C,D) + E + *WP++ + CONST##n);    \
     E = D; D = C; C = R32(B,30); B = A; A = T
 
-/* specific cases, for when the overall rotation is unraveled */
+/* 特定情况下，当整体旋转被解开时 */
 #define FA(n)    \
     T = T32(R32(A,5) + f##n(B,C,D) + E + *WP++ + CONST##n); B = R32(B,30)
 
@@ -151,7 +136,7 @@ sha1_transform(SHA1_INFO *sha1_info)
     sha1_info->digest[2] = T32(sha1_info->digest[2] + A);
     sha1_info->digest[3] = T32(sha1_info->digest[3] + B);
     sha1_info->digest[4] = T32(sha1_info->digest[4] + C);
-#else /* !UNRAVEL */
+#else /* ！解开 */
 #ifdef UNROLL_LOOPS
     FG(1); FG(1); FG(1); FG(1); FG(1); FG(1); FG(1); FG(1); FG(1); FG(1);
     FG(1); FG(1); FG(1); FG(1); FG(1); FG(1); FG(1); FG(1); FG(1); FG(1);
@@ -161,21 +146,21 @@ sha1_transform(SHA1_INFO *sha1_info)
     FG(3); FG(3); FG(3); FG(3); FG(3); FG(3); FG(3); FG(3); FG(3); FG(3);
     FG(4); FG(4); FG(4); FG(4); FG(4); FG(4); FG(4); FG(4); FG(4); FG(4);
     FG(4); FG(4); FG(4); FG(4); FG(4); FG(4); FG(4); FG(4); FG(4); FG(4);
-#else /* !UNROLL_LOOPS */
+#else /* ！展开操作（_L） */
     for (i =  0; i < 20; ++i) { FG(1); }
     for (i = 20; i < 40; ++i) { FG(2); }
     for (i = 40; i < 60; ++i) { FG(3); }
     for (i = 60; i < 80; ++i) { FG(4); }
-#endif /* !UNROLL_LOOPS */
+#endif /* ！展开操作（_L） */
     sha1_info->digest[0] = T32(sha1_info->digest[0] + A);
     sha1_info->digest[1] = T32(sha1_info->digest[1] + B);
     sha1_info->digest[2] = T32(sha1_info->digest[2] + C);
     sha1_info->digest[3] = T32(sha1_info->digest[3] + D);
     sha1_info->digest[4] = T32(sha1_info->digest[4] + E);
-#endif /* !UNRAVEL */
+#endif /* ！解开 */
 }
 
-/* initialize the SHA digest */
+/* 初始化SHA摘要 */
 
 void
 sha1_init(SHA1_INFO *sha1_info)
@@ -190,7 +175,7 @@ sha1_init(SHA1_INFO *sha1_info)
     sha1_info->local = 0;
 }
 
-/* update the SHA digest */
+/* 更新SHA摘要 */
 
 void
 sha1_update(SHA1_INFO *sha1_info, uint8_t *buffer, int count)
@@ -256,7 +241,7 @@ sha1_transform_and_copy(unsigned char digest[20], SHA1_INFO *sha1_info)
     digest[19] = (unsigned char) ((sha1_info->digest[4]      ) & 0xff);
 }
 
-/* finish computing the SHA digest */
+/* 完成SHA摘要的计算 */
 void
 sha1_final(uint8_t digest[20], SHA1_INFO *sha1_info)
 {
@@ -286,4 +271,4 @@ sha1_final(uint8_t digest[20], SHA1_INFO *sha1_info)
     sha1_transform_and_copy(digest, sha1_info);
 }
 
-/***EOF***/
+/* **EOF** */

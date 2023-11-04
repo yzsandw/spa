@@ -1,43 +1,11 @@
-/**
- * \file lib/hmac.c
- *
- * \brief Provide HMAC support to SPA communications
- */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 
 #include "hmac.h"
 #ifdef HAVE_C_UNIT_TESTS /* LCOV_EXCL_START */
 DECLARE_TEST_SUITE(hmac_test, "hmac functions test suite");
 #endif /* LCOV_EXCL_STOP */
 
-/**
- * /brief populate the inner and outer pads
- *
- *
- */
+/* * */
 static void
 pad_init(unsigned char *inner_pad, unsigned char *outer_pad,
         const unsigned char * const key, const int key_len)
@@ -78,8 +46,7 @@ hmac_md5(const char *msg, const unsigned int msg_len,
 	
     if(MD5_BLOCK_LEN < hmac_key_len)
     {
-        /* Calculate the digest of the key
-        */
+        /* 计算密钥摘要 */
         md5(final_key, (unsigned char *)hmac_key, final_len);
         final_len = MD5_DIGEST_LEN;
     }
@@ -124,8 +91,7 @@ hmac_sha1(const char *msg, const unsigned int msg_len,
 
     if(SHA1_BLOCK_LEN < hmac_key_len)
     {
-        /* Calculate the digest of the key
-        */
+        /* 计算密钥摘要 */
         sha1(final_key, (unsigned char *)hmac_key, final_len);
         final_len = SHA1_DIGEST_LEN;
     }
@@ -170,8 +136,7 @@ hmac_sha256(const char *msg, const unsigned int msg_len,
 
     if(SHA256_BLOCK_LEN < hmac_key_len)
     {
-        /* Calculate the digest of the key
-        */
+        /* 计算密钥摘要 */
         sha256(final_key, (unsigned char *)hmac_key, final_len);
         final_len = SHA256_DIGEST_LEN;
     }
@@ -216,8 +181,7 @@ hmac_sha384(const char *msg, const unsigned int msg_len,
 
     if(SHA384_BLOCK_LEN < hmac_key_len)
     {
-        /* Calculate the digest of the key
-        */
+        /* 计算密钥摘要 */
         sha384(final_key, (unsigned char *)hmac_key, final_len);
         final_len = SHA384_DIGEST_LEN;
     }
@@ -262,8 +226,7 @@ hmac_sha512(const char *msg, const unsigned int msg_len,
 
     if(SHA512_BLOCK_LEN < hmac_key_len)
     {
-        /* Calculate the digest of the key
-        */
+        /* 计算密钥摘要 */
         sha512(final_key, (unsigned char *)hmac_key, final_len);
         final_len = SHA512_DIGEST_LEN;
     }
@@ -308,8 +271,7 @@ hmac_sha3_256(const char *msg, const unsigned int msg_len,
 
     if(SHA3_256_BLOCK_LEN < hmac_key_len)
     {
-        /* Calculate the digest of the key
-        */
+        /* 计算密钥摘要 */
         FIPS202_SHA3_256((unsigned char *)hmac_key, final_len, final_key);
         final_len = SHA3_256_DIGEST_LEN;
     }
@@ -354,8 +316,7 @@ hmac_sha3_512(const char *msg, const unsigned int msg_len,
 
     if(SHA3_512_BLOCK_LEN < hmac_key_len)
     {
-        /* Calculate the digest of the key
-        */
+        /* 计算密钥摘要 */
         FIPS202_SHA3_512((unsigned char *)hmac_key, final_len, final_key);
         final_len = SHA3_512_DIGEST_LEN;
     }
@@ -1474,4 +1435,4 @@ int register_ts_hmac_test(void)
     return register_ts(&TEST_SUITE(hmac_test));
 }
 
-#endif /* HAVE_C_UNIT_TESTS */ /* LCOV_EXCL_STOP */
+#endif /* 有_单元_测试 */ /* LCOV_EXCL_STOP */

@@ -28,6 +28,7 @@ target_compile_definitions(main PRIVATE
         HAVE_CTYPE_H=1
         HAVE_TIME_H=1
         HAVE_LOCALE_H=1
+        # 版本号
         VERSION="0.0.1"
         # 防火墙的执行文件？
         FIREWALL_EXE="iptables"

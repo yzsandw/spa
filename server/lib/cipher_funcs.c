@@ -1,32 +1,4 @@
-/**
- * \file lib/cipher_funcs.c
- *
- * \brief Cipher functions used by fwknop
- */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #include <stdio.h>
 #include <string.h>
 
@@ -52,8 +24,7 @@
 DECLARE_TEST_SUITE(digest_test, "Cipher functions test suite");
 #endif /* LCOV_EXCL_STOP */
 
-/* Get random data.
-*/
+/* 获取随机数据。 */
 void
 get_random_data(unsigned char *data, const size_t len)
 {
@@ -77,18 +48,14 @@ get_random_data(unsigned char *data, const size_t len)
     int             do_time = 0;
     size_t          amt_read;
 
-    /* Attempt to read seed data from /dev/urandom.  If that does not
-     * work, then fall back to a time-based method (less secure, but
-     * probably more portable).
-    */
+    /* 尝试从/dev/urandom读取种子数据。如果没有 */
     if((rfd = fopen(RAND_FILE, "r")) == NULL)
     {
         do_time = 1;
     }
     else
     {
-        /* Read seed from /dev/urandom
-        */
+        /* 从/dev/urandom读取种子 */
         amt_read = fread(data, len, 1, rfd);
         fclose(rfd);
 
@@ -98,8 +65,7 @@ get_random_data(unsigned char *data, const size_t len)
 
     if (do_time)
     {
-        /* Seed based on time (current usecs).
-        */
+        /* 基于时间的种子（当前用途）。 */
         gettimeofday(&tv, NULL);
         srand(tv.tv_usec);
 
@@ -112,33 +78,24 @@ get_random_data(unsigned char *data, const size_t len)
 }
 
 
-/*** These are Rijndael-specific functions ***/
+/* **这些是Rijndael特定的函数** */
 
-/* Rijndael function to generate initial salt and initialization vector
- * (iv).  This is is done to be compatible with the data produced via OpenSSL
-*/
+/* Rijndael函数生成初始salt和初始化向量 */
 static void
 rij_salt_and_iv(RIJNDAEL_context *ctx, const char *key,
         const int key_len, const unsigned char *data, const int mode_flag)
 {
     char            pw_buf[RIJNDAEL_MAX_KEYSIZE] = {0};
     unsigned char   tmp_buf[MD5_DIGEST_LEN+RIJNDAEL_MAX_KEYSIZE+RIJNDAEL_BLOCKSIZE] = {0};
-    unsigned char   kiv_buf[RIJNDAEL_MAX_KEYSIZE+RIJNDAEL_BLOCKSIZE] = {0}; /* Key and IV buffer */
-    unsigned char   md5_buf[MD5_DIGEST_LEN] = {0}; /* Buffer for computed md5 hash */
+    unsigned char   kiv_buf[RIJNDAEL_MAX_KEYSIZE+RIJNDAEL_BLOCKSIZE] = {0}; /* 钥匙和IV缓冲器 */
+    unsigned char   md5_buf[MD5_DIGEST_LEN] = {0}; /* 计算的md5哈希的缓冲区 */
 
     int             final_key_len = 0;
     size_t          kiv_len = 0;
 
     if(mode_flag == FKO_ENC_MODE_CBC_LEGACY_IV)
     {
-        /* Pad the pw with '0' chars up to the minimum Rijndael key size.
-         *
-         * This maintains compatibility with the old perl code if absolutely
-         * necessary in some scenarios, but is not recommended to use since it
-         * breaks compatibility with how OpenSSL implements AES and introduces
-         * other problems.  This code will be removed altogether in a future
-         * version of fwknop.
-        */
+        /* 用“0”个字符填充密码，最大不超过Rijndael密钥的最小大小。 */
         if(key_len < RIJNDAEL_MIN_KEYSIZE)
         {
             memcpy(pw_buf, key, key_len);
@@ -157,26 +114,19 @@ rij_salt_and_iv(RIJNDAEL_context *ctx, const char *key,
         final_key_len = key_len;
     }
 
-    /* If we are decrypting, data will contain the salt. Otherwise,
-     * for encryption, we generate a random salt.
-    */
+    /* 如果我们正在解密，数据将包含盐。否则 */
     if(data != NULL)
     {
-        /* Pull the salt from the data
-        */
+        /* 从数据中提取盐 */
         memcpy(ctx->salt, (data+SALT_LEN), SALT_LEN);
     }
     else
     {
-        /* Generate a random 8-byte salt.
-        */
+        /* 生成一个随机的8字节salt。 */
         get_random_data(ctx->salt, SALT_LEN);
     }
 
-    /* Now generate the key and initialization vector.
-     * (again it is the perl Crypt::CBC way, with a touch of
-     * fwknop).
-    */
+    /* 现在生成密钥和初始化向量。 */
     memcpy(tmp_buf+MD5_DIGEST_LEN, pw_buf, final_key_len);
     memcpy(tmp_buf+MD5_DIGEST_LEN+final_key_len, ctx->salt, SALT_LEN);
 
@@ -198,16 +148,14 @@ rij_salt_and_iv(RIJNDAEL_context *ctx, const char *key,
     memcpy(ctx->iv,  kiv_buf+RIJNDAEL_MAX_KEYSIZE, RIJNDAEL_BLOCKSIZE);
 }
 
-/* Initialization entry point.
-*/
+/* 初始化入口点。 */
 static void
 rijndael_init(RIJNDAEL_context *ctx, const char *key,
     const int key_len, const unsigned char *data,
     int encryption_mode)
 {
 
-    /* The default is Rijndael in CBC mode
-    */
+    /* CBC模式下的默认值为Rijndael */
     if(encryption_mode == FKO_ENC_MODE_CBC
             || encryption_mode == FKO_ENC_MODE_CBC_LEGACY_IV)
         ctx->mode = MODE_CBC;
@@ -221,21 +169,17 @@ rijndael_init(RIJNDAEL_context *ctx, const char *key,
         ctx->mode = MODE_CFB;
     else if(encryption_mode == FKO_ENC_MODE_ECB)
         ctx->mode = MODE_ECB;
-    else  /* shouldn't get this far */
+    else  /* 不应该走这么远 */
         ctx->mode = encryption_mode;
 
-    /* Generate the salt and initialization vector.
-    */
+    /* 生成salt和初始化向量。 */
     rij_salt_and_iv(ctx, key, key_len, data, encryption_mode);
 
-    /* Intialize our Rijndael context.
-    */
+    /* 使我们的Rijndael环境变得亲切。 */
     rijndael_setup(ctx, RIJNDAEL_MAX_KEYSIZE, ctx->key);
 }
 
-/* Take a chunk of data, encrypt it in the same way OpenSSL would
- * (with a default of AES in CBC mode).
-*/
+/* 取一块数据，以OpenSSL相同的方式进行加密 */
 size_t
 rij_encrypt(unsigned char *in, size_t in_len,
     const char *key, const int key_len,
@@ -247,20 +191,19 @@ rij_encrypt(unsigned char *in, size_t in_len,
 
     rijndael_init(&ctx, key, key_len, NULL, encryption_mode);
 
-    /* Prepend the salt to the ciphertext...
-    */
+    /* 在密文中加入盐。。。 */
     memcpy(ondx, "Salted__", SALT_LEN);
     ondx+=SALT_LEN;
     memcpy(ondx, ctx.salt, SALT_LEN);
     ondx+=SALT_LEN;
 
-    /* Add padding to the original plaintext to ensure that it is a
-     * multiple of the Rijndael block size
-    */
+    /* 在原始明文中添加填充以确保它是 */
+   //为原始明文添加填充，确保其大小是 Rijndael 数据块大小的倍数
     pad_val = RIJNDAEL_BLOCKSIZE - (in_len % RIJNDAEL_BLOCKSIZE);
     for (i = (int)in_len; i < ((int)in_len+pad_val); i++)
         in[i] = pad_val;
-
+    
+    //分组加密
     block_encrypt(&ctx, in, in_len+pad_val, ondx, ctx.iv);
 
     ondx += in_len+pad_val;
@@ -272,8 +215,7 @@ rij_encrypt(unsigned char *in, size_t in_len,
     return(ondx - out);
 }
 
-/* Decrypt the given data.
-*/
+/* 解密给定的数据。 */
 size_t
 rij_decrypt(unsigned char *in, size_t in_len,
     const char *key, const int key_len,
@@ -289,9 +231,7 @@ rij_decrypt(unsigned char *in, size_t in_len,
 
     rijndael_init(&ctx, key, key_len, in, encryption_mode);
 
-    /* Remove the first block since it contains the salt (it was consumed
-     * by the rijndael_init() function above).
-    */
+    /* 移除第一块，因为它含有盐（它已被消耗 */
     in_len -= RIJNDAEL_BLOCKSIZE;
     memmove(in, in+RIJNDAEL_BLOCKSIZE, in_len);
 
@@ -299,8 +239,7 @@ rij_decrypt(unsigned char *in, size_t in_len,
 
     ondx += in_len;
 
-    /* Find and remove padding.
-    */
+    /* 查找并移除衬垫。 */
     pad_val = *(ondx-1);
 
     if(pad_val >= 0 && pad_val <= RIJNDAEL_BLOCKSIZE)
@@ -326,9 +265,7 @@ rij_decrypt(unsigned char *in, size_t in_len,
     return(ondx - out);
 }
 
-/* See if we need to add the "Salted__" string to the front of the
- * encrypted data.
-*/
+/* 看看是否需要将“Salted__”字符串添加到 */
 int
 add_salted_str(fko_ctx_t ctx)
 {
@@ -339,9 +276,7 @@ add_salted_str(fko_ctx_t ctx)
     return(FKO_SUCCESS);
 #endif
 
-    /* We only add the base64 encoded salt to data that is already base64
-     * encoded
-    */
+    /* 我们只将base64编码的salt添加到已经是base64的数据中 */
     if(is_base64((unsigned char *)ctx->encrypted_msg,
             ctx->encrypted_msg_len) == 0)
         return(FKO_ERROR_INVALID_DATA_ENCODE_NOTBASE64);
@@ -349,8 +284,7 @@ add_salted_str(fko_ctx_t ctx)
     if(constant_runtime_cmp(ctx->encrypted_msg,
             B64_RIJNDAEL_SALT, B64_RIJNDAEL_SALT_STR_LEN) != 0)
     {
-        /* We need to realloc space for the salt.
-        */
+        /* 我们需要重新分配盐的空间。 */
         tbuf = realloc(ctx->encrypted_msg, ctx->encrypted_msg_len
                     + B64_RIJNDAEL_SALT_STR_LEN+1);
         if(tbuf == NULL)
@@ -361,10 +295,7 @@ add_salted_str(fko_ctx_t ctx)
         ctx->encrypted_msg = memcpy(tbuf,
                 B64_RIJNDAEL_SALT, B64_RIJNDAEL_SALT_STR_LEN);
 
-        /* Adjust the encoded msg len for added SALT value and Make sure we
-         * are still a properly NULL-terminated string (Ubuntu was one system
-         * for which this was an issue).
-        */
+        /* 为添加的SALT值调整编码的消息长度，并确保 */
         ctx->encrypted_msg_len += B64_RIJNDAEL_SALT_STR_LEN;
         tbuf[ctx->encrypted_msg_len] = '\0';
 
@@ -374,17 +305,13 @@ add_salted_str(fko_ctx_t ctx)
     return(FKO_SUCCESS);
 }
 
-/* See if we need to add the "hQ" string to the front of the
- * encrypted data.
-*/
+/* 看看我们是否需要将“hQ”字符串添加到 */
 int
 add_gpg_prefix(fko_ctx_t ctx)
 {
     char           *tbuf;
 
-    /* We only add the base64 encoded salt to data that is already base64
-     * encoded
-    */
+    /* 我们只将base64编码的salt添加到已经是base64的数据中 */
     if(is_base64((unsigned char *)ctx->encrypted_msg,
                 ctx->encrypted_msg_len) == 0)
         return(FKO_ERROR_INVALID_DATA_ENCODE_NOTBASE64);
@@ -392,8 +319,7 @@ add_gpg_prefix(fko_ctx_t ctx)
     if(constant_runtime_cmp(ctx->encrypted_msg,
             B64_GPG_PREFIX, B64_GPG_PREFIX_STR_LEN) != 0)
     {
-        /* We need to realloc space for the prefix.
-        */
+        /* 我们需要重新分配前缀的空间。 */
         tbuf = realloc(ctx->encrypted_msg, ctx->encrypted_msg_len
                     + B64_GPG_PREFIX_STR_LEN+1);
         if(tbuf == NULL)
@@ -404,10 +330,7 @@ add_gpg_prefix(fko_ctx_t ctx)
         ctx->encrypted_msg = memcpy(tbuf,
                 B64_GPG_PREFIX, B64_GPG_PREFIX_STR_LEN);
 
-        /* Adjust the encoded msg len for added SALT value and Make sure we
-         * are still a properly NULL-terminated string (Ubuntu was one system
-         * for which this was an issue).
-        */
+        /* 为添加的SALT值调整编码的消息长度，并确保 */
         ctx->encrypted_msg_len += B64_GPG_PREFIX_STR_LEN;
         tbuf[ctx->encrypted_msg_len] = '\0';
 
@@ -660,4 +583,4 @@ int register_ts_aes_test(void)
     return register_ts(&TEST_SUITE(digest_test));
 }
 #endif /* LCOV_EXCL_STOP */
-/***EOF***/
+/* **EOF** */

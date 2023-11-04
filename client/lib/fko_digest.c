@@ -1,40 +1,9 @@
-/**
- * \file lib/fko_digest.c
- *
- * \brief Create the base64-encoded digest for the current spa data. The
- *          digest used is determined by the digest_type setting in the
- *          fko context.
- */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #include "fko_common.h"
 #include "fko.h"
 #include "digest.h"
 
-/* Set the SPA digest type.
-*/
+/* 设置SPA摘要类型。 */
 static int
 set_spa_digest_type(fko_ctx_t ctx,
     short *digest_type_field, const short digest_type)
@@ -42,8 +11,7 @@ set_spa_digest_type(fko_ctx_t ctx,
 #if HAVE_LIBFIU
     fiu_return_on("set_spa_digest_type_init", FKO_ERROR_CTX_NOT_INITIALIZED);
 #endif
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -73,8 +41,7 @@ fko_set_raw_spa_digest_type(fko_ctx_t ctx, const short raw_digest_type)
     return set_spa_digest_type(ctx, &ctx->raw_digest_type, raw_digest_type);
 }
 
-/* Return the SPA digest type.
-*/
+/* 返回SPA摘要类型。 */
 int
 fko_get_spa_digest_type(fko_ctx_t ctx, short *digest_type)
 {
@@ -82,8 +49,7 @@ fko_get_spa_digest_type(fko_ctx_t ctx, short *digest_type)
     fiu_return_on("fko_get_spa_digest_type_init",
             FKO_ERROR_CTX_NOT_INITIALIZED);
 #endif
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -100,8 +66,7 @@ fko_get_spa_digest_type(fko_ctx_t ctx, short *digest_type)
     return(FKO_SUCCESS);
 }
 
-/* Return the SPA digest type.
-*/
+/* 返回SPA摘要类型。 */
 int
 fko_get_raw_spa_digest_type(fko_ctx_t ctx, short *raw_digest_type)
 {
@@ -109,8 +74,7 @@ fko_get_raw_spa_digest_type(fko_ctx_t ctx, short *raw_digest_type)
     fiu_return_on("fko_get_raw_spa_digest_type_init",
             FKO_ERROR_CTX_NOT_INITIALIZED);
 #endif
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -220,9 +184,7 @@ set_digest(char *data, char **digest, short digest_type, int *digest_len)
             return(FKO_ERROR_INVALID_DIGEST_TYPE);
     }
 
-    /* Just in case this is a subsequent call to this function.  We
-     * do not want to be leaking memory.
-    */
+    /* 以防万一这是对该函数的后续调用。我们 */
     if(*digest != NULL)
         free(*digest);
 
@@ -238,13 +200,11 @@ fko_set_spa_digest(fko_ctx_t ctx)
 #if HAVE_LIBFIU
     fiu_return_on("fko_set_spa_digest_init", FKO_ERROR_CTX_NOT_INITIALIZED);
 #endif
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
-    /* Must have encoded message data to start with.
-    */
+    /* 必须具有编码的消息数据才能开始。 */
    //判断是否编码过
     if(ctx->encoded_msg == NULL)
         return(FKO_ERROR_MISSING_ENCODED_DATA);
@@ -264,13 +224,11 @@ fko_set_raw_spa_digest(fko_ctx_t ctx)
 #if HAVE_LIBFIU
     fiu_return_on("fko_set_raw_spa_digest_init", FKO_ERROR_CTX_NOT_INITIALIZED);
 #endif
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
-    /* Must have encoded message data to start with.
-    */
+    /* 必须具有编码的消息数据才能开始。 */
     if(ctx->encrypted_msg == NULL)
         return(FKO_ERROR_MISSING_ENCODED_DATA);
 
@@ -288,8 +246,7 @@ fko_get_spa_digest(fko_ctx_t ctx, char **md)
 #if HAVE_LIBFIU
     fiu_return_on("fko_get_spa_digest_init", FKO_ERROR_CTX_NOT_INITIALIZED);
 #endif
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -310,8 +267,7 @@ fko_get_raw_spa_digest(fko_ctx_t ctx, char **md)
 #if HAVE_LIBFIU
     fiu_return_on("fko_get_raw_spa_digest_init", FKO_ERROR_CTX_NOT_INITIALIZED);
 #endif
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -320,4 +276,4 @@ fko_get_raw_spa_digest(fko_ctx_t ctx, char **md)
     return(FKO_SUCCESS);
 }
 
-/***EOF***/
+/* **EOF** */

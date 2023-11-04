@@ -1,98 +1,19 @@
-/**
- * \file    lib/sha2.c
- *
- * \brief An implementation of the SHA 26/384/512 digests.
- */
+/* * */
 
-/* AUTHOR: Aaron D. Gifford - http://www.aarongifford.com/
- *
- * Copyright (c) 2000-2001, Aaron D. Gifford
- *
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the copyright holder nor the names of contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTOR(S) ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTOR(S) BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- *****************************************************************************
-*/
-#include <string.h>	/* memcpy()/memset() or bcopy()/bzero() */
-#include <assert.h>	/* assert() */
+/* 作者：Aaron D.Gifford-http://www.aarongifford.com/ */
+#include <string.h>	/* memcpy（）/memset（）或bcopy（）/bzero（） */
+#include <assert.h>	/* assert（） */
 #include "sha2.h"
 
 #if HAVE_SYS_BYTEORDER_H
   #include <sys/byteorder.h>
 #endif
 
-/*
- * ASSERT NOTE:
- * Some sanity checking code is included using assert().  On my FreeBSD
- * system, this additional code can be removed by compiling with NDEBUG
- * defined.  Check your own systems manpage on assert() to see how to
- * compile WITHOUT the sanity checking code on your system.
- *
- * UNROLLED TRANSFORM LOOP NOTE:
- * You can define SHA2_UNROLL_TRANSFORM to use the unrolled transform
- * loop version for the hash transform rounds (defined using macros
- * later in this file).  Either define on the command line, for example:
- *
- *   cc -DSHA2_UNROLL_TRANSFORM -o sha2 sha2.c sha2prog.c
- *
- * or define below:
- *
- *   #define SHA2_UNROLL_TRANSFORM
- *
- */
+/* *断言注释： */
 
 
-/*** SHA-256/384/512 Machine Architecture Definitions *****************/
-/*
- * BYTE_ORDER NOTE:
- *
- * Please make sure that your system defines BYTE_ORDER.  If your
- * architecture is little-endian, make sure it also defines
- * LITTLE_ENDIAN and that the two (BYTE_ORDER and LITTLE_ENDIAN) are
- * equivalent.
- *
- * If your system does not define the above, then you can do so by
- * hand like this:
- *
- *   #define LITTLE_ENDIAN 1234
- *   #define BIG_ENDIAN    4321
- *
- * And for little-endian machines, add:
- *
- *   #define BYTE_ORDER LITTLE_ENDIAN
- *
- * Or for big-endian machines:
- *
- *   #define BYTE_ORDER BIG_ENDIAN
- *
- * The FreeBSD machine this was written on defines BYTE_ORDER
- * appropriately by including <sys/types.h> (which in turn includes
- * <machine/endian.h> where the appropriate definitions are actually
- * made).
- */
+/* **SHA-256/384/512机器体系结构定义**************** */
+/* *字节顺序注释（_O）： */
 
 #ifndef BYTE_ORDER
   #ifdef WIN32
@@ -108,43 +29,30 @@
 #error Define BYTE_ORDER to be equal to either LITTLE_ENDIAN or BIG_ENDIAN
 #endif
 
-/*
- * Define the followingsha2_* types to types of the correct length on
- * the native archtecture.   Most BSD systems and Linux define u_intXX_t
- * types.  Machines with very recent ANSI C headers, can use the
- * uintXX_t definintions from inttypes.h by defining SHA2_USE_INTTYPES_H
- * during compile or in the sha.h header file.
- *
- * Machines that support neither u_intXX_t nor inttypes.h's uintXX_t
- * will need to define these three typedefs below (and the appropriate
- * ones in sha.h too) by hand according to their system architecture.
- *
- * Thank you, Jun-ichiro itojun Hagino, for suggesting using u_intXX_t
- * types and pointing out recent ANSI C support for uintXX_t in inttypes.h.
- */
+/* *将以下类型2_*定义为上正确长度的类型 */
 #ifdef SHA2_USE_INTTYPES_H
 
-typedef uint8_t  sha2_byte;	/* Exactly 1 byte */
-typedef uint32_t sha2_word32;	/* Exactly 4 bytes */
-typedef uint64_t sha2_word64;	/* Exactly 8 bytes */
+typedef uint8_t  sha2_byte;	/* 正好1个字节 */
+typedef uint32_t sha2_word32;	/* 正好4个字节 */
+typedef uint64_t sha2_word64;	/* 正好8个字节 */
 
 #else /* SHA2_USE_INTTYPES_H */
 
-typedef u_int8_t  sha2_byte;	/* Exactly 1 byte */
-typedef u_int32_t sha2_word32;	/* Exactly 4 bytes */
-typedef u_int64_t sha2_word64;	/* Exactly 8 bytes */
+typedef u_int8_t  sha2_byte;	/* 正好1个字节 */
+typedef u_int32_t sha2_word32;	/* 正好4个字节 */
+typedef u_int64_t sha2_word64;	/* 正好8个字节 */
 
 #endif /* SHA2_USE_INTTYPES_H */
 
 
-/*** SHA-256/384/512 Various Length Definitions ***********************/
-/* NOTE: Most of these are in sha2.h */
+/* **SHA-256/384/512各种长度定义********************** */
+/* 注：大多数都在sha2.h */
 #define SHA256_SHORT_BLOCK_LEN	(SHA256_BLOCK_LEN - 8)
 #define SHA384_SHORT_BLOCK_LEN	(SHA384_BLOCK_LEN - 16)
 #define SHA512_SHORT_BLOCK_LEN	(SHA512_BLOCK_LEN - 16)
 
 
-/*** ENDIAN REVERSAL MACROS *******************************************/
+/* **ENDIAN反转宏****************************************** */
 #if BYTE_ORDER == LITTLE_ENDIAN
 #define REVERSE32(w,x)	{ \
 	sha2_word32 tmp = (w); \
@@ -159,13 +67,9 @@ typedef u_int64_t sha2_word64;	/* Exactly 8 bytes */
 	(x) = ((tmp & 0xffff0000ffff0000ULL) >> 16) | \
 	      ((tmp & 0x0000ffff0000ffffULL) << 16); \
 }
-#endif /* BYTE_ORDER == LITTLE_ENDIAN */
+#endif /* 字节顺序==LITTLE_ENDIAN */
 
-/*
- * Macro for incrementally adding the unsigned 64-bit integer n to the
- * unsigned 128-bit integer (represented using a two-element array of
- * 64-bit words):
- */
+/* *用于将无符号64位整数n增量添加到 */
 #define ADDINC128(w,n)	{ \
 	(w)[0] += (sha2_word64)(n); \
 	if ((w)[0] < (n)) { \
@@ -173,21 +77,13 @@ typedef u_int64_t sha2_word64;	/* Exactly 8 bytes */
 	} \
 }
 
-/*
- * Macros for copying blocks of memory and for zeroing out ranges
- * of memory.  Using these macros makes it easy to switch from
- * using memset()/memcpy() and using bzero()/bcopy().
- *
- * Please define either SHA2_USE_MEMSET_MEMCPY or define
- * SHA2_USE_BZERO_BCOPY depending on which function set you
- * choose to use:
- */
+/* *用于复制内存块和调零范围的宏 */
 #if !defined(SHA2_USE_MEMSET_MEMCPY) && !defined(SHA2_USE_BZERO_BCOPY)
-/* Default to memset()/memcpy() if no option is specified */
+/* 如果未指定选项，则默认为memset（）/memcpy（） */
 #define	SHA2_USE_MEMSET_MEMCPY	1
 #endif
 #if defined(SHA2_USE_MEMSET_MEMCPY) && defined(SHA2_USE_BZERO_BCOPY)
-/* Abort with an error if BOTH options are defined */
+/* 如果定义了BOTH选项，则中止并出现错误 */
 #error Define either SHA2_USE_MEMSET_MEMCPY or SHA2_USE_BZERO_BCOPY, not both!
 #endif
 
@@ -201,50 +97,40 @@ typedef u_int64_t sha2_word64;	/* Exactly 8 bytes */
 #endif
 
 
-/*** THE SIX LOGICAL FUNCTIONS ****************************************/
-/*
- * Bit shifting and rotation (used by the six SHA-XYZ logical functions:
- *
- *   NOTE:  The naming of R and S appears backwards here (R is a SHIFT and
- *   S is a ROTATION) because the SHA-256/384/512 description document
- *   (see http://csrc.nist.gov/cryptval/shs/sha256-384-512.pdf) uses this
- *   same "backwards" definition.
- */
-/* Shift-right (used in SHA-256, SHA-384, and SHA-512): */
+/* **六个逻辑函数*************************************** */
+/* *位移位和旋转（由六个SHA-XYZ逻辑函数使用： */
+/* 右移（用于SHA-256、SHA-384和SHA-512）： */
 #define R(b,x) 		((x) >> (b))
-/* 32-bit Rotate-right (used in SHA-256): */
+/* 32位向右旋转（用于SHA-256）： */
 #define S32(b,x)	(((x) >> (b)) | ((x) << (32 - (b))))
-/* 64-bit Rotate-right (used in SHA-384 and SHA-512): */
+/* 64位向右旋转（用于SHA-384和SHA-512）： */
 #define S64(b,x)	(((x) >> (b)) | ((x) << (64 - (b))))
 
-/* Two of six logical functions used in SHA-256, SHA-384, and SHA-512: */
+/* SHA-256、SHA-384和SHA-512中使用的六个逻辑函数中的两个： */
 #define Ch(x,y,z)	(((x) & (y)) ^ ((~(x)) & (z)))
 #define Maj(x,y,z)	(((x) & (y)) ^ ((x) & (z)) ^ ((y) & (z)))
 
-/* Four of six logical functions used in SHA-256: */
+/* SHA-256中使用的六个逻辑函数中的四个： */
 #define Sigma0_256(x)	(S32(2,  (x)) ^ S32(13, (x)) ^ S32(22, (x)))
 #define Sigma1_256(x)	(S32(6,  (x)) ^ S32(11, (x)) ^ S32(25, (x)))
 #define sigma0_256(x)	(S32(7,  (x)) ^ S32(18, (x)) ^ R(3 ,   (x)))
 #define sigma1_256(x)	(S32(17, (x)) ^ S32(19, (x)) ^ R(10,   (x)))
 
-/* Four of six logical functions used in SHA-384 and SHA-512: */
+/* SHA-384和SHA-512中使用的六个逻辑函数中的四个： */
 #define Sigma0_512(x)	(S64(28, (x)) ^ S64(34, (x)) ^ S64(39, (x)))
 #define Sigma1_512(x)	(S64(14, (x)) ^ S64(18, (x)) ^ S64(41, (x)))
 #define sigma0_512(x)	(S64( 1, (x)) ^ S64( 8, (x)) ^ R( 7,   (x)))
 #define sigma1_512(x)	(S64(19, (x)) ^ S64(61, (x)) ^ R( 6,   (x)))
 
-/*** INTERNAL FUNCTION PROTOTYPES *************************************/
-/* NOTE: These should not be accessed directly from outside this
- * library -- they are intended for private internal visibility/use
- * only.
- */
+/* **内部功能原型************************************ */
+/* 注意：这些不应直接从外部访问 */
 void SHA512_Last(SHA512_CTX*);
 void SHA256_Transform(SHA256_CTX*, const sha2_word32*);
 void SHA512_Transform(SHA512_CTX*, const sha2_word64*);
 
 
-/*** SHA-XYZ INITIAL HASH VALUES AND CONSTANTS ************************/
-/* Hash constant words K for SHA-256: */
+/* **SHA-XYZ初始哈希值和常量*********************** */
+/* SHA-256的哈希常量字K： */
 const static sha2_word32 K256[64] = {
 	0x428a2f98UL, 0x71374491UL, 0xb5c0fbcfUL, 0xe9b5dba5UL,
 	0x3956c25bUL, 0x59f111f1UL, 0x923f82a4UL, 0xab1c5ed5UL,
@@ -264,7 +150,7 @@ const static sha2_word32 K256[64] = {
 	0x90befffaUL, 0xa4506cebUL, 0xbef9a3f7UL, 0xc67178f2UL
 };
 
-/* Initial hash value H for SHA-256: */
+/* SHA-256的初始哈希值H： */
 const static sha2_word32 sha256_initial_hash_value[8] = {
 	0x6a09e667UL,
 	0xbb67ae85UL,
@@ -276,7 +162,7 @@ const static sha2_word32 sha256_initial_hash_value[8] = {
 	0x5be0cd19UL
 };
 
-/* Hash constant words K for SHA-384 and SHA-512: */
+/* SHA-384和SHA-512的哈希常量字K： */
 const static sha2_word64 K512[80] = {
 	0x428a2f98d728ae22ULL, 0x7137449123ef65cdULL,
 	0xb5c0fbcfec4d3b2fULL, 0xe9b5dba58189dbbcULL,
@@ -320,7 +206,7 @@ const static sha2_word64 K512[80] = {
 	0x5fcb6fab3ad6faecULL, 0x6c44198c4a475817ULL
 };
 
-/* Initial hash value H for SHA-384 */
+/* SHA-384的初始哈希值H */
 const static sha2_word64 sha384_initial_hash_value[8] = {
 	0xcbbb9d5dc1059ed8ULL,
 	0x629a292a367cd507ULL,
@@ -332,7 +218,7 @@ const static sha2_word64 sha384_initial_hash_value[8] = {
 	0x47b5481dbefa4fa4ULL
 };
 
-/* Initial hash value H for SHA-512 */
+/* SHA-512的初始哈希值H */
 const static sha2_word64 sha512_initial_hash_value[8] = {
 	0x6a09e667f3bcc908ULL,
 	0xbb67ae8584caa73bULL,
@@ -345,7 +231,7 @@ const static sha2_word64 sha512_initial_hash_value[8] = {
 };
 
 
-/*** SHA-256: *********************************************************/
+/* **沙-256：******************************************************** */
 void SHA256_Init(SHA256_CTX* context) {
 	if (context == (SHA256_CTX*)0) {
 		return;
@@ -357,7 +243,7 @@ void SHA256_Init(SHA256_CTX* context) {
 
 #ifdef SHA2_UNROLL_TRANSFORM
 
-/* Unrolled SHA-256 round macros: */
+/* 推出SHA-256圆形宏： */
 
 #if BYTE_ORDER == LITTLE_ENDIAN
 
@@ -370,7 +256,7 @@ void SHA256_Init(SHA256_CTX* context) {
 	j++
 
 
-#else /* BYTE_ORDER == LITTLE_ENDIAN */
+#else /* 字节顺序==LITTLE_ENDIAN */
 
 #define ROUND256_0_TO_15(a,b,c,d,e,f,g,h)	\
 	T1 = (h) + Sigma1_256(e) + Ch((e), (f), (g)) + \
@@ -379,7 +265,7 @@ void SHA256_Init(SHA256_CTX* context) {
 	(h) = T1 + Sigma0_256(a) + Maj((a), (b), (c)); \
 	j++
 
-#endif /* BYTE_ORDER == LITTLE_ENDIAN */
+#endif /* 字节顺序==LITTLE_ENDIAN */
 
 #define ROUND256(a,b,c,d,e,f,g,h)	\
 	s0 = W256[(j+1)&0x0f]; \
@@ -399,7 +285,7 @@ void SHA256_Transform(SHA256_CTX* context, const sha2_word32* data) {
 
 	W256 = (sha2_word32*)context->buffer;
 
-	/* Initialize registers with the prev. intermediate value */
+	/* 用prev初始化寄存器。中间值 */
 	a = context->state[0];
 	b = context->state[1];
 	c = context->state[2];
@@ -411,7 +297,7 @@ void SHA256_Transform(SHA256_CTX* context, const sha2_word32* data) {
 
 	j = 0;
 	do {
-		/* Rounds 0 to 15 (unrolled): */
+		/* 第0到15轮（展开）： */
 		ROUND256_0_TO_15(a,b,c,d,e,f,g,h);
 		ROUND256_0_TO_15(h,a,b,c,d,e,f,g);
 		ROUND256_0_TO_15(g,h,a,b,c,d,e,f);
@@ -422,7 +308,7 @@ void SHA256_Transform(SHA256_CTX* context, const sha2_word32* data) {
 		ROUND256_0_TO_15(b,c,d,e,f,g,h,a);
 	} while (j < 16);
 
-	/* Now for the remaining rounds to 64: */
+	/* 现在剩下的64轮： */
 	do {
 		ROUND256(a,b,c,d,e,f,g,h);
 		ROUND256(h,a,b,c,d,e,f,g);
@@ -434,7 +320,7 @@ void SHA256_Transform(SHA256_CTX* context, const sha2_word32* data) {
 		ROUND256(b,c,d,e,f,g,h,a);
 	} while (j < 64);
 
-	/* Compute the current intermediate hash value */
+	/* 计算当前中间哈希值 */
 	context->state[0] += a;
 	context->state[1] += b;
 	context->state[2] += c;
@@ -444,7 +330,7 @@ void SHA256_Transform(SHA256_CTX* context, const sha2_word32* data) {
 	context->state[6] += g;
 	context->state[7] += h;
 
-	/* Clean up */
+	/* 清理 */
 	a = b = c = d = e = f = g = h = T1 = 0;
 }
 
@@ -457,7 +343,7 @@ void SHA256_Transform(SHA256_CTX* context, const sha2_word32* data) {
 
 	W256 = (sha2_word32*)context->buffer;
 
-	/* Initialize registers with the prev. intermediate value */
+	/* 用prev初始化寄存器。中间值 */
 	a = context->state[0];
 	b = context->state[1];
 	c = context->state[2];
@@ -470,14 +356,14 @@ void SHA256_Transform(SHA256_CTX* context, const sha2_word32* data) {
 	j = 0;
 	do {
 #if BYTE_ORDER == LITTLE_ENDIAN
-		/* Copy data while converting to host byte order */
+		/* 转换为主机字节顺序时复制数据 */
 		REVERSE32(*data++,W256[j]);
-		/* Apply the SHA-256 compression function to update a..h */
+		/* 应用SHA-256压缩功能更新a..h */
 		T1 = h + Sigma1_256(e) + Ch(e, f, g) + K256[j] + W256[j];
-#else /* BYTE_ORDER == LITTLE_ENDIAN */
-		/* Apply the SHA-256 compression function to update a..h with copy */
+#else /* 字节顺序==LITTLE_ENDIAN */
+		/* 应用SHA-256压缩功能用副本更新a..h */
 		T1 = h + Sigma1_256(e) + Ch(e, f, g) + K256[j] + (W256[j] = *data++);
-#endif /* BYTE_ORDER == LITTLE_ENDIAN */
+#endif /* 字节顺序==LITTLE_ENDIAN */
 		T2 = Sigma0_256(a) + Maj(a, b, c);
 		h = g;
 		g = f;
@@ -492,13 +378,13 @@ void SHA256_Transform(SHA256_CTX* context, const sha2_word32* data) {
 	} while (j < 16);
 
 	do {
-		/* Part of the message block expansion: */
+		/* 消息块扩展的一部分： */
 		s0 = W256[(j+1)&0x0f];
 		s0 = sigma0_256(s0);
 		s1 = W256[(j+14)&0x0f];
 		s1 = sigma1_256(s1);
 
-		/* Apply the SHA-256 compression function to update a..h */
+		/* 应用SHA-256压缩功能更新a..h */
 		T1 = h + Sigma1_256(e) + Ch(e, f, g) + K256[j] +
 		     (W256[j&0x0f] += s1 + W256[(j+9)&0x0f] + s0);
 		T2 = Sigma0_256(a) + Maj(a, b, c);
@@ -514,7 +400,7 @@ void SHA256_Transform(SHA256_CTX* context, const sha2_word32* data) {
 		j++;
 	} while (j < 64);
 
-	/* Compute the current intermediate hash value */
+	/* 计算当前中间哈希值 */
 	context->state[0] += a;
 	context->state[1] += b;
 	context->state[2] += c;
@@ -524,7 +410,7 @@ void SHA256_Transform(SHA256_CTX* context, const sha2_word32* data) {
 	context->state[6] += g;
 	context->state[7] += h;
 
-	/* Clean up */
+	/* 清理 */
 	a = b = c = d = e = f = g = h = T1 = T2 = 0;
 }
 
@@ -534,47 +420,47 @@ void SHA256_Update(SHA256_CTX* context, const sha2_byte *data, size_t len) {
 	unsigned int	freespace, usedspace;
 
 	if (len == 0) {
-		/* Calling with no data is valid - we do nothing */
+		/* 没有数据的调用是有效的-我们什么都不做 */
 		return;
 	}
 
-	/* Sanity check: */
+	/* 卫生检查： */
 	assert(context != (SHA256_CTX*)0 && data != (sha2_byte*)0);
 
 	usedspace = (context->bitcount >> 3) % SHA256_BLOCK_LEN;
 	if (usedspace > 0) {
-		/* Calculate how much free space is available in the buffer */
+		/* 计算缓冲区中有多少可用空间 */
 		freespace = SHA256_BLOCK_LEN - usedspace;
 
 		if (len >= freespace) {
-			/* Fill the buffer completely and process it */
+			/* 完全填充缓冲区并进行处理 */
 			MEMCPY_BCOPY(&context->buffer[usedspace], data, freespace);
 			context->bitcount += freespace << 3;
 			len -= freespace;
 			data += freespace;
 			SHA256_Transform(context, (sha2_word32*)context->buffer);
 		} else {
-			/* The buffer is not yet full */
+			/* 缓冲区尚未满 */
 			MEMCPY_BCOPY(&context->buffer[usedspace], data, len);
 			context->bitcount += len << 3;
-			/* Clean up: */
+			/* 清理： */
 			usedspace = freespace = 0;
 			return;
 		}
 	}
 	while (len >= SHA256_BLOCK_LEN) {
-		/* Process as many complete blocks as we can */
+		/* 处理尽可能多的完整块 */
 		SHA256_Transform(context, (sha2_word32*)data);
 		context->bitcount += SHA256_BLOCK_LEN << 3;
 		len -= SHA256_BLOCK_LEN;
 		data += SHA256_BLOCK_LEN;
 	}
 	if (len > 0) {
-		/* There's left-overs, so save 'em */
+		/* 还有剩余的，留着吧 */
 		MEMCPY_BCOPY(context->buffer, data, len);
 		context->bitcount += len << 3;
 	}
-	/* Clean up: */
+	/* 清理： */
 	usedspace = freespace = 0;
 }
 
@@ -582,49 +468,49 @@ void SHA256_Final(sha2_byte digest[], SHA256_CTX* context) {
 	sha2_word32	*d = (sha2_word32*)digest;
 	unsigned int	usedspace;
 
-	/* Sanity check: */
+	/* 卫生检查： */
 	assert(context != (SHA256_CTX*)0);
 
-	/* If no digest buffer is passed, we don't bother doing this: */
+	/* 如果没有传递摘要缓冲区，我们就不必这么做： */
 	if (digest != (sha2_byte*)0) {
 		usedspace = (context->bitcount >> 3) % SHA256_BLOCK_LEN;
 #if BYTE_ORDER == LITTLE_ENDIAN
-		/* Convert FROM host byte order */
+		/* 转换FROM主机字节顺序 */
 		REVERSE64(context->bitcount,context->bitcount);
 #endif
 		if (usedspace > 0) {
-			/* Begin padding with a 1 bit: */
+			/* 以1位开始填充： */
 			context->buffer[usedspace++] = 0x80;
 
 			if (usedspace <= SHA256_SHORT_BLOCK_LEN) {
-				/* Set-up for the last transform: */
+				/* 为上一次转换设置： */
 				MEMSET_BZERO(&context->buffer[usedspace], SHA256_SHORT_BLOCK_LEN - usedspace);
 			} else {
 				if (usedspace < SHA256_BLOCK_LEN) {
 					MEMSET_BZERO(&context->buffer[usedspace], SHA256_BLOCK_LEN - usedspace);
 				}
-				/* Do second-to-last transform: */
+				/* 执行倒数第二个变换： */
 				SHA256_Transform(context, (sha2_word32*)context->buffer);
 
-				/* And set-up for the last transform: */
+				/* 以及最后一次转换的设置： */
 				MEMSET_BZERO(context->buffer, SHA256_SHORT_BLOCK_LEN);
 			}
 		} else {
-			/* Set-up for the last transform: */
+			/* 为上一次转换设置： */
 			MEMSET_BZERO(context->buffer, SHA256_SHORT_BLOCK_LEN);
 
-			/* Begin padding with a 1 bit: */
+			/* 以1位开始填充： */
 			*context->buffer = 0x80;
 		}
-		/* Set the bit count: */
+		/* 设置位计数： */
 		memcpy(&(context->buffer[SHA256_SHORT_BLOCK_LEN]), &(context->bitcount), sizeof(sha2_word64));
 
-		/* Final transform: */
+		/* 最终变换： */
 		SHA256_Transform(context, (sha2_word32*)context->buffer);
 
 #if BYTE_ORDER == LITTLE_ENDIAN
 		{
-			/* Convert TO host byte order */
+			/* 转换为主机字节顺序 */
 			int	j;
 			for (j = 0; j < 8; j++) {
 				REVERSE32(context->state[j],context->state[j]);
@@ -636,12 +522,12 @@ void SHA256_Final(sha2_byte digest[], SHA256_CTX* context) {
 #endif
 	}
 
-	/* Clean up state data: */
+	/* 清理状态数据： */
 	MEMSET_BZERO(context, sizeof(*context));
 	usedspace = 0;
 }
 
-/*** SHA-512: *********************************************************/
+/* **沙512：******************************************************** */
 void SHA512_Init(SHA512_CTX* context) {
 	if (context == (SHA512_CTX*)0) {
 		return;
@@ -653,7 +539,7 @@ void SHA512_Init(SHA512_CTX* context) {
 
 #ifdef SHA2_UNROLL_TRANSFORM
 
-/* Unrolled SHA-512 round macros: */
+/* 推出SHA-512圆形宏： */
 #if BYTE_ORDER == LITTLE_ENDIAN
 
 #define ROUND512_0_TO_15(a,b,c,d,e,f,g,h)	\
@@ -665,7 +551,7 @@ void SHA512_Init(SHA512_CTX* context) {
 	j++
 
 
-#else /* BYTE_ORDER == LITTLE_ENDIAN */
+#else /* 字节顺序==LITTLE_ENDIAN */
 
 #define ROUND512_0_TO_15(a,b,c,d,e,f,g,h)	\
 	T1 = (h) + Sigma1_512(e) + Ch((e), (f), (g)) + \
@@ -674,7 +560,7 @@ void SHA512_Init(SHA512_CTX* context) {
 	(h) = T1 + Sigma0_512(a) + Maj((a), (b), (c)); \
 	j++
 
-#endif /* BYTE_ORDER == LITTLE_ENDIAN */
+#endif /* 字节顺序==LITTLE_ENDIAN */
 
 #define ROUND512(a,b,c,d,e,f,g,h)	\
 	s0 = W512[(j+1)&0x0f]; \
@@ -692,7 +578,7 @@ void SHA512_Transform(SHA512_CTX* context, const sha2_word64* data) {
 	sha2_word64	T1, *W512 = (sha2_word64*)context->buffer;
 	int		j;
 
-	/* Initialize registers with the prev. intermediate value */
+	/* 用prev初始化寄存器。中间值 */
 	a = context->state[0];
 	b = context->state[1];
 	c = context->state[2];
@@ -714,7 +600,7 @@ void SHA512_Transform(SHA512_CTX* context, const sha2_word64* data) {
 		ROUND512_0_TO_15(b,c,d,e,f,g,h,a);
 	} while (j < 16);
 
-	/* Now for the remaining rounds up to 79: */
+	/* 现在剩下的79轮比赛： */
 	do {
 		ROUND512(a,b,c,d,e,f,g,h);
 		ROUND512(h,a,b,c,d,e,f,g);
@@ -726,7 +612,7 @@ void SHA512_Transform(SHA512_CTX* context, const sha2_word64* data) {
 		ROUND512(b,c,d,e,f,g,h,a);
 	} while (j < 80);
 
-	/* Compute the current intermediate hash value */
+	/* 计算当前中间哈希值 */
 	context->state[0] += a;
 	context->state[1] += b;
 	context->state[2] += c;
@@ -736,7 +622,7 @@ void SHA512_Transform(SHA512_CTX* context, const sha2_word64* data) {
 	context->state[6] += g;
 	context->state[7] += h;
 
-	/* Clean up */
+	/* 清理 */
 	a = b = c = d = e = f = g = h = T1 = 0;
 }
 
@@ -747,7 +633,7 @@ void SHA512_Transform(SHA512_CTX* context, const sha2_word64* data) {
 	sha2_word64	T1, T2, *W512 = (sha2_word64*)context->buffer;
 	int		j;
 
-	/* Initialize registers with the prev. intermediate value */
+	/* 用prev初始化寄存器。中间值 */
 	a = context->state[0];
 	b = context->state[1];
 	c = context->state[2];
@@ -760,14 +646,14 @@ void SHA512_Transform(SHA512_CTX* context, const sha2_word64* data) {
 	j = 0;
 	do {
 #if BYTE_ORDER == LITTLE_ENDIAN
-		/* Convert TO host byte order */
+		/* 转换为主机字节顺序 */
 		REVERSE64(*data++, W512[j]);
-		/* Apply the SHA-512 compression function to update a..h */
+		/* 应用SHA-512压缩功能更新a..h */
 		T1 = h + Sigma1_512(e) + Ch(e, f, g) + K512[j] + W512[j];
-#else /* BYTE_ORDER == LITTLE_ENDIAN */
-		/* Apply the SHA-512 compression function to update a..h with copy */
+#else /* 字节顺序==LITTLE_ENDIAN */
+		/* 应用SHA-512压缩功能用副本更新a..h */
 		T1 = h + Sigma1_512(e) + Ch(e, f, g) + K512[j] + (W512[j] = *data++);
-#endif /* BYTE_ORDER == LITTLE_ENDIAN */
+#endif /* 字节顺序==LITTLE_ENDIAN */
 		T2 = Sigma0_512(a) + Maj(a, b, c);
 		h = g;
 		g = f;
@@ -782,13 +668,13 @@ void SHA512_Transform(SHA512_CTX* context, const sha2_word64* data) {
 	} while (j < 16);
 
 	do {
-		/* Part of the message block expansion: */
+		/* 消息块扩展的一部分： */
 		s0 = W512[(j+1)&0x0f];
 		s0 = sigma0_512(s0);
 		s1 = W512[(j+14)&0x0f];
 		s1 =  sigma1_512(s1);
 
-		/* Apply the SHA-512 compression function to update a..h */
+		/* 应用SHA-512压缩功能更新a..h */
 		T1 = h + Sigma1_512(e) + Ch(e, f, g) + K512[j] +
 		     (W512[j&0x0f] += s1 + W512[(j+9)&0x0f] + s0);
 		T2 = Sigma0_512(a) + Maj(a, b, c);
@@ -804,7 +690,7 @@ void SHA512_Transform(SHA512_CTX* context, const sha2_word64* data) {
 		j++;
 	} while (j < 80);
 
-	/* Compute the current intermediate hash value */
+	/* 计算当前中间哈希值 */
 	context->state[0] += a;
 	context->state[1] += b;
 	context->state[2] += c;
@@ -814,7 +700,7 @@ void SHA512_Transform(SHA512_CTX* context, const sha2_word64* data) {
 	context->state[6] += g;
 	context->state[7] += h;
 
-	/* Clean up */
+	/* 清理 */
 	a = b = c = d = e = f = g = h = T1 = T2 = 0;
 }
 
@@ -824,47 +710,47 @@ void SHA512_Update(SHA512_CTX* context, const sha2_byte *data, size_t len) {
 	unsigned int	freespace, usedspace;
 
 	if (len == 0) {
-		/* Calling with no data is valid - we do nothing */
+		/* 没有数据的调用是有效的-我们什么都不做 */
 		return;
 	}
 
-	/* Sanity check: */
+	/* 卫生检查： */
 	assert(context != (SHA512_CTX*)0 && data != (sha2_byte*)0);
 
 	usedspace = (context->bitcount[0] >> 3) % SHA512_BLOCK_LEN;
 	if (usedspace > 0) {
-		/* Calculate how much free space is available in the buffer */
+		/* 计算缓冲区中有多少可用空间 */
 		freespace = SHA512_BLOCK_LEN - usedspace;
 
 		if (len >= freespace) {
-			/* Fill the buffer completely and process it */
+			/* 完全填充缓冲区并进行处理 */
 			MEMCPY_BCOPY(&context->buffer[usedspace], data, freespace);
 			ADDINC128(context->bitcount, freespace << 3);
 			len -= freespace;
 			data += freespace;
 			SHA512_Transform(context, (sha2_word64*)context->buffer);
 		} else {
-			/* The buffer is not yet full */
+			/* 缓冲区尚未满 */
 			MEMCPY_BCOPY(&context->buffer[usedspace], data, len);
 			ADDINC128(context->bitcount, len << 3);
-			/* Clean up: */
+			/* 清理： */
 			usedspace = freespace = 0;
 			return;
 		}
 	}
 	while (len >= SHA512_BLOCK_LEN) {
-		/* Process as many complete blocks as we can */
+		/* 处理尽可能多的完整块 */
 		SHA512_Transform(context, (sha2_word64*)data);
 		ADDINC128(context->bitcount, SHA512_BLOCK_LEN << 3);
 		len -= SHA512_BLOCK_LEN;
 		data += SHA512_BLOCK_LEN;
 	}
 	if (len > 0) {
-		/* There's left-overs, so save 'em */
+		/* 还有剩余的，留着吧 */
 		MEMCPY_BCOPY(context->buffer, data, len);
 		ADDINC128(context->bitcount, len << 3);
 	}
-	/* Clean up: */
+	/* 清理： */
 	usedspace = freespace = 0;
 }
 
@@ -873,56 +759,56 @@ void SHA512_Last(SHA512_CTX* context) {
 
 	usedspace = (context->bitcount[0] >> 3) % SHA512_BLOCK_LEN;
 #if BYTE_ORDER == LITTLE_ENDIAN
-	/* Convert FROM host byte order */
+	/* 转换FROM主机字节顺序 */
 	REVERSE64(context->bitcount[0],context->bitcount[0]);
 	REVERSE64(context->bitcount[1],context->bitcount[1]);
 #endif
 	if (usedspace > 0) {
-		/* Begin padding with a 1 bit: */
+		/* 以1位开始填充： */
 		context->buffer[usedspace++] = 0x80;
 
 		if (usedspace <= SHA512_SHORT_BLOCK_LEN) {
-			/* Set-up for the last transform: */
+			/* 为上一次转换设置： */
 			MEMSET_BZERO(&context->buffer[usedspace], SHA512_SHORT_BLOCK_LEN - usedspace);
 		} else {
 			if (usedspace < SHA512_BLOCK_LEN) {
 				MEMSET_BZERO(&context->buffer[usedspace], SHA512_BLOCK_LEN - usedspace);
 			}
-			/* Do second-to-last transform: */
+			/* 执行倒数第二个变换： */
 			SHA512_Transform(context, (sha2_word64*)context->buffer);
 
-			/* And set-up for the last transform: */
+			/* 以及最后一次转换的设置： */
 			MEMSET_BZERO(context->buffer, SHA512_BLOCK_LEN - 2);
 		}
 	} else {
-		/* Prepare for final transform: */
+		/* 准备进行最终转换： */
 		MEMSET_BZERO(context->buffer, SHA512_SHORT_BLOCK_LEN);
 
-		/* Begin padding with a 1 bit: */
+		/* 以1位开始填充： */
 		*context->buffer = 0x80;
 	}
-	/* Store the length of input data (in bits): */
+	/* 存储输入数据的长度（以位为单位）： */
 	memcpy(&(context->buffer[SHA512_SHORT_BLOCK_LEN]),   &(context->bitcount[1]), sizeof(sha2_word64));
 	memcpy(&(context->buffer[SHA512_SHORT_BLOCK_LEN+8]), &(context->bitcount[0]), sizeof(sha2_word64));
 
-	/* Final transform: */
+	/* 最终变换： */
 	SHA512_Transform(context, (sha2_word64*)context->buffer);
 }
 
 void SHA512_Final(sha2_byte digest[], SHA512_CTX* context) {
 	sha2_word64	*d = (sha2_word64*)digest;
 
-	/* Sanity check: */
+	/* 卫生检查： */
 	assert(context != (SHA512_CTX*)0);
 
-	/* If no digest buffer is passed, we don't bother doing this: */
+	/* 如果没有传递摘要缓冲区，我们就不必这么做： */
 	if (digest != (sha2_byte*)0) {
 		SHA512_Last(context);
 
-		/* Save the hash data for output: */
+		/* 保存哈希数据以进行输出： */
 #if BYTE_ORDER == LITTLE_ENDIAN
 		{
-			/* Convert TO host byte order */
+			/* 转换为主机字节顺序 */
 			int	j;
 			for (j = 0; j < 8; j++) {
 				REVERSE64(context->state[j],context->state[j]);
@@ -934,12 +820,12 @@ void SHA512_Final(sha2_byte digest[], SHA512_CTX* context) {
 #endif
 	}
 
-	/* Zero out state data */
+	/* 归零状态数据 */
 	MEMSET_BZERO(context, sizeof(*context));
 }
 
 
-/*** SHA-384: *********************************************************/
+/* **SHA-384：******************************************************** */
 void SHA384_Init(SHA384_CTX* context) {
 	if (context == (SHA384_CTX*)0) {
 		return;
@@ -956,17 +842,17 @@ void SHA384_Update(SHA384_CTX* context, const sha2_byte* data, size_t len) {
 void SHA384_Final(sha2_byte digest[], SHA384_CTX* context) {
 	sha2_word64	*d = (sha2_word64*)digest;
 
-	/* Sanity check: */
+	/* 卫生检查： */
 	assert(context != (SHA384_CTX*)0);
 
-	/* If no digest buffer is passed, we don't bother doing this: */
+	/* 如果没有传递摘要缓冲区，我们就不必这么做： */
 	if (digest != (sha2_byte*)0) {
 		SHA512_Last((SHA512_CTX*)context);
 
-		/* Save the hash data for output: */
+		/* 保存哈希数据以进行输出： */
 #if BYTE_ORDER == LITTLE_ENDIAN
 		{
-			/* Convert TO host byte order */
+			/* 转换为主机字节顺序 */
 			int	j;
 			for (j = 0; j < 6; j++) {
 				REVERSE64(context->state[j],context->state[j]);
@@ -978,6 +864,6 @@ void SHA384_Final(sha2_byte digest[], SHA384_CTX* context) {
 #endif
 	}
 
-	/* Zero out state data */
+	/* 归零状态数据 */
 	MEMSET_BZERO(context, sizeof(*context));
 }

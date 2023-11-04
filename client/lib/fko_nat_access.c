@@ -1,37 +1,8 @@
-/**
- * \file lib/fko_nat_access.c
- *
- * \brief Set/Get the spa nat access request data.
- */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #include "fko_common.h"
 #include "fko.h"
 
-/* Set the SPA Nat Access data
-*/
+/* 设置SPA Nat Access数据 */
 int
 fko_set_spa_nat_access(fko_ctx_t ctx, const char * const msg)
 {
@@ -41,13 +12,11 @@ fko_set_spa_nat_access(fko_ctx_t ctx, const char * const msg)
     fiu_return_on("fko_set_spa_nat_access_init", FKO_ERROR_CTX_NOT_INITIALIZED);
 #endif
 
-    /* Context must be initialized.
-    */
+    /* 必须初始化上下文。 */
     if(!CTX_INITIALIZED(ctx))
         return FKO_ERROR_CTX_NOT_INITIALIZED;
 
-    /* Gotta have a valid string.
-    */
+    /* 必须有一个有效的字符串。 */
     if(msg == NULL || strnlen(msg, MAX_SPA_NAT_ACCESS_SIZE) == 0)
         return(FKO_ERROR_INVALID_DATA_NAT_EMPTY);
 
@@ -55,9 +24,7 @@ fko_set_spa_nat_access(fko_ctx_t ctx, const char * const msg)
     fiu_return_on("fko_set_spa_nat_access_empty", FKO_ERROR_INVALID_DATA_NAT_EMPTY);
 #endif
 
-    /* --DSS XXX: Bail out for now.  But consider just
-     *            truncating in the future...
-    */
+    /* --DSS XXX：暂时退出。但考虑一下 */
     if(strnlen(msg, MAX_SPA_NAT_ACCESS_SIZE) == MAX_SPA_NAT_ACCESS_SIZE)
         return(FKO_ERROR_DATA_TOO_LARGE);
 
@@ -68,9 +35,7 @@ fko_set_spa_nat_access(fko_ctx_t ctx, const char * const msg)
     if((res = validate_nat_access_msg(msg)) != FKO_SUCCESS)
         return(res);
 
-    /* Just in case this is a subsequent call to this function.  We
-     * do not want to be leaking memory.
-    */
+    /* 以防万一这是对该函数的后续调用。我们 */
     if(ctx->nat_access != NULL)
         free(ctx->nat_access);
 
@@ -81,11 +46,7 @@ fko_set_spa_nat_access(fko_ctx_t ctx, const char * const msg)
     if(ctx->nat_access == NULL)
         return(FKO_ERROR_MEMORY_ALLOCATION);
 
-    /* If we set the nat_access message Then we force the message_type
-     * as well. Technically, the message type should be set already.
-     * This will serve a half-protective measure.
-     * --DSS XXX: should do this better.
-    */
+    /* 如果我们设置nat_access消息，那么我们强制执行message_type */
     if(ctx->client_timeout > 0)
     {
         if(ctx->message_type != FKO_CLIENT_TIMEOUT_LOCAL_NAT_ACCESS_MSG)
@@ -99,8 +60,7 @@ fko_set_spa_nat_access(fko_ctx_t ctx, const char * const msg)
     return(FKO_SUCCESS);
 }
 
-/* Return the SPA message data.
-*/
+/* 返回SPA消息数据。 */
 int
 fko_get_spa_nat_access(fko_ctx_t ctx, char **nat_access)
 {
@@ -109,8 +69,7 @@ fko_get_spa_nat_access(fko_ctx_t ctx, char **nat_access)
     fiu_return_on("fko_get_spa_nat_access_init", FKO_ERROR_CTX_NOT_INITIALIZED);
 #endif
 
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -126,4 +85,4 @@ fko_get_spa_nat_access(fko_ctx_t ctx, char **nat_access)
     return(FKO_SUCCESS);
 }
 
-/***EOF***/
+/* **EOF** */

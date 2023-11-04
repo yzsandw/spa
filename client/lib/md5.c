@@ -1,39 +1,11 @@
-/**
- * \file lib/md5.c
- *
- * \brief Implementation of the MD5 message-digest algorithm for libfwknop.
- */
 
-/* This code implements the MD5 message-digest algorithm.
- *
- * The algorithm is due to Ron Rivest. This code was
- * written by Colin Plumb in 1993, no copyright is claimed.
- * This code is in the public domain; do with it what you wish.
- *
- * Equivalent code is available from RSA Data Security, Inc.
- * This code has been tested against that, and is equivalent,
- * except that you don't need to include two pages of legalese
- * with every copy.
- *
- * To compute the message digest of a chunk of bytes, declare an
- * MD5Context structure, pass it to MD5Init, call MD5Update as
- * needed on buffers full of bytes, and then call MD5Final, which
- * will fill a supplied 16-byte array with the digest.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *
- *****************************************************************************
-*/
 #include "md5.h"
 #include "fko_common.h"
 
 #if BYTEORDER == 1234
-  #define byteReverse(buf, len)    /* Nothing */
+  #define byteReverse(buf, len)    /* 没有什么 */
 #elif BYTEORDER == 4321
-  /* Note: this code is harmless on little-endian machines.
-  */
+  /* 注意：这段代码在little-endian机器上是无害的。 */
   void byteReverse(unsigned char *buf, unsigned longs)
   {
       uint32_t t;
@@ -45,16 +17,13 @@
       } while (--longs);
   }
 #else
-  #define byteReverse(buf, len)    /* Nothing */
+  #define byteReverse(buf, len)    /* 没有什么 */
   #ifndef WIN32
     #warning Undetermined or unsupported Byte Order... We will try LITTLE_ENDIAN
   #endif
 #endif
 
-/*
- * Start MD5 accumulation.  Set bit count to 0 and buffer to mysterious
- * initialization constants.
- */
+/* *启动MD5累加。将位计数设置为0，将缓冲区设置为神秘 */
 void
 MD5Init(MD5Context *ctx)
 {
@@ -67,25 +36,21 @@ MD5Init(MD5Context *ctx)
     ctx->bits[1] = 0;
 }
 
-/* Update context to reflect the concatenation of another buffer full
- * of bytes.
- */
+/* 更新上下文以反映另一个缓冲区已满的串联 */
 void
 MD5Update(MD5Context *ctx, unsigned char *buf, unsigned len)
 {
     uint32_t t;
 
-    /* Update bitcount
-    */
+    /* 更新位计数 */
     t = ctx->bits[0];
     if ((ctx->bits[0] = t + ((uint32_t) len << 3)) < t)
-    ctx->bits[1]++;     /* Carry from low to high */
+    ctx->bits[1]++;     /* 从低到高进位 */
     ctx->bits[1] += len >> 29;
 
-    t = (t >> 3) & 0x3f;    /* Bytes already in shsInfo->data */
+    t = (t >> 3) & 0x3f;    /* shsInfo->数据中已存在的字节数 */
 
-    /* Handle any leading odd-sized chunks
-    */
+    /* 处理任何前导的奇数大小的块 */
     if (t) {
         unsigned char *p = (unsigned char *) ctx->in + t;
 
@@ -103,8 +68,7 @@ MD5Update(MD5Context *ctx, unsigned char *buf, unsigned len)
         len -= t;
     }
 
-    /* Process data in 64-byte chunks
-    */
+    /* 以64字节块处理数据 */
     while (len >= 64) {
         memcpy(ctx->in, buf, 64);
         byteReverse(ctx->in, 16);
@@ -113,56 +77,44 @@ MD5Update(MD5Context *ctx, unsigned char *buf, unsigned len)
         len -= 64;
     }
 
-    /* Handle any remaining bytes of data.
-    */
+    /* 处理任何剩余的数据字节。 */
     memcpy(ctx->in, buf, len);
 }
 
-/* Final wrapup - pad to 64-byte boundary with the bit pattern
- * 1 0* (64-bit count of bits processed, MSB-first)
- */
+/* 最终封装-使用位模式填充到64字节边界 */
 void
 MD5Final(unsigned char digest[16], MD5Context *ctx)
 {
     unsigned count;
     unsigned char *p;
 
-    /* Compute number of bytes mod 64
-    */
+    /* 计算字节数mod 64 */
     count = (ctx->bits[0] >> 3) & 0x3F;
 
-    /* Set the first char of padding to 0x80.  This is safe since there is
-     * always at least one byte free
-    */
+    /* 将填充的第一个字符设置为0x80。这是安全的，因为有 */
     p = ctx->in + count;
     *p++ = 0x80;
 
-    /* Bytes of padding needed to make 64 bytes
-    */
+    /* 生成64字节所需的填充字节 */
     count = 64 - 1 - count;
 
-    /* Pad out to 56 mod 64
-    */
+    /* 填充到56 mod 64 */
     if (count < 8) {
-        /* Two lots of padding:  Pad the first block to 64 bytes
-        */
+        /* 两组填充：将第一个块填充为64字节 */
         memset(p, 0, count);
         byteReverse(ctx->in, 16);
         MD5Transform(ctx->buf, (uint32_t *) ctx->in);
 
-        /* Now fill the next block with 56 bytes
-        */
+        /* 现在用56个字节填充下一个块 */
         memset(ctx->in, 0, 56);
     } else {
-        /* Pad block to 56 bytes
-        */
+        /* 将块填充到56字节 */
         memset(p, 0, count - 8);
     }
 
     byteReverse(ctx->in, 14);
 
-    /* Append length in bits and transform
-    */
+    /* 以位为单位的附加长度和变换 */
     memcpy(&(ctx->in[56]), &(ctx->bits[0]), sizeof(uint32_t));
     memcpy(&(ctx->in[60]), &(ctx->bits[1]), sizeof(uint32_t));
 
@@ -170,26 +122,21 @@ MD5Final(unsigned char digest[16], MD5Context *ctx)
     byteReverse((unsigned char *) ctx->buf, 4);
     memcpy(digest, ctx->buf, 16);
 
-    memset(ctx, 0, sizeof(*ctx));        /* In case it's sensitive */
+    memset(ctx, 0, sizeof(*ctx));        /* 以防敏感 */
 }
 
 
-/* The four core functions
-*/
+/* 四大核心功能 */
 #define F1(x, y, z) (z ^ (x & (y ^ z)))
 #define F2(x, y, z) F1(z, x, y)
 #define F3(x, y, z) (x ^ y ^ z)
 #define F4(x, y, z) (y ^ (x | ~z))
 
-/* This is the central step in the MD5 algorithm.
-*/
+/* 这是MD5算法的核心步骤。 */
 #define MD5STEP(f, w, x, y, z, data, s) \
     ( w += f(x, y, z) + data,  w = w<<s | w>>(32-s),  w += x )
 
-/* The core of the MD5 algorithm, this alters an existing MD5 hash to
- * reflect the addition of 16 longwords of new data.  MD5Update blocks
- * the data and converts bytes into longwords for this routine.
-*/
+/* MD5算法的核心，这将现有的MD5哈希更改为 */
 void
 MD5Transform(uint32_t buf[4], uint32_t in[16])
 {
@@ -274,4 +221,4 @@ MD5Transform(uint32_t buf[4], uint32_t in[16])
     buf[3] += d;
 }
 
-/***EOF***/
+/* **EOF** */

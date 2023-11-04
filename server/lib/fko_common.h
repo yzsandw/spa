@@ -1,36 +1,6 @@
-/**
- * \file lib/fko_common.h
- *
- * \brief Common header for libfko source files.
- */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #ifndef FKO_COMMON_H
 #define FKO_COMMON_H 1
-
-
 
 #if HAVE_CONFIG_H
   #include "config.h"
@@ -48,16 +18,16 @@
   #include <string.h>
 #elif HAVE_STRINGS_H
   #include <strings.h>
-#endif /*STDC_HEADERS*/
+#endif /* STDC_HEADERS */
 
 #if HAVE_UNISTD_H
   #include <unistd.h>
 #endif
 
 #if HAVE_CTYPE_H
-  #include <ctype.h> /* Using this for isdigit() */
+  #include <ctype.h> /* 将此用于isdigit（） */
 #else
-  /* Fall-back does not account for locale */
+  /* 回退不考虑区域设置 */
   #define isdigit(c) (c >= 48 && c <= 57)
 #endif
 
@@ -80,8 +50,7 @@
   #define S_IWUSR     _S_IWRITE
   #define PATH_SEP    '\\'
 
-  /* These are needed for the digest code under windows.
-  */
+  /* 这些是windows下的摘要代码所需要的。 */
   typedef unsigned __int8   uint8_t;
   typedef unsigned __int32	uint32_t;
   typedef unsigned __int64	uint64_t;
@@ -91,19 +60,18 @@
   #endif
 #endif
 
-/* Work out endianness
-*/
+/* 计算结束时间 */
 #ifdef HAVE_ENDIAN_H
   #include <endian.h>
-  #if defined(BYTE_ORDER) /* POSIX proposal */
+  #if defined(BYTE_ORDER) /* POSIX提案 */
     #define BYTEORDER BYTE_ORDER
-  #elif defined(__BYTE_ORDER) /* older systems? */
+  #elif defined(__BYTE_ORDER) /* 旧系统？ */
     #define BYTEORDER __BYTE_ORDER
   #endif
-#elif HAVE_SYS_ENDIAN_H /* FreeBSD has a sys/endian.h */
+#elif HAVE_SYS_ENDIAN_H /* FreeBSD有一个sys/endian.h */
   #include <sys/endian.h>
   #define BYTEORDER _BYTE_ORDER
-#elif HAVE_SYS_BYTEORDER_H /* Solaris (v10 at least) seems to have this */
+#elif HAVE_SYS_BYTEORDER_H /* Solaris（至少是v10）似乎有这个 */
   #include <sys/byteorder.h>
   #if defined(_BIG_ENDIAN)
     #define BYTEORDER 4321
@@ -145,12 +113,11 @@
   #endif
 #endif
 
-/* Convenient macros for wrapping sections in 'extern "C" {' constructs.
-*/
+/* 用于将节包装在'extern“C”｛'构造中的方便宏。 */
 #ifdef __cplusplus
   #define BEGIN_C_DECLS extern "C" {
   #define END_C_DECLS   }
-#else /* !__cplusplus */
+#else /* __cplusplus */
   #define BEGIN_C_DECLS
   #define END_C_DECLS
 #endif /* __cplusplus */
@@ -162,22 +129,19 @@
 #include "fko_message.h"
 #include "fko_user.h"
 
-/* Try to cover for those that do not have bzero.
-*/
+/* 试着为那些没有bzero的人做掩护。 */
 #if !HAVE_BZERO && HAVE_MEMSET
  #define bzero(buf, bytes)      ((void) memset (buf, 0, bytes))
 #endif
 
-/* Work-around for not having strnlen
-*/
+/* 解决没有strnlen的问题 */
 #if !HAVE_STRNLEN
   #define strnlen(s, l) (strlen(s) < l ? strlen(s) : l)
 #endif
 
-/* Get the number of elements of an array
- */
+/* 获取数组的元素数 */
 #define ARRAY_SIZE(t)   (sizeof(t) / sizeof(t[0]))
 
 #endif /* FKO_COMMON_H */
 
-/***EOF***/
+/* **EOF** */

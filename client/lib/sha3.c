@@ -1,150 +1,43 @@
-/**
- * \file lib/sha3.c
- *
- * \brief Implementation of SHA3
- */
+/* * */
 
-/*
-Implementation by the Keccak, Keyak and Ketje Teams, namely, Guido Bertoni,
-Joan Daemen, Michael Peeters, Gilles Van Assche and Ronny Van Keer, hereby
-denoted as "the implementer".
+/* 由Keccak、Keyak和Ketje团队实施，即Guido Bertoni， */
 
-For more information, feedback or questions, please refer to our websites:
-http://keccak.noekeon.org/
-http://keyak.noekeon.org/
-http://ketje.noekeon.org/
+/* ================================================================ */
 
-To the extent possible under law, the implementer has waived all copyright
-and related or neighboring rights to the source code in this file.
-http://creativecommons.org/publicdomain/zero/1.0/
-*/
-
-/*
-================================================================
-The purpose of this source file is to demonstrate a readable and compact
-implementation of all the Keccak instances approved in the FIPS 202 standard,
-including the hash functions and the extendable-output functions (XOFs).
-
-We focused on clarity and on source-code compactness,
-rather than on the performance.
-
-The advantages of this implementation are:
-    + The source code is compact, after removing the comments, that is. :-)
-    + There are no tables with arbitrary constants.
-    + For clarity, the comments link the operations to the specifications using
-        the same notation as much as possible.
-    + There is no restriction in cryptographic features. In particular,
-        the SHAKE128 and SHAKE256 XOFs can produce any output length.
-    + The code does not use much RAM, as all operations are done in place.
-
-The drawbacks of this implementation are:
-    - There is no message queue. The whole message must be ready in a buffer.
-    - It is not optimized for peformance.
-
-The implementation is even simpler on a little endian platform. Just define the
-LITTLE_ENDIAN symbol in that case.
-
-For a more complete set of implementations, please refer to
-the Keccak Code Package at https://github.com/gvanas/KeccakCodePackage
-
-For more information, please refer to:
-    * [Keccak Reference] http://keccak.noekeon.org/Keccak-reference-3.0.pdf
-    * [Keccak Specifications Summary] http://keccak.noekeon.org/specs_summary.html
-
-This file uses UTF-8 encoding, as some comments use Greek letters.
-================================================================
-*/
-
-/**
-  * Function to compute the Keccak[r, c] sponge function over a given input.
-  * @param  rate            The value of the rate r.
-  * @param  capacity        The value of the capacity c.
-  * @param  input           Pointer to the input message.
-  * @param  inputByteLen    The number of input bytes provided in the input message.
-  * @param  delimitedSuffix Bits that will be automatically appended to the end
-  *                         of the input message, as in domain separation.
-  *                         This is a byte containing from 0 to 7 bits
-  *                         These <i>n</i> bits must be in the least significant bit positions
-  *                         and must be delimited with a bit 1 at position <i>n</i>
-  *                         (counting from 0=LSB to 7=MSB) and followed by bits 0
-  *                         from position <i>n</i>+1 to position 7.
-  *                         Some examples:
-  *                             - If no bits are to be appended, then @a delimitedSuffix must be 0x01.
-  *                             - If the 2-bit sequence 0,1 is to be appended (as for SHA3-*), @a delimitedSuffix must be 0x06.
-  *                             - If the 4-bit sequence 1,1,1,1 is to be appended (as for SHAKE*), @a delimitedSuffix must be 0x1F.
-  *                             - If the 7-bit sequence 1,1,0,1,0,0,0 is to be absorbed, @a delimitedSuffix must be 0x8B.
-  * @param  output          Pointer to the buffer where to store the output.
-  * @param  outputByteLen   The number of output bytes desired.
-  * @pre    One must have r+c=1600 and the rate a multiple of 8 bits in this implementation.
-  */
+/* * */
 //void Keccak(unsigned int rate, unsigned int capacity, const unsigned char *input, unsigned long long int inputByteLen, unsigned char delimitedSuffix, unsigned char *output, unsigned long long int outputByteLen);
 
-/**
-  *  Function to compute SHAKE128 on the input message with any output length.
-  */
+/* * */
 #include "sha3.h"
 
-/*
-void FIPS202_SHAKE128(const unsigned char *input, unsigned int inputByteLen, unsigned char *output, int outputByteLen)
-{
-    Keccak(1344, 256, input, inputByteLen, 0x1F, output, outputByteLen);
-}
-*/
+/* void FIPS202_SHAKE128（const unsigned char*input，unsigned int inputByteLen，unssigned char*output，int outputByteLen） */
 
-/**
-  *  Function to compute SHAKE256 on the input message with any output length.
-void FIPS202_SHAKE256(const unsigned char *input, unsigned int inputByteLen, unsigned char *output, int outputByteLen)
-{
-    Keccak(1088, 512, input, inputByteLen, 0x1F, output, outputByteLen);
-}
-*/
+/* * */
 
-/**
-  *  Function to compute SHA3-224 on the input message. The output length is fixed to 28 bytes.
-void FIPS202_SHA3_224(const unsigned char *input, unsigned int inputByteLen, unsigned char *output)
-{
-    Keccak(1152, 448, input, inputByteLen, 0x06, output, 28);
-}
-*/
+/* * */
 
-/**
-  *  Function to compute SHA3-256 on the input message. The output length is fixed to 32 bytes.
-  */
+/* * */
 void FIPS202_SHA3_256(const unsigned char *input, unsigned int inputByteLen, unsigned char *output)
 {
     Keccak(1088, 512, input, inputByteLen, 0x06, output, 32);
 }
 
-/**
-  *  Function to compute SHA3-384 on the input message. The output length is fixed to 48 bytes.
-void FIPS202_SHA3_384(const unsigned char *input, unsigned int inputByteLen, unsigned char *output)
-{
-    Keccak(832, 768, input, inputByteLen, 0x06, output, 48);
-}
-*/
+/* * */
 
-/**
-  *  Function to compute SHA3-512 on the input message. The output length is fixed to 64 bytes.
-  */
+/* * */
 void FIPS202_SHA3_512(const unsigned char *input, unsigned int inputByteLen, unsigned char *output)
 {
     Keccak(576, 1024, input, inputByteLen, 0x06, output, 64);
 }
 
-/*
-================================================================
-Technicalities
-================================================================
-*/
+/* ================================================================ */
 
 typedef unsigned char UINT8;
 typedef unsigned long long int UINT64;
 typedef UINT64 tKeccakLane;
 
 #ifndef LITTLE_ENDIAN
-/** Function to load a 64-bit value using the little-endian (LE) convention.
-  * On a LE platform, this could be greatly simplified using a cast.
-  */
+/* *函数使用little-endian（LE）约定加载64位值。 */
 static UINT64 load64(const UINT8 *x)
 {
     int i;
@@ -157,9 +50,7 @@ static UINT64 load64(const UINT8 *x)
     return u;
 }
 
-/** Function to store a 64-bit value using the little-endian (LE) convention.
-  * On a LE platform, this could be greatly simplified using a cast.
-  */
+/* *函数使用little-endian（LE）约定存储64位值。 */
 static void store64(UINT8 *x, UINT64 u)
 {
     unsigned int i;
@@ -170,9 +61,7 @@ static void store64(UINT8 *x, UINT64 u)
     }
 }
 
-/** Function to XOR into a 64-bit value using the little-endian (LE) convention.
-  * On a LE platform, this could be greatly simplified using a cast.
-  */
+/* *函数使用little-endian（LE）约定异或为64位值。 */
 static void xor64(UINT8 *x, UINT64 u)
 {
     unsigned int i;
@@ -184,11 +73,7 @@ static void xor64(UINT8 *x, UINT64 u)
 }
 #endif
 
-/*
-================================================================
-A readable and compact implementation of the Keccak-f[1600] permutation.
-================================================================
-*/
+/* ================================================================ */
 
 #define ROL64(a, offset) ((((UINT64)a) << offset) ^ (((UINT64)a) >> (64-offset)))
 #define i(x, y) ((x)+5*(y))
@@ -203,10 +88,7 @@ A readable and compact implementation of the Keccak-f[1600] permutation.
     #define XORLane(x, y, lane)     xor64((UINT8*)state+sizeof(tKeccakLane)*i(x, y), lane)
 #endif
 
-/**
-  * Function that computes the linear feedback shift register (LFSR) used to
-  * define the round constants (see [Keccak Reference, Section 1.2]).
-  */
+/* * */
 int LFSR86540(UINT8 *LFSR)
 {
     int result = ((*LFSR) & 0x01) != 0;
@@ -218,9 +100,7 @@ int LFSR86540(UINT8 *LFSR)
     return result;
 }
 
-/**
- * Function that computes the Keccak-f[1600] permutation on the given state.
- */
+/* * */
 void KeccakF1600_StatePermute(void *state)
 {
     unsigned int round, x, y, j, t;
@@ -282,12 +162,7 @@ void KeccakF1600_StatePermute(void *state)
     }
 }
 
-/*
-================================================================
-A readable and compact implementation of the Keccak sponge functions
-that use the Keccak-f[1600] permutation.
-================================================================
-*/
+/* ================================================================ */
 
 #include <string.h>
 #define MIN(a, b) ((a) < (b) ? (a) : (b))

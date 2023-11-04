@@ -1,30 +1,4 @@
-/**
- * \file    lib/digest.c
- *
- * \brief   Roll-up of the digests used by fwknop.
- */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- */
 
 #include "fko_common.h"
 #include "digest.h"
@@ -32,8 +6,7 @@
 #ifdef HAVE_C_UNIT_TESTS /* LCOV_EXCL_START */
 DECLARE_TEST_SUITE(digest_test, "digest functions test suite");
 #endif /* LCOV_EXCL_STOP */
-/* Compute MD5 hash on in and store result in out.
-*/
+/* 在in上计算MD5哈希，并将结果存储在out中。 */
 void
 md5(unsigned char *out, unsigned char *in, size_t size)
 {
@@ -44,8 +17,7 @@ md5(unsigned char *out, unsigned char *in, size_t size)
     MD5Final(out, &ctx);
 }
 
-/* Compute MD5 hash on in and store the base64 string result in out.
-*/
+/* 在in上计算MD5哈希，并将base64字符串结果存储在out中。 */
 void
 md5_base64(char *out, unsigned char *in, size_t size)
 {
@@ -57,8 +29,7 @@ md5_base64(char *out, unsigned char *in, size_t size)
     strip_b64_eq(out);
 }
 
-/* Compute SHA1 hash on in and store result in out.
-*/
+/* 在in上计算SHA1哈希，并将结果存储在out中。 */
 void
 sha1(unsigned char *out, unsigned char *in, size_t size)
 {
@@ -69,8 +40,7 @@ sha1(unsigned char *out, unsigned char *in, size_t size)
     sha1_final(out, &sha1_info);
 }
 
-/* Compute SHA1 hash on in and store the base64 string result in out.
-*/
+/* 在in上计算SHA1哈希，并将base64字符串结果存储在out中。 */
 void
 sha1_base64(char *out, unsigned char *in, size_t size)
 {
@@ -82,8 +52,7 @@ sha1_base64(char *out, unsigned char *in, size_t size)
     strip_b64_eq(out);
 }
 
-/* Compute SHA256 hash on in and store the hex string result in out.
-*/
+/* 在in上计算SHA256哈希，并将十六进制字符串结果存储在out中。 */
 void
 sha256(unsigned char *out, unsigned char *in, size_t size)
 {
@@ -94,8 +63,7 @@ sha256(unsigned char *out, unsigned char *in, size_t size)
     SHA256_Final(out, &sha256_ctx);
 }
 
-/* Compute SHA256 hash on in and store the base64 string result in out.
-*/
+/* 在in上计算SHA256哈希，并将base64字符串结果存储在out中。 */
 void
 sha256_base64(char *out, unsigned char *in, size_t size)
 {
@@ -107,8 +75,7 @@ sha256_base64(char *out, unsigned char *in, size_t size)
     strip_b64_eq(out);
 }
 
-/* Compute SHA384 hash on in and store the hex string result in out.
-*/
+/* 在in上计算SHA384哈希，并将十六进制字符串结果存储在out中。 */
 void
 sha384(unsigned char *out, unsigned char *in, size_t size)
 {
@@ -119,8 +86,7 @@ sha384(unsigned char *out, unsigned char *in, size_t size)
     SHA384_Final(out, &sha384_ctx);
 }
 
-/* Compute SHA384 hash on in and store the base64 string result in out.
-*/
+/* 在in上计算SHA384哈希，并将base64字符串结果存储在out中。 */
 void
 sha384_base64(char *out, unsigned char *in, size_t size)
 {
@@ -132,8 +98,7 @@ sha384_base64(char *out, unsigned char *in, size_t size)
     strip_b64_eq(out);
 }
 
-/* Compute SHA512 hash on in and store the hex string result in out.
-*/
+/* 在in上计算SHA512哈希，并将十六进制字符串结果存储在out中。 */
 void
 sha512(unsigned char *out, unsigned char *in, size_t size)
 {
@@ -144,8 +109,7 @@ sha512(unsigned char *out, unsigned char *in, size_t size)
     SHA512_Final(out, &sha512_ctx);
 }
 
-/* Compute SHA512 hash on in and store the base64 string result in out.
-*/
+/* 在in上计算SHA512哈希，并将base64字符串结果存储在out中。 */
 void
 sha512_base64(char *out, unsigned char *in, size_t size)
 {
@@ -575,5 +539,5 @@ int register_ts_digest_test(void)
     return register_ts(&TEST_SUITE(digest_test));
 }
 
-#endif /* HAVE_C_UNIT_TESTS */ /* LCOV_EXCL_STOP */
-/***EOF***/
+#endif /* 有_单元_测试 */ /* LCOV_EXCL_STOP */
+/* **EOF** */

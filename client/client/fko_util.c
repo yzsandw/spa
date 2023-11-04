@@ -1,4 +1,6 @@
+/* * */
 
+/* Fwknop主要由文件“AUTHORS”中列出的人员开发。 */
 #include "fko_common.h"
 #include "fko_util.h"
 #include <errno.h>

@@ -1,32 +1,4 @@
-/**
- * \file lib/fko_message.c
- *
- * \brief Set/Get the spa message (access req/command/etc) based on the current spa data.
- */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #include "fko_common.h"
 #include "fko_message.h"
 #include "fko.h"
@@ -81,8 +53,7 @@ have_port(const char *msg)
     if(startlen == MAX_SPA_MESSAGE_SIZE)
         return(FKO_ERROR_INVALID_DATA_MESSAGE_PORT_MISSING);
 
-    /* Must have at least one digit for the port number
-    */
+    /* 端口号必须至少有一个数字 */
     if(isdigit((int)(unsigned char)*ndx) == 0)
         return(FKO_ERROR_INVALID_SPA_ACCESS_MSG);
 
@@ -104,8 +75,7 @@ have_port(const char *msg)
     return FKO_SUCCESS;
 }
 
-/* Set the SPA message type.
-*/
+/* 设置SPA消息类型。 */
 int
 fko_set_spa_message_type(fko_ctx_t ctx, const short msg_type)
 {
@@ -113,8 +83,7 @@ fko_set_spa_message_type(fko_ctx_t ctx, const short msg_type)
     fiu_return_on("fko_set_spa_message_type_init",
             FKO_ERROR_CTX_NOT_INITIALIZED);
 #endif
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return FKO_ERROR_CTX_NOT_INITIALIZED;
 
@@ -132,8 +101,7 @@ fko_set_spa_message_type(fko_ctx_t ctx, const short msg_type)
     return(FKO_SUCCESS);
 }
 
-/* Return the SPA message type.
-*/
+/* 返回SPA消息类型。 */
 int
 fko_get_spa_message_type(fko_ctx_t ctx, short *msg_type)
 {
@@ -143,8 +111,7 @@ fko_get_spa_message_type(fko_ctx_t ctx, short *msg_type)
             FKO_ERROR_CTX_NOT_INITIALIZED);
 #endif
 
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return FKO_ERROR_CTX_NOT_INITIALIZED;
 
@@ -160,31 +127,26 @@ fko_get_spa_message_type(fko_ctx_t ctx, short *msg_type)
     return(FKO_SUCCESS);
 }
 
-/* Set the SPA MESSAGE data
-*/
+/* 设置SPA MESSAGE数据 */
+/* 这段代码是一个名为fko_set_spa_消息的函数，用于设置一个名为消息的字符串作为SPA（单页申请）消息。 */
 int
 fko_set_spa_message(fko_ctx_t ctx, const char * const msg)
 {
     int res = FKO_ERROR_UNKNOWN;
 
-    /* Context must be initialized.
-    */
+    /* 必须初始化上下文。 */
     if(!CTX_INITIALIZED(ctx))
         return FKO_ERROR_CTX_NOT_INITIALIZED;
 
-    /* Gotta have a valid string.
-    */
+    /* 必须有一个有效的字符串。 */
     if(msg == NULL || strnlen(msg, MAX_SPA_MESSAGE_SIZE) == 0)
         return(FKO_ERROR_INVALID_DATA_MESSAGE_EMPTY);
 
-    /* --DSS XXX: Bail out for now.  But consider just
-     *            truncating in the future...
-    */
+    /* --DSS XXX：暂时退出。但考虑一下 */
     if(strnlen(msg, MAX_SPA_MESSAGE_SIZE) == MAX_SPA_MESSAGE_SIZE)
         return(FKO_ERROR_DATA_TOO_LARGE);
 
-    /* Basic message type and format checking...
-    */
+    /* 基本消息类型和格式检查。。。 */
     if(ctx->message_type == FKO_COMMAND_MSG)
         res = validate_cmd_msg(msg);
     else
@@ -193,9 +155,7 @@ fko_set_spa_message(fko_ctx_t ctx, const char * const msg)
     if(res != FKO_SUCCESS)
         return(res);
 
-    /* Just in case this is a subsequent call to this function.  We
-     * do not want to be leaking memory.
-    */
+    /* 以防万一这是对该函数的后续调用。我们 */
     if(ctx->message != NULL)
         free(ctx->message);
 
@@ -209,8 +169,7 @@ fko_set_spa_message(fko_ctx_t ctx, const char * const msg)
     return(FKO_SUCCESS);
 }
 
-/* Return the SPA message data.
-*/
+/* 返回SPA消息数据。 */
 int
 fko_get_spa_message(fko_ctx_t ctx, char **msg)
 {
@@ -219,8 +178,7 @@ fko_get_spa_message(fko_ctx_t ctx, char **msg)
     fiu_return_on("fko_get_spa_message_init", FKO_ERROR_CTX_NOT_INITIALIZED);
 #endif
 
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -236,8 +194,7 @@ fko_get_spa_message(fko_ctx_t ctx, char **msg)
     return(FKO_SUCCESS);
 }
 
-/* Validate a command message format.
-*/
+/* 验证命令消息格式。 */
 int
 validate_cmd_msg(const char *msg)
 {
@@ -248,15 +205,11 @@ validate_cmd_msg(const char *msg)
     if(startlen == MAX_SPA_CMD_LEN)
         return(FKO_ERROR_INVALID_DATA_MESSAGE_CMD_MISSING);
 
-    /* Should always have a valid allow IP regardless of message type
-    */
+    /* 无论消息类型如何，都应始终具有有效的允许IP */
     if((res = have_allow_ip(msg)) != FKO_SUCCESS)
         return(FKO_ERROR_INVALID_SPA_COMMAND_MSG);
 
-    /* Commands are fairly free-form so all we can really verify is
-     * there is something at all. Get past the IP and comma, and make
-     * sure we have some string leftover...
-    */
+    /* 命令是相当自由的，所以我们能真正验证的只是 */
     ndx = strchr(msg, ',');
     if(ndx == NULL || (1+(ndx - msg)) >= startlen)
         return(FKO_ERROR_INVALID_SPA_COMMAND_MSG);
@@ -274,20 +227,16 @@ validate_access_msg(const char *msg)
     if(startlen == MAX_SPA_MESSAGE_SIZE)
         return(FKO_ERROR_INVALID_DATA_MESSAGE_ACCESS_MISSING);
 
-    /* Should always have a valid allow IP regardless of message type
-    */
+    /* 无论消息类型如何，都应始终具有有效的允许IP */
     if((res = have_allow_ip(msg)) != FKO_SUCCESS)
         return(res);
 
-    /* Position ourselves beyond the allow IP and make sure we are
-     * still good.
-    */
+    /* 将自己定位在允许的IP之外，并确保我们 */
     ndx = strchr(msg, ',');
     if(ndx == NULL || (1+(ndx - msg)) >= startlen)
         return(FKO_ERROR_INVALID_SPA_ACCESS_MSG);
 
-    /* Look for a comma to see if this is a multi-part access request.
-    */
+    /* 查找逗号以查看这是否是一个由多部分组成的访问请求。 */
     do {
         ndx++;
         res = validate_proto_port_spec(ndx);
@@ -309,25 +258,20 @@ validate_nat_access_msg(const char *msg)
     if(startlen == MAX_SPA_MESSAGE_SIZE)
         return(FKO_ERROR_INVALID_DATA_MESSAGE_NAT_MISSING);
 
-    /* must have exactly one comma here
-    */
+    /* 这里必须只有一个逗号 */
     if(count_characters(msg, ',', startlen) != 1)
         return(FKO_ERROR_INVALID_SPA_NAT_ACCESS_MSG);
 
-    /* Must not be longer than the max hostname length
-    */
+    /* 不得长于主机名的最大长度 */
     host_len = strcspn(msg, ",");
     if(host_len > MAX_HOSTNAME_LEN)
         return(FKO_ERROR_INVALID_SPA_NAT_ACCESS_MSG);
 
-    /* Check for some invalid characters
-    */
+    /* 检查一些无效字符 */
     if(strcspn(msg, " /?\"\'\\") < host_len)
         return(FKO_ERROR_INVALID_SPA_NAT_ACCESS_MSG);
 
-    /* Position ourselves beyond the allow IP and make sure we have
-     * a single port value
-    */
+    /* 将自己定位在允许的IP之外，并确保我们 */
     ndx = strchr(msg, ',');
     if(ndx == NULL || (1+(ndx - msg)) >= startlen)
         return(FKO_ERROR_INVALID_SPA_NAT_ACCESS_MSG);
@@ -352,8 +296,7 @@ validate_proto_port_spec(const char *msg)
     if(startlen == MAX_SPA_MESSAGE_SIZE)
         return(FKO_ERROR_INVALID_DATA_MESSAGE_PORTPROTO_MISSING);
 
-    /* Now check for proto/port string.
-    */
+    /* 现在检查proto/port字符串。 */
     if(strncmp(ndx, "tcp", 3)
       && strncmp(ndx, "udp", 3)
       && strncmp(ndx, "icmp", 4)
@@ -364,11 +307,10 @@ validate_proto_port_spec(const char *msg)
     if(ndx == NULL || ((1+(ndx - msg)) > MAX_PROTO_STR_LEN))
         return(FKO_ERROR_INVALID_SPA_ACCESS_MSG);
 
-    /* Skip over the '/' and make sure we only have digits.
-    */
+    /* 跳过“/”并确保我们只有数字。 */
     ndx++;
 
     return have_port(ndx);
 }
 
-/***EOF***/
+/* **EOF** */

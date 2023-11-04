@@ -1,32 +1,4 @@
-/**
- * \file lib/fko_hmac.c
- *
- * \brief Provide HMAC support to SPA communications
- */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #include "fko_common.h"
 #include "fko.h"
 #include "cipher_funcs.h"
@@ -42,8 +14,7 @@ fko_verify_hmac(fko_ctx_t ctx,
     int      res = FKO_SUCCESS;
     int      hmac_b64_digest_len = 0, zero_free_rv = FKO_SUCCESS;
 
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -77,8 +48,7 @@ fko_verify_hmac(fko_ctx_t ctx,
             < MIN_SPA_ENCODED_MSG_SIZE)
         return(FKO_ERROR_INVALID_DATA_HMAC_ENCMSGLEN_VALIDFAIL);
 
-    /* Get digest value
-    */
+    /* 获取摘要值 */
     hmac_digest_from_data = strndup((ctx->encrypted_msg
             + ctx->encrypted_msg_len - hmac_b64_digest_len),
             hmac_b64_digest_len);
@@ -86,8 +56,7 @@ fko_verify_hmac(fko_ctx_t ctx,
     if(hmac_digest_from_data == NULL)
         return(FKO_ERROR_MEMORY_ALLOCATION);
 
-    /* Now we chop the HMAC digest off of the encrypted msg
-    */
+    /* 现在我们从加密消息中截取HMAC摘要 */
     tbuf = strndup(ctx->encrypted_msg,
             ctx->encrypted_msg_len - hmac_b64_digest_len);
 
@@ -108,9 +77,7 @@ fko_verify_hmac(fko_ctx_t ctx,
 
     if(ctx->encryption_mode == FKO_ENC_MODE_ASYMMETRIC)
     {
-        /* See if we need to add the "hQ" string to the front of the
-         * encrypted data.
-         */
+        /* 看看我们是否需要将“hQ”字符串添加到 */
         if(! ctx->added_gpg_prefix)
         {
             res = add_gpg_prefix(ctx);
@@ -118,9 +85,7 @@ fko_verify_hmac(fko_ctx_t ctx,
     }
     else
     {
-        /* See if we need to add the "Salted__" string to the front of the
-         * encrypted data.
-         */
+        /* 看看是否需要将“Salted__”字符串添加到 */
         if(! ctx->added_salted_str)
         {
             res = add_salted_str(ctx);
@@ -139,9 +104,7 @@ fko_verify_hmac(fko_ctx_t ctx,
             return(zero_free_rv);
     }
 
-    /* Calculate the HMAC from the encrypted data and then
-     * compare
-    */
+    /* 根据加密数据计算HMAC，然后 */
     res = fko_set_spa_hmac_type(ctx, ctx->hmac_type);
     if(res == FKO_SUCCESS)
     {
@@ -167,13 +130,11 @@ fko_verify_hmac(fko_ctx_t ctx,
         return(res);
 }
 
-/* Return the fko HMAC data
-*/
+/* 返回fko HMAC数据 */
 int
 fko_get_spa_hmac(fko_ctx_t ctx, char **hmac_data)
 {
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -185,8 +146,7 @@ fko_get_spa_hmac(fko_ctx_t ctx, char **hmac_data)
     return(FKO_SUCCESS);
 }
 
-/* Set the HMAC type
-*/
+/* 设置HMAC类型 */
 int
 fko_set_spa_hmac_type(fko_ctx_t ctx, const short hmac_type)
 {
@@ -195,8 +155,7 @@ fko_set_spa_hmac_type(fko_ctx_t ctx, const short hmac_type)
             FKO_ERROR_CTX_NOT_INITIALIZED);
 #endif
 
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -215,13 +174,11 @@ fko_set_spa_hmac_type(fko_ctx_t ctx, const short hmac_type)
     return(FKO_SUCCESS);
 }
 
-/* Return the fko HMAC type
-*/
+/* 返回fko HMAC类型 */
 int
 fko_get_spa_hmac_type(fko_ctx_t ctx, short *hmac_type)
 {
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -242,8 +199,7 @@ int fko_set_spa_hmac(fko_ctx_t ctx,
     int   hmac_digest_len = 0;
     int   res = FKO_ERROR_UNKNOWN ;
 
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -351,4 +307,4 @@ int fko_set_spa_hmac(fko_ctx_t ctx,
     return FKO_SUCCESS;
 }
 
-/***EOF***/
+/* **EOF** */

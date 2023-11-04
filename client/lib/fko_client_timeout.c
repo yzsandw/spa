@@ -1,50 +1,18 @@
-/**
- * \file lib/fko_client_timeout.c
- *
- * \brief Set/Get the spa client timeout data
- */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #include "fko_common.h"
 #include "fko.h"
 
-/* Set the SPA Client Timeout data
-*设置 SPA客户端超时数据。
-*/
+/* 设置SPA客户端超时数据 */
 int
 fko_set_spa_client_timeout(fko_ctx_t ctx, const int timeout)
 {
     int     old_msg_type;
 
-    /* Context must be initialized.
-    */
+    /* 必须初始化上下文。 */
     if(!CTX_INITIALIZED(ctx))
         return FKO_ERROR_CTX_NOT_INITIALIZED;
 
-    /* The timeout should not be negative
-    */
+    /* 超时不应为负数 */
     if(timeout < 0)
         return(FKO_ERROR_INVALID_DATA_CLIENT_TIMEOUT_NEGATIVE);
 
@@ -54,9 +22,7 @@ fko_set_spa_client_timeout(fko_ctx_t ctx, const int timeout)
 
     ctx->state |= FKO_DATA_MODIFIED;
 
-    /* If a timeout is set, then we may need to verify/change message
-     * type accordingly.
-    */
+    /* 如果设置了超时，那么我们可能需要验证/更改消息 */
     if(ctx->client_timeout > 0)
     {
         switch(ctx->message_type)
@@ -74,7 +40,7 @@ fko_set_spa_client_timeout(fko_ctx_t ctx, const int timeout)
                 break;
         }
     }
-    else  /* Timeout is 0, which means ignore it. */
+    else  /* 超时为0，表示忽略它。 */
     {
         switch(ctx->message_type)
         {
@@ -98,8 +64,7 @@ fko_set_spa_client_timeout(fko_ctx_t ctx, const int timeout)
     return(FKO_SUCCESS);
 }
 
-/* Return the SPA message data.
-*/
+/* 返回SPA消息数据。 */
 int
 fko_get_spa_client_timeout(fko_ctx_t ctx, int *timeout)
 {
@@ -109,8 +74,7 @@ fko_get_spa_client_timeout(fko_ctx_t ctx, int *timeout)
             FKO_ERROR_CTX_NOT_INITIALIZED);
 #endif
 
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -127,4 +91,4 @@ fko_get_spa_client_timeout(fko_ctx_t ctx, int *timeout)
     return(FKO_SUCCESS);
 }
 
-/***EOF***/
+/* **EOF** */

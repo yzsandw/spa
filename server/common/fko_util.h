@@ -1,43 +1,14 @@
-/**
- * \file common/fko_util.h
- *
- * \brief Header for utility functions used by libfko
- */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #ifndef FKO_UTIL_H
 #define FKO_UTIL_H 1
 
 #include "fko.h"
 
-#define MAX_CMDLINE_ARGS   30    /*!< should be way more than enough */
+#define MAX_CMDLINE_ARGS   30    /* ！<应该绰绰有余 */
 #define MAX_ARGS_LINE_LEN  1024
 #define MAX_HOSTNAME_LEN    70
 
-/* Function prototypes
-*/
+/* 功能原型 */
 int     is_valid_encoded_msg_len(const int len);
 int     is_valid_pt_msg_len(const int len);
 int     is_valid_ipv4_addr(const char * const ip_str, const int len);
@@ -64,12 +35,7 @@ void  chop_newline(char *str);
 void  chop_char(char *str, const char chop);
 void  chop_spaces(char *str);
 
-/**
- *
- * \brief counts the occurrences of a character
- *
- * \return returns the number of chars found
- */
+/* * */
 int   count_characters(const char *str, const char match, int len);
 
 int   strtoargv(const char * const args_str, char **argv_new, int *argc_new);
@@ -101,6 +67,6 @@ int     dump_ctx_to_buffer(fko_ctx_t ctx, char *dump_buf, size_t dump_buf_len);
   #include <netdb.h>
 #endif
 
-#endif /* FKO_UTIL_H */
+#endif /* FKO_UTIL.H */
 
-/***EOF***/
+/* **EOF** */

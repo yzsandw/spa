@@ -1,128 +1,62 @@
-/**
- * \file lib/rijndael.h
- *
- * \brief rijndael - An implementation of the Rijndael cipher.
- */
 
-/*
- * Copyright (C) 2000, 2001 Rafael R. Sevilla <sevillar@team.ph.inter.net>
- *
- * Currently maintained by brian d foy, <bdfoy@cpan.org>
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
-/*
- * Rijndael is a 128/192/256-bit block cipher that accepts key sizes of
- * 128, 192, or 256 bits, designed by Joan Daemen and Vincent Rijmen.  See
- * http://www.esat.kuleuven.ac.be/~rijmen/rijndael/ for details.
- */
+/* *Rijndael是一个128/192/256位分组密码，接受的密钥大小为 */
 #ifndef RIJNDAEL_H
 #define RIJNDAEL_H 1
 
 #include "common.h"
 
-/* Other block sizes and key lengths are possible, but in the context of
- * the ssh protocols, 256 bits is the default.
- */
+/* 其他块大小和密钥长度也是可能的，但在 */
 #define RIJNDAEL_BLOCKSIZE 16
 #define RIJNDAEL_KEYSIZE   32
 #define RIJNDAEL_MIN_KEYSIZE 16
 #define RIJNDAEL_MAX_KEYSIZE 32
 #define SALT_LEN 8
 
-#define     MODE_ECB        1    /*  Are we ciphering in ECB mode?   */
-#define     MODE_CBC        2    /*  Are we ciphering in CBC mode?   */
-#define     MODE_CFB        3    /*  Are we ciphering in 128-bit CFB mode? */
-#define     MODE_PCBC       4    /*  Are we ciphering in PCBC mode? */
-#define     MODE_OFB        5    /*  Are we ciphering in 128-bit OFB mode? */
-#define     MODE_CTR        6    /*  Are we ciphering in counter mode? */
+#define     MODE_ECB        1    /* 我们是在欧洲央行模式下加密吗？ */
+#define     MODE_CBC        2    /* 我们是在CBC模式下加密吗？ */
+#define     MODE_CFB        3    /* 我们是在128位CFB模式下加密吗？ */
+#define     MODE_PCBC       4    /* 我们是在PCBC模式下加密吗？ */
+#define     MODE_OFB        5    /* 我们是在128位OFB模式下加密吗？ */
+#define     MODE_CTR        6    /* 我们是在计数器模式下加密吗？ */
 
-/* Allow keys of size 128 <= bits <= 256 */
+/* 允许大小为128<=位<=256的密钥 */
 
 typedef struct {
-  uint32_t keys[60];		/* maximum size of key schedule */
-  uint32_t ikeys[60];		/* inverse key schedule */
-  int nrounds;			/* number of rounds to use for our key size */
-  int mode;			    /* encryption mode */
-  /* Added by DSS */
+  uint32_t keys[60];		/* 密钥调度的最大大小 */
+  uint32_t ikeys[60];		/* 倒键时间表 */
+  int nrounds;			/* 用于我们的密钥大小的回合数 */
+  int mode;			    /* 加密模式 */
+  /* 由DSS添加 */
   uint8_t key[RIJNDAEL_MAX_KEYSIZE];
   uint8_t iv[RIJNDAEL_BLOCKSIZE];
   uint8_t salt[SALT_LEN];
 } RIJNDAEL_context;
 
-/**
- * \brief initialize a Rijndael context with key
- *
- * This basically performs Rijndael's key scheduling algorithm, as it's the
- * only initialization required anyhow.   The key size is specified in bytes,
- * but the only valid values are 16 (128 bits), 24 (192 bits), and 32 (256
- * bits).  If a value other than these three is specified, the key will be
- * truncated to the closest value less than the key size specified, e.g.
- * specifying 7 will use only the first 6 bytes of the key given.  DO NOT
- * PASS A VALUE LESS THAN 16 TO KEYSIZE!
- */
+/* * */
 void
 rijndael_setup(RIJNDAEL_context *ctx,
     const size_t keysize, const uint8_t *key);
 
-/*
- * rijndael_encrypt()
- *
- * Encrypt 16 bytes of data with the Rijndael algorithm.  Before this
- * function can be used, rijndael_setup must be used in order to initialize
- * Rijndael's key schedule.
- *
- * This function always encrypts 16 bytes of plaintext to 16 bytes of
- * ciphertext.  The memory areas of the plaintext and the ciphertext can
- * overlap.
- */
+/* *rijndael_encrypt（） */
 
 void
 rijndael_encrypt(RIJNDAEL_context *context,
 		 const uint8_t *plaintext,
 		 uint8_t *ciphertext);
 
-/*
- * rijndael_decrypt()
- *
- * Decrypt 16 bytes of data with the Rijndael algorithm.
- *
- * Before this function can be used, rijndael_setup() must be used in order
- * to set up the key schedule required for the decryption algorithm.
- *
- * This function always decrypts 16 bytes of ciphertext to 16 bytes of
- * plaintext.  The memory areas of the plaintext and the ciphertext can
- * overlap.
- */
+/* *rijndael_decrypt（） */
 
 void
 rijndael_decrypt(RIJNDAEL_context *context,
 		 const uint8_t *ciphertext,
 		 uint8_t *plaintext);
 
-/* Encrypt a block of plaintext in a mode specified in the context */
+/* 以上下文中指定的模式加密明文块 */
 void
 block_encrypt(RIJNDAEL_context *ctx, uint8_t *input, int inputlen,
 	      uint8_t *output, uint8_t *iv);
 
-/* Decrypt a block of plaintext in a mode specified in the context */
+/* 以上下文中指定的模式解密明文块 */
 void
 block_decrypt(RIJNDAEL_context *ctx, uint8_t *input, int inputlen,
 	      uint8_t *output, uint8_t *iv);

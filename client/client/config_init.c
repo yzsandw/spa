@@ -1,33 +1,4 @@
-/**
- * \file    client/config_init.c
- *
- * \brief   Command-line and config file processing for fwknop client.
- */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- ******************************************************************************
- */
-//
 #include "fwknop_common.h"
 #include "netinet_common.h"
 #include "config_init.h"
@@ -40,51 +11,41 @@
   #define STDIN_FILENO 0
 #endif
 
-#define RC_PARAM_TEMPLATE           "%-24s    %s\n"                     /*!< Template to define param = val in a rc file */
-#define RC_SECTION_DEFAULT          "default"                           /*!< Name of the default section in fwknoprc */
-#define RC_SECTION_TEMPLATE         "[%s]\n"                            /*!< Template to define a section in a rc file */
-#define FWKNOPRC_OFLAGS             (O_WRONLY|O_CREAT|O_EXCL)           /*!< O_flags used to create an fwknoprc file with the open function */
-#define FWKNOPRC_MODE               (S_IRUSR|S_IWUSR)                   /*!< mode used to create an fwknoprc file with the open function */
-#define PARAM_YES_VALUE             "Y"                                 /*!< String which represents a YES value for a parameter in fwknoprc */
-#define PARAM_NO_VALUE              "N"                                 /*!< String which represents a NO value for a parameter in fwknoprc */
-#define POSITION_TO_BITMASK(x)      ((uint32_t)(1) << ((x) % 32))       /*!< Macro do get a bitmask from a position */
-#define BITMASK_ARRAY_SIZE          2                                   /*!< Number of 32bits integer used to handle bitmask in the fko_var_bitmask_t structure */
-#define LF_CHAR                     0x0A                                /*!< Hexadecimal value associated to the LF char */
+#define RC_PARAM_TEMPLATE           "%-24s    %s\n"                     /* ！<在rc文件中定义param=val的模板 */
+#define RC_SECTION_DEFAULT          "default"                           /* ！<fwknoprc中默认节的名称 */
+#define RC_SECTION_TEMPLATE         "[%s]\n"                            /* ！<在rc文件中定义节的模板 */
+#define FWKNOPRC_OFLAGS             (O_WRONLY|O_CREAT|O_EXCL)           /* ！<用于使用open函数创建fwknoprc文件的O_flags */
+#define FWKNOPRC_MODE               (S_IRUSR|S_IWUSR)                   /* ！<用于使用open函数创建fwknoprc文件的模式 */
+#define PARAM_YES_VALUE             "Y"                                 /* ！<表示fwknoprc中参数的YES值的字符串 */
+#define PARAM_NO_VALUE              "N"                                 /* ！<表示fwknoprc中参数的NO值的字符串 */
+#define POSITION_TO_BITMASK(x)      ((uint32_t)(1) << ((x) % 32))       /* ！<宏确实从某个位置获取位掩码 */
+#define BITMASK_ARRAY_SIZE          2                                   /* ！<用于处理fko_var_bitmask_t结构中的位掩码的32位整数的数目 */
+#define LF_CHAR                     0x0A                                /* ！<与LF字符关联的十六进制值 */
 
 #ifdef HAVE_C_UNIT_TESTS /* LCOV_EXCL_START */
   #include "cunit_common.h"
   DECLARE_TEST_SUITE(config_init, "Config init test suite");
 #endif /* LCOV_EXCL_STOP */
 
-/**
- * Structure to handle long bitmask.
- *
- * The structure is built as an array of unsigned 32 bits integer to be able to
- * easily increase the size of the bitmask.
- * This bitmask can contains at most (BITMASK_ARRAY_SIZE * 32) values.
- */
+/* * */
 typedef struct fko_var_bitmask
 {
-    uint32_t dw[BITMASK_ARRAY_SIZE];        /*!< Array of bitmasks */
+    uint32_t dw[BITMASK_ARRAY_SIZE];        /* ！<位掩码数组 */
 } fko_var_bitmask_t;
 
-/**
- * Structure to handle a variable in an rcfile (name and value)
- */
+/* * */
 //这个结构体用来处理rc文件中的变量（名称和值）
 typedef struct rc_file_param
 {
-    char name[MAX_LINE_LEN];    /*!< Variable name */
-    char val[MAX_LINE_LEN];     /*!< Variable value */
+    char name[MAX_LINE_LEN];    /* ！<变量名称 */
+    char val[MAX_LINE_LEN];     /* ！<变量值 */
 } rc_file_param_t;
 
-/**
- * Structure to identify a configuration variable (name and position)
- */
+/* * */
 typedef struct fko_var
 {
-    const char      name[32];   /*!< Variable name in fwknoprc */
-    unsigned int    pos;        /*!< Variable position from the fwknop_cli_arg_t enumeration */
+    const char      name[32];   /* ！<fwknoprc中的变量名称 */
+    unsigned int    pos;        /* ！<fwknop_cli_arg_t枚举中的变量位置 */
 } fko_var_t;
 
 enum
@@ -185,11 +146,8 @@ static fko_var_t fko_var_array[FWKNOP_CLI_LAST_ARG] =
     { "NO_SAVE_ARGS",          FWKNOP_CLI_ARG_NO_SAVE_ARGS          }
 };
 
-/* Array to define which conf. variables are critical and should not be
- * overwritten when a stanza is updated using the --save-rc-stanza arg
- * without the user validation */
-/* 数组用于定义哪些配置变量是关键的，当使用 --save-rc-stanza 参数
-更新一个段落时，这些变量不应该被覆盖，而无需用户验证 */
+/* 数组来定义哪些配置变量是关键的，不应该是 */
+/* 数组用于定义哪些配置变量是关键的，当使用 --保存rc节参数 */
 static int critical_var_array[] =
 {
     FWKNOP_CLI_ARG_KEY_RIJNDAEL,
@@ -202,29 +160,25 @@ static int critical_var_array[] =
     FWKNOP_CLI_ARG_GPG_SIGNING_PW_BASE64
 };
 
-/**
- * @brief Generate Rijndael + HMAC keys from /dev/urandom (base64 encoded).  
- * 从 /dev/urandom 生成 Rijndael + HMAC 密钥（base64 编码）
- * @param options FKO command line option structure
- */
+/* * */
 static void
 generate_keys(fko_cli_options_t *options)
 {
     int res;
 
-    /* If asked, we have to generate the keys */
+    /* 如果被要求，我们必须生成密钥 */
     if(options->key_gen)
     {
-        /* Zero out the key buffers */
+        /* 将密钥缓冲区清零 */
         memset(&(options->key_base64), 0x00, sizeof(options->key_base64));
         memset(&(options->hmac_key_base64), 0x00, sizeof(options->hmac_key_base64));
 
-        /* Generate the key through libfko */
+        /* 通过libfko生成密钥 */
         res = fko_key_gen(options->key_base64, options->key_len,
                 options->hmac_key_base64, options->hmac_key_len,
                 options->hmac_type);
 
-        /* Exit upon key generation failure*/
+        /* 密钥生成失败时退出 */
         if(res != FKO_SUCCESS)
         {
             log_msg(LOG_VERBOSITY_ERROR, "%s: fko_key_gen: Error %i - %s",
@@ -232,34 +186,25 @@ generate_keys(fko_cli_options_t *options)
             exit(EXIT_FAILURE);
         }
 
-        /* Everything is ok - nothing to do */
+        /* 一切都好-没什么可做的 */
         else;
     }
 
-    /* No key generation asked - nothing to do */
+    /* 无需密钥生成-无需执行任何操作 */
     else;
 }
 
-/**
- * @brief Check if a variable is a critical var.
- *
- * This function check the critical_var_array table to find if the variable
- * position is available.
- *
- * @param var_pos   Fwknop configuration variable position
- *
- * @return 1 the variable is critical, 0 otherwise
- */
+/* * */
 static int
 var_is_critical(short var_pos)
 {
-    int ndx;            /* Index on the critical_var_array array */
+    int ndx;            /* critical_var_array数组上的索引 */
     int var_found = 0;
 
-    /* Go through the array of critical vars */
+    /* 遍历关键变量数组 */
     for (ndx=0 ; ndx<ARRAY_SIZE(critical_var_array) ; ndx++)
     {
-        /* and check if we find it */
+        /* 检查我们是否找到 */
         if (var_pos == critical_var_array[ndx])
         {
             var_found = 1;
@@ -270,104 +215,69 @@ var_is_critical(short var_pos)
     return var_found;
 }
 
-/**
- * @brief Add a variable to a bitmask
- *
- * This function adds the bitmask associated to a variable position, to a
- * bitmask.
- *
- * @param var_pos   Fwknop configuration variable position
- * @param bm        fko_var_bitmask_t variable to update
- */
+/* * */
 static void
 add_var_to_bitmask(short var_pos, fko_var_bitmask_t *bm)
 {
     unsigned int bitmask_ndx;
 
-    /* Look for the index on the uint32_t array we have to process */
+    /* 查找我们必须处理的uint32_t数组上的索引 */
     bitmask_ndx = var_pos / 32;
 
-    /* Set the bitmask according to the index found */
+    /* 根据找到的索引设置位掩码 */
     if (bitmask_ndx < BITMASK_ARRAY_SIZE)
         bm->dw[bitmask_ndx] |= POSITION_TO_BITMASK(var_pos);
 
-    /* The index on the uint32_t bitmask is invalid */
+    /* uint32_t位掩码上的索引无效 */
     else
         log_msg(LOG_VERBOSITY_WARNING,
                 "add_var_to_bitmask() : Bad variable position %u", var_pos);
 }
 
-/**
- * @brief Remove a variable from a bitmask
- *
- * This function removes the bitmask associated to the variable position from a
- * bitmask.
- *
- * @param var_pos   Fwknop configuration variable position
- * @param bm        fko_var_bitmask_t structure to update
- */
+/* * */
 static void
 remove_var_from_bitmask(short var_pos, fko_var_bitmask_t *bm)
 {
     unsigned int bitmask_ndx;
 
-    /* Look for the index on the uint32_t array we have to process */
+    /* 查找我们必须处理的uint32_t数组上的索引 */
     bitmask_ndx = var_pos / 32;
 
-    /* Set the bitmask according to the index found */
+    /* 根据找到的索引设置位掩码 */
     if (bitmask_ndx < BITMASK_ARRAY_SIZE)
         bm->dw[bitmask_ndx] &= ~POSITION_TO_BITMASK(var_pos);
 
-    /* The index on the uint32_t bitmask is invalid */
+    /* uint32_t位掩码上的索引无效 */
     else
         log_msg(LOG_VERBOSITY_WARNING,
                 "remove_from_bitmask() : Bad variable position %u", var_pos);
 }
 
-/**
- * @brief Return whether a variable is available in a bitmask
- *
- * The variable bitmask is looked for in the bitmask.
- *
- * @param var_pos   Fwknop configuration variable position
- * @param bm        fko_var_bitmask_t structure to check
- *
- * @return 1 if the bitmsk contains the variable, 0 otherwise.
- */
+/* * */
 static int
 bitmask_has_var(short var_pos, fko_var_bitmask_t *bm)
 {
     unsigned int    bitmask_ndx;
     int             var_found = 0;
 
-    /* Look for the index on the uint32_t array we have to process */
+    /* 查找我们必须处理的uint32_t数组上的索引 */
     bitmask_ndx = var_pos / 32;
 
-    /* Check the bitmask according to the index found */
+    /* 根据找到的索引检查位掩码 */
     if (bitmask_ndx < BITMASK_ARRAY_SIZE)
     {
         if ( bm->dw[bitmask_ndx] & POSITION_TO_BITMASK(var_pos) )
             var_found = 1;
     }
 
-    /* The index on the uint32_t bitmask is invalid */
+    /* uint32_t位掩码上的索引无效 */
     else
         log_msg(LOG_VERBOSITY_WARNING, "bitmask_has_var_ndx() : Bad variable position %u", var_pos);
 
     return var_found;
 }
 
-/**
- * @brief Ask the user if a variable must be overwritten or not for a specific stanza
- *
- * If the user sets other chars than a 'y' char, we assume he does not want to
- * overwrite the variable.
- *
- * @param var       Variable which should be overwritten
- * @param stanza    Stanza where the variable should be overwritten
- *
- * @return 1 if the user wants to overwrite the variable, 0 otherwise
- */
+/* * */
 static int
 ask_overwrite_var(const char *var, const char *stanza)
 {
@@ -393,23 +303,14 @@ ask_overwrite_var(const char *var, const char *stanza)
     return overwrite;
 }
 
-/**
- * @brief Lookup a variable in the variable array according to its name
- *
- * This function parses the fko_var_array table and try to find a match
- * for the user string, which indicates we have found a configuration variable.
- *
- * @param str       String to compare against every fwknop conf variables
- *
- * @return A pointer on the variable structure, or NULL if not found
- */
+/* * */
 static fko_var_t *
 lookup_var_by_name(const char *var_name)
 {
-    short       ndx;            /* Index on the the fko_var_array table */
+    short       ndx;            /* fko_var_array表上的索引 */
     fko_var_t  *var = NULL;
 
-    /* Check str against each variable available in fko_var_array */
+    /* 根据fko_var_array中的每个可用变量检查str */
     for (ndx=0 ; ndx<ARRAY_SIZE(fko_var_array) ; ndx++)
     {
         if (CONF_VAR_IS(var_name, fko_var_array[ndx].name))
@@ -422,23 +323,14 @@ lookup_var_by_name(const char *var_name)
     return var;
 }
 
-/**
- * @brief Lookup a variable in the variable array according to its position
- *
- * This function parses the fko_var_array table and try to find a match
- * for the position, which indicates we have found a configuration variable.
- *
- * @param var_pos   Position to compare against every fwknop conf variables
- *
- * @return A pointer on the variable structure, or NULL if not found
- */
+/* * */
 static fko_var_t *
 lookup_var_by_position(short var_pos)
 {
-    short       ndx;            /* Index on the the fko_var_array table */
+    short       ndx;            /* fko_var_array表上的索引 */
     fko_var_t  *var = NULL;
 
-    /* Check str against each variable available in fko_var_array */
+    /* 根据fko_var_array中的每个可用变量检查str */
     for (ndx=0 ; ndx<ARRAY_SIZE(fko_var_array) ; ndx++)
     {
         if (var_pos == fko_var_array[ndx].pos)
@@ -451,17 +343,7 @@ lookup_var_by_position(short var_pos)
     return var;
 }
 
-/**
- * @brief Set a string as a Yes or No value according to a boolean (0 or 1).
- *
- * This function checks whether a value is set to zero or not, and updates a
- * string to a YES_NO parameter value.
- * The string must be zeroed before being passed to the function.
- *
- * @param val Variable to check
- * @param s String where to store the YES_NO value.
- * @param len Number of bytes avaialble for the s buffer.
- */
+/* * */
 static void
 bool_to_yesno(int val, char* s, size_t len)
 {
@@ -471,13 +353,7 @@ bool_to_yesno(int val, char* s, size_t len)
         strlcpy(s, PARAM_YES_VALUE, len);
 }
 
-/**
- * @brief Is a string formatted as YES string.
- *
- * @param s String to check for a YES string
- *
- * @return 1 if the string match the YES pattern, 0 otherwise
- */
+/* * */
 static int
 is_yes_str(const char *s)
 {
@@ -491,19 +367,7 @@ is_yes_str(const char *s)
     return valid;
 }
 
-/**
- * @brief Check if a section is in a line and fetch it.
- *
- * This function parses a NULL terminated string in order to find a section,
- * something like [mysection]. If it succeeds, the stanza is retrieved.
- *
- * @param line String containing a line from the rc file to check for a section
- * @param line_size size of the line buffer
- * @param rc_section String to store the section found
- * @param rc_section_size Size of the rc_section buffer
- *
- * @return 1 if a section was found, 0 otherwise
- */
+/* * */
 static int
 is_rc_section(const char* line, uint16_t line_size, char* rc_section, uint16_t rc_section_size)
 {
@@ -543,14 +407,7 @@ is_rc_section(const char* line, uint16_t line_size, char* rc_section, uint16_t r
     return section_found;
 }
 
-/**
- * @brief Grab a variable and its value from a rc line.
- *
- * @param line  Line to parse for a variable
- * @param param Parameter structure where to store the variable name and its value
- *
- * @return 0 if no variable has been found, 1 otherwise.
- */
+/* * */
 static int
 is_rc_param(const char *line, rc_file_param_t *param)
 {
@@ -560,7 +417,7 @@ is_rc_param(const char *line, rc_file_param_t *param)
 
     memset(param, 0, sizeof(*param));
 
-    /* Fetch the variable and its value */
+    /* 获取变量及其值 */
     if(sscanf(line, "%s %[^ ;\t\n\r#]", var, val) != 2)
     {
         log_msg(LOG_VERBOSITY_WARNING,
@@ -568,36 +425,25 @@ is_rc_param(const char *line, rc_file_param_t *param)
         return 0;
     }
 
-    /* Remove any colon that may be on the end of the var */
+    /* 删除var末尾的任何冒号 */
     if((ndx = strrchr(var, ':')) != NULL)
         *ndx = '\0';
 
-    /* Even though sscanf should automatically add a terminating
-     * NULL byte, an assumption is made that the input arrays are
-     * big enough, so we'll force a terminating NULL byte regardless
-     */
+    /* 即使sscanf应该自动添加终止 */
     var[MAX_LINE_LEN-1] = 0x0;
     val[MAX_LINE_LEN-1] = 0x0;
 
-    /* Remove any trailing whitespace from the value
-    */
+    /* 从值中删除任何尾随空格 */
     chop_whitespace(val);
 
-    /* Copy back the val and var in the structure */
+    /* 复制回结构中的val和var */
     strlcpy(param->name, var, sizeof(param->name));
     strlcpy(param->val, val, sizeof(param->val));
 
     return 1;
 }
 
-/**
- * \brief Dump available stanzas from an fwknoprc file
- *
- * This function parses a rcfile and looks for configured stanzas.
- * They are all displayed except the default stanza.
- *
- * \param rcfile full path to the rcfile to parse
- */
+/* * */
 static int
 dump_configured_stanzas_from_rcfile(const char* rcfile)
 {
@@ -605,7 +451,7 @@ dump_configured_stanzas_from_rcfile(const char* rcfile)
     char    line[MAX_LINE_LEN]   = {0};
     char    curr_stanza[MAX_LINE_LEN] = {0};
 
-    /* Open the rcfile in read mode */
+    /* 以读取模式打开rcfile */
     if ((rc = fopen(rcfile, "r")) == NULL)
     {
         log_msg(LOG_VERBOSITY_WARNING, "Unable to open rc file: %s: %s",
@@ -616,26 +462,25 @@ dump_configured_stanzas_from_rcfile(const char* rcfile)
 
     log_msg(LOG_VERBOSITY_NORMAL, "The following stanzas are configured in %s :", rcfile);
 
-    /* Parse the rcfile line by line to find stanza */
+    /* 逐行分析rcfile以查找节 */
     while ((fgets(line, MAX_LINE_LEN, rc)) != NULL)
     {
         line[MAX_LINE_LEN-1] = '\0';
 
-        /* Get past comments and empty lines (note: we only look at the first
-         * character. */
+        /* 获取过去的评论和空行（注意：我们只看第一行 */
         if(IS_EMPTY_LINE(line[0]))
             continue;
 
-        /* Check which section we are working on */
+        /* 检查我们正在处理的部分 */
         else if (is_rc_section(line, strlen(line), curr_stanza, sizeof(curr_stanza)))
         {
-            /* Print the stanza and continue - we exclude the default stanza */
+            /* 打印节并继续-我们排除默认节 */
             if (strcasecmp(curr_stanza, RC_SECTION_DEFAULT) != 0)
                 log_msg(LOG_VERBOSITY_NORMAL, " - %s", curr_stanza);
             continue;
         }
 
-        /* Nothing we care about */
+        /* 我们什么都不在乎 */
         else;
     }
 
@@ -644,8 +489,7 @@ dump_configured_stanzas_from_rcfile(const char* rcfile)
     return EXIT_SUCCESS;
 }
 
-/* Assign path to fwknop rc file
-*/
+/* 为fwknop rc文件分配路径 */
 static void
 set_rc_file(char *rcfile, fko_cli_options_t *options)
 {
@@ -679,10 +523,7 @@ set_rc_file(char *rcfile, fko_cli_options_t *options)
 
         rcf_offset = strlen(rcfile);
 
-        /* Sanity check the path to .fwknoprc.
-         * The preceding path plus the path separator and '.fwknoprc' = 11
-         * cannot exceed MAX_PATH_LEN.
-         */
+        /* Sanity检查到.fknoprc的路径。 */
         if(rcf_offset > (MAX_PATH_LEN - 11))
         {
             log_msg(LOG_VERBOSITY_ERROR, "Warning: Path to .fwknoprc file is too long.\n"
@@ -698,11 +539,7 @@ set_rc_file(char *rcfile, fko_cli_options_t *options)
         strlcpy(rcfile, options->rc_file, MAX_PATH_LEN);
     }
 
-    /* Check rc file permissions - if anything other than user read/write,
-     * then throw a warning.  This change was made to help ensure that the
-     * client consumes a proper rc file with strict permissions set (thanks
-     * to Fernando Arnaboldi from IOActive for pointing this out).
-    */
+    /* 检查rc文件权限-如果除了用户读/写之外， */
     if(verify_file_perms_ownership(rcfile, -1) != 1)
         exit(EXIT_FAILURE);
 
@@ -746,16 +583,13 @@ keys_status(fko_cli_options_t *options)
                         options->key_base64, options->hmac_key_base64);
         }
 
-        /* Always exit out in --key-gen mode since the fwknopd server
-         * has no way to know what the new keys are
-        */
+        /* 由于fwknopd服务器，始终以--key-gen模式退出 */
         exit(EXIT_SUCCESS);
     }
 }
 
 
-/* Parse any time offset from the command line
-*/
+/* 从命令行分析任何时间偏移 */
 static int
 parse_time_offset(const char *offset_str, int *offset)
 {
@@ -795,8 +629,7 @@ parse_time_offset(const char *offset_str, int *offset)
     *offset = strtol_wrapper(offset_digits, 0, (2 << 15),
             NO_EXIT_UPON_ERR, &is_err);
 
-    /* Apply the offset_type multiplier
-    */
+    /* 应用offset_type乘数 */
     *offset *= offset_type;
 
     return is_err == 0 ? 1 : 0;
@@ -810,8 +643,7 @@ create_fwknoprc(const char *rcfile)
 
     log_msg(LOG_VERBOSITY_NORMAL, "[*] Creating initial rc file: %s.", rcfile);
 
-    /* Try to create the initial rcfile with user read/write rights only.
-     * If the rcfile already exists, an error is returned */
+    /* 尝试仅使用用户读/写权限创建初始rcfile。 */
     rcfile_fd = open(rcfile, FWKNOPRC_OFLAGS ,FWKNOPRC_MODE);
 
     // If an error occurred ...
@@ -916,19 +748,19 @@ static int
 parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
 {
     int         tmpint, is_err;
-    int         parse_error = 0;    /* 0 if the variable has been successfully processed, < 0 otherwise */
-    fko_var_t  *var;                /* Pointer on an fwknop variable structure */
+    int         parse_error = 0;    /* 如果变量已成功处理，则为0，否则为<0 */
+    fko_var_t  *var;                /* fwknop变量结构上的指针 */
 
     log_msg(LOG_VERBOSITY_DEBUG, "parse_rc_param() : Parsing variable %s...", var_name);
 
-    /* Lookup the variable according to its name. */
+    /* 根据变量的名称查找该变量。 */
     var = lookup_var_by_name(var_name);
 
-    /* The variable is not handled if its pointer is NULL */
+    /* 如果变量的指针为NULL，则不处理该变量 */
     if (var == NULL)
         parse_error = -1;
 
-    /* Digest Type */
+    /* 摘要类型 */
     else if (var->pos == FWKNOP_CLI_ARG_DIGEST_TYPE)
     {
         tmpint = digest_strtoint(val);
@@ -937,7 +769,7 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
         else
             options->digest_type = tmpint;
     }
-    /* Server protocol */
+    /* 服务器协议 */
     else if (var->pos == FWKNOP_CLI_ARG_SPA_SERVER_PROTO)
     {
         tmpint = proto_strtoint(val);
@@ -946,7 +778,7 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
         else
             options->spa_proto = tmpint;
     }
-    /* Server port */
+    /* 服务器端口 */
     else if (var->pos == FWKNOP_CLI_ARG_SPA_SERVER_PORT)
     {
         tmpint = strtol_wrapper(val, 0, MAX_PORT, NO_EXIT_UPON_ERR, &is_err);
@@ -955,7 +787,7 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
         else
             parse_error = -1;
     }
-    /* Source port */
+    /* 源端口 */
     else if (var->pos == FWKNOP_CLI_ARG_SPA_SOURCE_PORT)
     {
         tmpint = strtol_wrapper(val, 0, MAX_PORT, NO_EXIT_UPON_ERR, &is_err);
@@ -964,7 +796,7 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
         else
             parse_error = -1;
     }
-    /* Firewall rule timeout */
+    /* 防火墙规则超时 */
     else if (var->pos == FWKNOP_CLI_ARG_FW_TIMEOUT)
     {
         tmpint = strtol_wrapper(val, 0, (2 << 15), NO_EXIT_UPON_ERR, &is_err);
@@ -973,27 +805,25 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
         else
             parse_error = -1;
     }
-    /* Allow IP */
+    /* 允许IP */
     else if (var->pos == FWKNOP_CLI_ARG_ALLOW_IP)
     {
-        /* In case this was set previously
-        */
+        /* 如果这是以前设置的 */
         options->resolve_ip_http_https = 0;
 
-        /* use source, resolve, or an actual IP
-        */
+        /* 使用源、解析或实际IP */
         if(strcasecmp(val, "source") == 0)
             strlcpy(options->allow_ip_str, "0.0.0.0", sizeof(options->allow_ip_str));
         else if(strcasecmp(val, "resolve") == 0)
             options->resolve_ip_http_https = 1;
-        else /* Assume IP address and validate */
+        else /* 假设IP地址并验证 */
         {
             strlcpy(options->allow_ip_str, val, sizeof(options->allow_ip_str));
             if(! is_valid_ipv4_addr(options->allow_ip_str, strlen(options->allow_ip_str)))
                 parse_error = -1;
         }
     }
-    /* Time Offset */
+    /* 时间偏移 */
     else if (var->pos == FWKNOP_CLI_ARG_TIME_OFFSET)
     {
         if(val[0] == '-')
@@ -1010,7 +840,7 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
             log_msg(LOG_VERBOSITY_WARNING,
                     "TIME_OFFSET argument '%s' invalid.", val);
     }
-    /* symmetric encryption mode */
+    /* 对称加密模式 */
     else if (var->pos == FWKNOP_CLI_ARG_ENCRYPTION_MODE)
     {
         tmpint = enc_mode_strtoint(val);
@@ -1019,81 +849,81 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
         else
             options->encryption_mode = tmpint;
     }
-    /* Use GPG ? */
+    /* 使用GPG？ */
     else if (var->pos == FWKNOP_CLI_ARG_USE_GPG)
     {
         if (is_yes_str(val))
             options->use_gpg = 1;
         else;
     }
-    /* Use GPG Agent ? */
+    /* 使用GPG代理？ */
     else if (var->pos == FWKNOP_CLI_ARG_USE_GPG_AGENT)
     {
         if (is_yes_str(val))
             options->use_gpg_agent = 1;
         else;
     }
-    /* No GPG signing passphrase ? */
+    /* 没有GPG签名密码？ */
     else if (var->pos == FWKNOP_CLI_ARG_GPG_NO_SIGNING_PW)
     {
         if (is_yes_str(val))
             options->gpg_no_signing_pw = 1;
         else;
     }
-    /* GPG Recipient */
+    /* GPG收件人 */
     else if (var->pos == FWKNOP_CLI_ARG_GPG_RECIPIENT)
     {
         strlcpy(options->gpg_recipient_key, val, sizeof(options->gpg_recipient_key));
     }
-    /* GPG Signer */
+    /* GPG签署人 */
     else if (var->pos == FWKNOP_CLI_ARG_GPG_SIGNER)
     {
         strlcpy(options->gpg_signer_key, val, sizeof(options->gpg_signer_key));
     }
-    /* GPG Homedir */
+    /* GPG主页目录 */
     else if (var->pos == FWKNOP_CLI_ARG_GPG_HOMEDIR)
     {
         strlcpy(options->gpg_home_dir, val, sizeof(options->gpg_home_dir));
     }
-    /* GPG path */
+    /* GPG路径 */
     else if (var->pos == FWKNOP_CLI_ARG_GPG_EXE_PATH)
     {
         strlcpy(options->gpg_exe, val, sizeof(options->gpg_exe));
     }
-    /* Spoof User */
+    /* 后台处理用户 */
     else if (var->pos == FWKNOP_CLI_ARG_SPOOF_USER)
     {
         strlcpy(options->spoof_user, val, sizeof(options->spoof_user));
     }
-    /* Spoof Source IP */
+    /* 后台处理源IP */
     else if (var->pos == FWKNOP_CLI_ARG_SPOOF_SOURCE_IP)
     {
         strlcpy(options->spoof_ip_src_str, val, sizeof(options->spoof_ip_src_str));
     }
-    /* ACCESS request */
+    /* ACCESS请求 */
     else if (var->pos == FWKNOP_CLI_ARG_ACCESS)
     {
         strlcpy(options->access_str, val, sizeof(options->access_str));
     }
-    /* SPA Server (destination) */
+    /* SPA服务器（目标） */
     else if (var->pos == FWKNOP_CLI_ARG_SPA_SERVER)
     {
         strlcpy(options->spa_server_str, val, sizeof(options->spa_server_str));
     }
-    /* Rand port ? */
+    /* 兰德端口？ */
     else if (var->pos == FWKNOP_CLI_ARG_RAND_PORT)
     {
         if (is_yes_str(val))
             options->rand_port = 1;
         else;
     }
-    /* Rijndael key */
+    /* Rijndael钥匙 */
     else if (var->pos == FWKNOP_CLI_ARG_KEY_RIJNDAEL)
     {
         strlcpy(options->key, val, sizeof(options->key));
         options->have_key = 1;
     }
-    /* Rijndael key (base-64 encoded) */
+    /* Rijndael密钥（base-64编码） */
     else if (var->pos == FWKNOP_CLI_ARG_KEY_RIJNDAEL_BASE64)
     {
         if (! is_base64((unsigned char *) val, strlen(val)))
@@ -1106,13 +936,13 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
         strlcpy(options->key_base64, val, sizeof(options->key_base64));
         options->have_base64_key = 1;
     }
-    /* GnuPG signing passphrase */
+    /* GnuPG签名密码 */
     else if (var->pos == FWKNOP_CLI_ARG_GPG_SIGNING_PW)
     {
         strlcpy(options->key, val, sizeof(options->key));
         options->have_key = 1;
     }
-    /* GnuPG signing passphrase (base-64 encoded) */
+    /* GnuPG签名密码短语（base-64编码） */
     else if (var->pos == FWKNOP_CLI_ARG_GPG_SIGNING_PW_BASE64)
     {
         if (! is_base64((unsigned char *) val, strlen(val)))
@@ -1125,7 +955,7 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
         strlcpy(options->key_base64, val, sizeof(options->key_base64));
         options->have_base64_key = 1;
     }
-    /* HMAC digest type */
+    /* HMAC摘要类型 */
     else if (var->pos == FWKNOP_CLI_ARG_HMAC_DIGEST_TYPE)
     {
         tmpint = hmac_digest_strtoint(val);
@@ -1141,7 +971,7 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
             options->hmac_type = tmpint;
         }
     }
-    /* HMAC key (base64 encoded) */
+    /* HMAC密钥（base64编码） */
     else if (var->pos == FWKNOP_CLI_ARG_KEY_HMAC_BASE64)
     {
         if (! is_base64((unsigned char *) val, strlen(val)))
@@ -1156,7 +986,7 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
         options->use_hmac = 1;
     }
 
-    /* HMAC key */
+    /* HMAC密钥 */
     else if (var->pos == FWKNOP_CLI_ARG_KEY_HMAC)
     {
         strlcpy(options->hmac_key, val, sizeof(options->hmac_key));
@@ -1164,40 +994,40 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
         options->use_hmac = 1;
     }
 
-    /* --use-hmac */
+    /* --使用hmac */
     else if (var->pos == FWKNOP_CLI_ARG_USE_HMAC)
     {
         if (is_yes_str(val))
             options->use_hmac = 1;
     }
-    /* --use-wget-user-agent */
+    /* --使用wget用户代理 */
     else if (var->pos == FWKNOP_CLI_ARG_USE_WGET_USER_AGENT)
     {
         if (is_yes_str(val))
             options->use_wget_user_agent = 1;
     }
-    /* Key file */
+    /* 密钥文件 */
     else if (var->pos == FWKNOP_CLI_ARG_KEY_FILE)
     {
         strlcpy(options->get_key_file, val, sizeof(options->get_key_file));
     }
-    /* HMAC key file */
+    /* HMAC密钥文件 */
     else if (var->pos == FWKNOP_CLI_ARG_HMAC_KEY_FILE)
     {
         strlcpy(options->get_key_file, val,
             sizeof(options->get_hmac_key_file));
     }
-    /* NAT Access Request */
+    /* NAT访问请求 */
     else if (var->pos == FWKNOP_CLI_ARG_NAT_ACCESS)
     {
         strlcpy(options->nat_access_str, val, sizeof(options->nat_access_str));
     }
-    /* HTTP User Agent */
+    /* HTTP用户代理 */
     else if (var->pos == FWKNOP_CLI_ARG_HTTP_USER_AGENT)
     {
         strlcpy(options->http_user_agent, val, sizeof(options->http_user_agent));
     }
-    /* Resolve URL */
+    /* 解析URL */
     else if (var->pos == FWKNOP_CLI_ARG_RESOLVE_URL)
     {
         if(options->resolve_url != NULL)
@@ -1211,7 +1041,7 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
         }
         strlcpy(options->resolve_url, val, tmpint);
     }
-    /* Resolve the SPA server (via DNS) - accept IPv4 addresses only ? */
+    /* 解析SPA服务器（通过DNS）-仅接受IPv4地址？ */
     else if (var->pos == FWKNOP_CLI_ARG_SERVER_RESOLVE_IPV4)
     {
         if (is_yes_str(val))
@@ -1219,7 +1049,7 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
             options->spa_server_resolve_ipv4 = 1;
         }
     }
-    /* wget command */
+    /* wget命令 */
     else if (var->pos == FWKNOP_CLI_ARG_WGET_CMD)
     {
         if(options->wget_bin != NULL)
@@ -1233,21 +1063,21 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
         }
         strlcpy(options->wget_bin, val, tmpint);
     }
-    /* NAT Local ? */
+    /* NAT本地？ */
     else if (var->pos == FWKNOP_CLI_ARG_NAT_LOCAL)
     {
         if (is_yes_str(val))
             options->nat_local = 1;
         else;
     }
-    /* NAT rand port ? */
+    /* NAT rand端口？ */
     else if (var->pos == FWKNOP_CLI_ARG_NAT_RAND_PORT)
     {
         if (is_yes_str(val))
             options->nat_rand_port = 1;
         else;
     }
-    /* NAT port */
+    /* NAT端口 */
     else if (var->pos == FWKNOP_CLI_ARG_NAT_PORT)
     {
         tmpint = strtol_wrapper(val, 0, MAX_PORT, NO_EXIT_UPON_ERR, &is_err);
@@ -1256,7 +1086,7 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
         else
             parse_error = -1;
     }
-    /* VERBOSE level */
+    /* VERBOSE级别 */
     else if (var->pos == FWKNOP_CLI_ARG_VERBOSE)
     {
         if (is_yes_str(val))
@@ -1273,38 +1103,35 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
         if (parse_error == 0)
             log_set_verbosity(LOG_DEFAULT_VERBOSITY + options->verbose);
     }
-    /* RESOLVE_IP_HTTPS ? */
+    /* RESOLVE_IP_HTTPS？ */
     else if (var->pos == FWKNOP_CLI_ARG_RESOLVE_IP_HTTPS)
     {
         if (is_yes_str(val))
             options->resolve_ip_http_https = 1;
         else;
     }
-    /* RESOLVE_IP_HTTP ? This actually results in HTTPS resolution by default
-     * unless --resolve-http-only is also given
-    */
+    /* RESOLVE_IP_HTTP？这实际上会在默认情况下导致HTTPS解析 */
     else if (var->pos == FWKNOP_CLI_ARG_RESOLVE_IP_HTTP)
     {
         if (is_yes_str(val))
             options->resolve_ip_http_https = 1;
         else;
     }
-    /* RESOLVE_HTTP_ONLY ?  Force HTTP instead of HTTPS IP resolution.
-    */
+    /* 仅解决HTTP_ONLY？强制HTTP而不是HTTPS IP解析。 */
     else if (var->pos == FWKNOP_CLI_ARG_RESOLVE_HTTP_ONLY)
     {
         if (is_yes_str(val))
             options->resolve_http_only = 1;
         else;
     }
-    /* avoid saving .fwknop.run by default */
+    /* 避免保存。默认情况下运行fwknop.run */
     else if (var->pos == FWKNOP_CLI_ARG_NO_SAVE_ARGS)
     {
         if (is_yes_str(val))
             options->no_save_args = 1;
         else;
     }
-    /* The variable is not a configuration variable */
+    /* 变量不是配置变量 */
     else
     {
         parse_error = -1;
@@ -1313,15 +1140,7 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
     return(parse_error);
 }
 
-/**
- * @brief Write a cli parameter to a file handle
- *
- * This function writes into a file handle a command line parameter
- *
- * @param fhandle File handle to write the new parameter to
- * @param var_pos Variable position
- * @param options FKO command line option structure
- */
+/* * */
 static void
 add_single_var_to_rc(FILE* fhandle, short var_pos, fko_cli_options_t *options)
 {
@@ -1336,7 +1155,7 @@ add_single_var_to_rc(FILE* fhandle, short var_pos, fko_cli_options_t *options)
     if (fhandle == NULL)
         return;
 
-    /* Select the argument to add and store its string value into val */
+    /* 选择要添加的参数并将其字符串值存储到val中 */
     switch (var->pos)
     {
         case FWKNOP_CLI_ARG_DIGEST_TYPE :
@@ -1490,21 +1309,12 @@ add_single_var_to_rc(FILE* fhandle, short var_pos, fko_cli_options_t *options)
     return;
 }
 
-/**
- * @brief Add configuration variables in a file
- *
- * The parameters are selected by a bitmask and extracted from the
- * fko_cli_options_t structure.
- *
- * @param rc        File handle on the file to write to
- * @param options   fko_cli_options_t structure containing the values of the parameters
- * @param bitmask   Bitmask used to select the parameters to add
- */
+/* * */
 static void
 add_multiple_vars_to_rc(FILE* rc, fko_cli_options_t *options, fko_var_bitmask_t *bitmask)
 {
-    short ndx = 0;      /* Index of a configuration variable in fko_var_array table */
-    short position;     /* Position of the configuration variable */
+    short ndx = 0;      /* fko_var_array表中配置变量的索引 */
+    short position;     /* 配置变量的位置 */
 
     for (ndx=0 ; ndx<ARRAY_SIZE(fko_var_array) ; ndx++)
     {
@@ -1514,19 +1324,7 @@ add_multiple_vars_to_rc(FILE* rc, fko_cli_options_t *options, fko_var_bitmask_t 
     }
 }
 
-/**
- * @brief Process the fwknoprc file and lookup a section to extract its settings.
- *
- * This function aims at loading the settings for a specific section in
- * an fwknoprc file.
- *
- * @param section_name  Name of the section to lookup.
- * @param options       Fwknop option structure where settings have to
- *                      be stored.
- *
- * @return 0 if the section has been found and processed successfully
- *         a negative value if one or more errors occurred
- */
+/* * */
 static int
 process_rc_section(char *section_name, fko_cli_options_t *options)
 {
@@ -1540,9 +1338,7 @@ process_rc_section(char *section_name, fko_cli_options_t *options)
 
     set_rc_file(rcfile, options);
 
-    /* Open the rc file for reading, if it does not exist, then create
-     * an initial .fwknoprc file with defaults and go on.
-    */
+    /* 打开rc文件进行读取，如果它不存在，则创建 */
     if ((rc = fopen(rcfile, "r")) == NULL)
     {
         if(errno == ENOENT)
@@ -1565,13 +1361,11 @@ process_rc_section(char *section_name, fko_cli_options_t *options)
         line_num++;
         line[MAX_LINE_LEN-1] = '\0';
 
-        /* Get past comments and empty lines (note: we only look at the
-         * first character.
-        */
+        /* 获取过去的评论和空行（注意：我们只查看 */
         if(IS_EMPTY_LINE(line[0]))
             continue;
 
-        /* Check which section we are working on */
+        /* 检查我们正在处理的部分 */
         if (is_rc_section(line, strlen(line), curr_stanza, sizeof(curr_stanza)))
         {
             rc_section_found = (strcasecmp(curr_stanza, section_name) == 0) ? 1 : 0;
@@ -1582,18 +1376,18 @@ process_rc_section(char *section_name, fko_cli_options_t *options)
             continue;
         }
 
-        /* We are not in the good section */
+        /* 我们不在好地段 */
         else if (rc_section_found == 0)
             continue;
 
-        /* We have not found a valid parameter */
+        /* 我们没有找到有效的参数 */
         else if (is_rc_param(line, &param) == 0)
         {
-            do_exit = 1;  /* We don't allow improperly formatted lines */
+            do_exit = 1;  /* 我们不允许格式不正确的行 */
             break;
         }
 
-        /* We have a valid parameter */
+        /* 我们有一个有效的参数 */
         else
         {
            if(parse_rc_param(options, param.name, param.val) < 0)
@@ -1614,17 +1408,7 @@ process_rc_section(char *section_name, fko_cli_options_t *options)
     return 0;
 }
 
-/**
- * @brief Update the user rc file with the new parameters for a selected stanza.
- *
- * This function writes the new configuration in a temporary file and renames it
- * as the new rc file afterwards. All of the previous parameters for the
- * selected stanza are removed and replaced by the arguments from the command
- * line.
- *
- * @param options structure containing all of the fko settings
- * @param args_bitmask command line argument bitmask
- */
+/* * */
 static void
 update_rc(fko_cli_options_t *options, fko_var_bitmask_t *bitmask)
 {
@@ -1637,7 +1421,7 @@ update_rc(fko_cli_options_t *options, fko_var_bitmask_t *bitmask)
     char            rcfile[MAX_PATH_LEN] = {0};
     char            rcfile_update[MAX_PATH_LEN] = {0};
     char            curr_stanza[MAX_LINE_LEN]   = {0};
-    rc_file_param_t param;                              /* Structure to contain a conf. variable name with its value  */
+    rc_file_param_t param;                              /* 结构，以包含一个具有其值的conf.变量名 */
     fko_var_t      *var;
 
     set_rc_file(rcfile, options);
@@ -1645,7 +1429,7 @@ update_rc(fko_cli_options_t *options, fko_var_bitmask_t *bitmask)
     strlcpy(rcfile_update, rcfile, sizeof(rcfile_update));
     strlcat(rcfile_update, ".updated", sizeof(rcfile_update));
 
-    /* Create a new temporary rc file */
+    /* 创建一个新的临时rc文件 */
     rcfile_fd = open(rcfile_update, FWKNOPRC_OFLAGS, FWKNOPRC_MODE);
     if (rcfile_fd == -1)
     {
@@ -1656,8 +1440,7 @@ update_rc(fko_cli_options_t *options, fko_var_bitmask_t *bitmask)
     }
     close(rcfile_fd);
 
-    /* Open the current rcfile and a temporary one respectively in read and
-     * write mode */
+    /* 在read和 */
     if ((rc = fopen(rcfile, "r")) == NULL)
     {
         log_msg(LOG_VERBOSITY_WARNING,
@@ -1675,23 +1458,20 @@ update_rc(fko_cli_options_t *options, fko_var_bitmask_t *bitmask)
         return;
     }
 
-    /* Go through the file line by line */
+    /* 逐行浏览文件 */
     stanza_found = 0;
     while ((fgets(line, MAX_LINE_LEN, rc)) != NULL)
     {
         line[MAX_LINE_LEN-1] = '\0';
 
-        /* Get past comments and empty lines (note: we only look at the
-         * first character.
-        */
+        /* 获取过去的评论和空行（注意：我们只查看 */
         if(IS_EMPTY_LINE(line[0]))
             continue;
 
-        /* If we find a section... */
+        /* 如果我们找到一个部分。。。 */
         if(is_rc_section(line, strlen(line), curr_stanza, sizeof(curr_stanza)) == 1)
         {
-            /* and we have already parsed the section we wanted to save, we
-             * can update our parameters */
+            /* 我们已经解析了要保存的部分 */
             if (stanza_found)
             {
                 log_msg(LOG_VERBOSITY_DEBUG, "update_rc() : Updating %s stanza", options->use_rc_stanza);
@@ -1701,26 +1481,23 @@ update_rc(fko_cli_options_t *options, fko_var_bitmask_t *bitmask)
                 stanza_updated = 1;
             }
 
-            /* and this is the one we are looking for, we set the stanza
-             * as found */
+            /* 这就是我们要找的，我们设定了诗节 */
             else if (strncasecmp(curr_stanza, options->use_rc_stanza, MAX_LINE_LEN) == 0)
                 stanza_found = 1;
 
-            /* otherwise we disable the stanza */
+            /* 否则我们将禁用节 */
             else
                 stanza_found = 0;
         }
 
-        /* If we are processing a parameter for our stanza */
+        /* 如果我们正在处理节的参数 */
         else if (stanza_found)
         {
-            /* and the user has specified a force option, there is no need to
-             * check for critical variables */
+            /* 并且用户已经指定了强制选项，则无需 */
             if (options->force_save_rc_stanza)
                 continue;
 
-            /* ask the user what to do with the critical var found in the
-             * rcfile */
+            /* 询问用户如何处理在 */
             else if (is_rc_param(line, &param))
             {
                 if (   ((var=lookup_var_by_name(param.name)) != NULL)
@@ -1736,32 +1513,29 @@ update_rc(fko_cli_options_t *options, fko_var_bitmask_t *bitmask)
             }
             else
             {
-                /* is_rc_param() returns false only when there is an
-                 * improperly formatted line - bail
-                */
+                /* is_rc_param（）仅在存在 */
                 fclose(rc);
                 fclose(rc_update);
                 return;
             }
         }
 
-        /* We're not processing any important variables from our stanza and no new
-         * stanza */
+        /* 我们没有处理节中的任何重要变量，也没有新的 */
         else;
 
-        /* Add the line to the new rcfile */
+        /* 将行添加到新的rcfile */
         fprintf(rc_update, "%s", line);
     }
 
-    /* The configuration has not been updated yet */
+    /* 配置尚未更新 */
     if (stanza_updated == 0)
     {
-        /* but the stanza has been found, We update it now. */
+        /* 但是节已经找到了，我们现在更新它。 */
         if (stanza_found == 1)
             log_msg(LOG_VERBOSITY_DEBUG, "update_rc() : Updating %s stanza",
                     options->use_rc_stanza);
 
-        /* otherwise we append the new settings to the file */
+        /* 否则，我们会将新设置附加到文件中 */
         else
         {
             fprintf(rc_update, "\n");
@@ -1773,14 +1547,14 @@ update_rc(fko_cli_options_t *options, fko_var_bitmask_t *bitmask)
         add_multiple_vars_to_rc(rc_update, options, bitmask);
     }
 
-    /* otherwise we have already done everything. Nothing to do. */
+    /* 否则我们已经做了所有的事情。没事可做。 */
     else;
 
-    /* Close file handles */
+    /* 关闭文件句柄 */
     fclose(rc);
     fclose(rc_update);
 
-    /* Renamed the temporary file as the new rc file */
+    /* 将临时文件重命名为新的rc文件 */
     if (remove(rcfile) != 0)
     {
         log_msg(LOG_VERBOSITY_WARNING,
@@ -1796,8 +1570,7 @@ update_rc(fko_cli_options_t *options, fko_var_bitmask_t *bitmask)
     }
 }
 
-/* Sanity and bounds checks for the various options.
-*/
+/* 各种选项的健康度和边界检查。 */
 static void
 validate_options(fko_cli_options_t *options)
 {
@@ -1813,8 +1586,7 @@ validate_options(fko_cli_options_t *options)
 
     if ( (options->save_rc_stanza == 1)  && (options->use_rc_stanza[0] == 0) )
     {
-        /* Set the stanza name to the -D arg value
-        */
+        /* 将节名称设置为-D arg值 */
         if (options->spa_server_str[0] == 0x0)
         {
             log_msg(LOG_VERBOSITY_ERROR,
@@ -1825,9 +1597,7 @@ validate_options(fko_cli_options_t *options)
         strlcpy(options->use_rc_stanza, options->spa_server_str, sizeof(options->use_rc_stanza));
     }
 
-    /* Must have a destination unless we are just testing or getting the
-     * the version, and must use one of [-s|-R|-a].
-    */
+    /* 必须有目的地，除非我们只是在测试或获取 */
     if(!options->test
         && !options->key_gen
         && !options->version
@@ -1861,8 +1631,7 @@ validate_options(fko_cli_options_t *options)
         }
     }
 
-    /* Make sure -a overrides IP resolution
-    */
+    /* 确保-a覆盖IP解析 */
     if(options->allow_ip_str[0] != 0x0
             && strncasecmp(options->allow_ip_str, "resolve", strlen("resolve")) != 0)
     {
@@ -1905,8 +1674,7 @@ validate_options(fko_cli_options_t *options)
         exit(EXIT_FAILURE);
     }
 
-    /* If we are using gpg, we must at least have the recipient set.
-    */
+    /* 如果我们使用gpg，我们必须至少有一个收件人集。 */
     if(options->use_gpg)
     {
         if(strlen(options->gpg_recipient_key) == 0)
@@ -1933,8 +1701,7 @@ validate_options(fko_cli_options_t *options)
         exit(EXIT_FAILURE);
     }
 
-    /* Validate HMAC digest type
-    */
+    /* 验证HMAC摘要类型 */
     if(options->use_hmac && options->hmac_type == FKO_HMAC_UNKNOWN)
         options->hmac_type = FKO_DEFAULT_HMAC_MODE;
 
@@ -1944,9 +1711,7 @@ validate_options(fko_cli_options_t *options)
     return;
 }
 
-/* Establish a few defaults such as UDP/62201 for sending the SPA
- * packet (can be changed with --server-proto/--server-port)
-*/
+/* 建立一些默认值，如UDP/62201，用于发送SPA */
 static void
 set_defaults(fko_cli_options_t *options)
 {
@@ -1956,19 +1721,17 @@ set_defaults(fko_cli_options_t *options)
 
     options->key_len        = FKO_DEFAULT_KEY_LEN;
     options->hmac_key_len   = FKO_DEFAULT_HMAC_KEY_LEN;
-    options->hmac_type      = FKO_HMAC_UNKNOWN;  /* updated when HMAC key is used */
+    options->hmac_type      = FKO_HMAC_UNKNOWN;  /* 使用HMAC密钥时更新 */
 
-    options->spa_icmp_type  = ICMP_ECHOREPLY;  /* only used in '-P icmp' mode */
-    options->spa_icmp_code  = 0;               /* only used in '-P icmp' mode */
+    options->spa_icmp_type  = ICMP_ECHOREPLY;  /* 仅用于“-P icmp”模式 */
+    options->spa_icmp_code  = 0;               /* 仅用于“-P icmp”模式 */
 
     options->input_fd       = FD_INVALID;
 
     return;
 }
 
-/* Initialize program configuration via config file and/or command-line
- * switches.
-*/
+/* 通过配置文件和/或命令行初始化程序配置 */
 //这个函数是用来初始化配置文件的
 void
 config_init(fko_cli_options_t *options, int argc, char **argv)
@@ -1977,21 +1740,17 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
     fko_var_bitmask_t   var_bitmask;
     char                rcfile[MAX_PATH_LEN] = {0};
 
-    /* Zero out options, opts_track and bitmask.
-    */
+    /* 清零选项、opts_track和bitmask。 */
    //初始化
 
     memset(options, 0x00, sizeof(fko_cli_options_t));
     memset(&var_bitmask, 0x00, sizeof(fko_var_bitmask_t));
 
-    /* Make sure a few reasonable defaults are set
-    */
+    /* 确保设置了一些合理的默认值 */
    //设置一些默认值
     set_defaults(options);
 
-    /* First pass over cmd_line args to see if a named-stanza in the
-     * rc file is used.
-    */
+    /* 首先传递cmd_line参数，查看 */
    //第一次遍历命令行参数，看看是否使用了配置文件中的命名段
     while ((cmd_arg = getopt_long(argc, argv,
             GETOPTS_OPTION_STRING, cmd_opts, &index)) != -1) {
@@ -2030,7 +1789,7 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
         }
     }
 
-    /* Update the verbosity level for the log module */
+    /* 更新日志模块的详细级别 */
     log_set_verbosity(LOG_DEFAULT_VERBOSITY + options->verbose);
 
     if(options->no_rc_file)
@@ -2056,24 +1815,22 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
     }
     else
     {
-        /* Dump the configured stanzas from an rcfile */
+        /* 从rc文件转储配置的节 */
         if (options->stanza_list == 1)
         {
             set_rc_file(rcfile, options);
             exit(dump_configured_stanzas_from_rcfile(rcfile));
         }
 
-        /* First process the .fwknoprc file.
-        */
+        /* 首先处理.fwknprc文件。 */
         process_rc_section(RC_SECTION_DEFAULT, options);
 
-        /* Load the user specified stanza from .fwknoprc file */
+        /* 从.fwknprc文件加载用户指定的节 */
         if ( (options->got_named_stanza) && (options->save_rc_stanza == 0) )
             process_rc_section(options->use_rc_stanza, options);
     }
 
-    /* Reset the options index so we can run through them again.
-    */
+    /* 重置选项索引，以便我们可以再次浏览它们。 */
     optind = 0;
 
     while ((cmd_arg = getopt_long(argc, argv,
@@ -2276,8 +2033,7 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
                 add_var_to_bitmask(FWKNOP_CLI_ARG_NO_SAVE_ARGS, &var_bitmask);
                 break;
             case 'n':
-                /* We already handled this earlier, so we do nothing here
-                */
+                /* 我们早些时候已经处理过了，所以我们在这里什么都不做 */
                 break;
             case 'N':
                 strlcpy(options->nat_access_str, optarg, sizeof(options->nat_access_str));
@@ -2359,8 +2115,7 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
                 add_var_to_bitmask(FWKNOP_CLI_ARG_SPA_SOURCE_PORT, &var_bitmask);
                 break;
             case SAVE_RC_STANZA:
-                /* We already handled this earlier, so we do nothing here
-                */
+                /* 我们早些时候已经处理过了，所以我们在这里什么都不做 */
                 break;
             case 'T':
                 options->test = 1;
@@ -2374,8 +2129,7 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
                 add_var_to_bitmask(FWKNOP_CLI_ARG_SPOOF_USER, &var_bitmask);
                 break;
             case 'v':
-                /* Handled earlier.
-                */
+                /* 处理得更早。 */
                 break;
             case 'V':
                 options->version = 1;
@@ -2431,12 +2185,10 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
                 add_var_to_bitmask(FWKNOP_CLI_ARG_NAT_PORT, &var_bitmask);
                 break;
             case NO_HOME_DIR:
-                /* We already handled this earlier, so we do nothing here
-                */
+                /* 我们早些时候已经处理过了，所以我们在这里什么都不做 */
                 break;
             case NO_RC_FILE:
-                /* We already handled this earlier, so we do nothing here
-                */
+                /* 我们早些时候已经处理过了，所以我们在这里什么都不做 */
                 break;
             case TIME_OFFSET_PLUS:
                 if (! parse_time_offset(optarg, &options->time_offset_plus))
@@ -2484,22 +2236,19 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
         }
     }
 
-    /* Now that we have all of our options set, we can validate them */
+    /* 现在我们已经设置了所有选项，我们可以验证它们 */
     // 现在我们已经设置了所有选项，我们可以验证它们
     validate_options(options);
 
-    /* Generate Rijndael + HMAC keys from /dev/random and base64 encode
-    */
+    /* 从/dev/random和base64编码生成Rijndael+HMAC密钥 */
    // 从/dev/random生成Rijndael + HMAC密钥并对其进行base64编码
     generate_keys(options);
 
-    /* We can upgrade our settings with the parameters set on the command
-     * line by the user */
+    /* 我们可以使用命令上设置的参数升级设置 */
     // 我们可以通过用户在命令行上设置的参数来升级我们的设置
     if (options->save_rc_stanza == 1)
     {
-        /* If we are asked to generate keys, we add them to the bitmask so
-         * that they can be added to the stanza when updated */
+        /* 如果我们被要求生成密钥，我们会将它们添加到位掩码中，这样 */
         if (options->key_gen == 1)
         {
             add_var_to_bitmask(FWKNOP_CLI_ARG_KEY_RIJNDAEL_BASE64, &var_bitmask);
@@ -2516,88 +2265,14 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
     return;
 }
 
-/* Print usage message...
-*/
+/* 打印使用情况消息。。。 */
 void
 usage(void)
 {
     log_msg(LOG_VERBOSITY_NORMAL,
             "\n%s client version %s\n%s - http://%s/fwknop/\n",
             MY_NAME, MY_VERSION, MY_DESC, HTTP_RESOLVE_HOST);
-    /*中文的日志解释
-      "Usage: fwknop -A <port list> [-s|-R|-a] -D <spa_server> [options]\n\n"
-      " -n, --named-config          指定在'$HOME/.fwknoprc'文件中提供一个命名配置节，以提供一部分或全部配置参数。\n"
-      "                             如果在命令行上设置了更多参数，配置将相应更新。\n"
-      " -A, --access                在服务器上提供要打开的端口/协议列表（例如 'tcp/22'）。\n"
-      " -a, --allow-ip              在SPA数据包中指定允许的IP地址（例如 '123.2.3.4'）。\n"
-      " -D, --destination           指定fwknop服务器的主机名或IP地址。\n"
-      " --use-hmac                  为出站的SPA数据包添加HMAC以进行认证加密。\n"
-      " -h, --help                  打印此用法信息并退出。\n"
-      " -B, --save-packet           将生成的数据包数据保存到指定的文件中。\n"
-      " -b, --save-packet-append    将生成的数据包数据追加到使用 -B 选项指定的文件中。\n"
-      " -C, --server-cmd            指定fwknop服务器将代表fwknop客户端执行的命令。\n"
-      " -N, --nat-access            获得内部服务的NAT访问权限。\n"
-      " -p, --server-port           设置出站SPA数据包的目标端口。\n"
-      " -P, --server-proto          设置出站SPA数据包的协议（udp、tcp、http、tcpraw、icmp）。\n"
-      "                             注意：'tcpraw'和'icmp'模式使用原始套接字，因此需要使用root权限。\n"
-      " -s, --source-ip             告诉fwknopd服务器接受SPA数据包所包含的源IP作为需要访问的IP（不推荐，并且fwknopd服务器可以忽略这样的请求）。\n"
-      " -S, --source-port           设置出站SPA数据包的源端口。\n"
-      " -Q, --spoof-source          设置出站SPA数据包的源IP。\n"
-      " -R, --resolve-ip-https      通过连接到URL（例如默认的：https://" HTTP_RESOLVE_HOST HTTP_RESOLVE_URL）解析外部网络IP。\n"
-      "                             使用wget的--secure-protocol模式（SSL）。URL可以通过--resolve-url选项覆盖。\n"
-      "     --resolve-http-only     强制通过HTTP而不是HTTPS（通过上面提到的URL）来解析外部IP。\n"
-      "                             不推荐使用，因为如果IP解析HTTP连接在传输过程中被第三方更改，会使fwknop容易受到中间人攻击。\n"
-      "     --resolve-url           覆盖用于解析源IP地址的默认URL。\n"
-      " -u, --user-agent            为了解析-R中的外部IP或通过HTTP发送SPA数据包，设置HTTP User-Agent。\n"
-      "                             如果未使用此选项，默认值是 Fwknop/<version>。\n"
-      "     --use-wget-user-agent   使用默认的wget User-Agent字符串，而不是Fwknop/<version>。\n"
-      " -w, --wget-cmd              在-R模式下手动设置wget的路径。\n"
-      " -H, --http-proxy            通过此HTTP代理主机发送SPA数据包。端口也可以通过在主机/IP后面加上\":<port>\"来指定。\n"
-      " -U, --spoof-user            设置出站SPA数据包中的用户名。\n"
-      " -l, --last-cmd              以与上次执行fwknop时相同的命令行参数运行fwknop客户端\n"
-      "                             （参数从~/.fwknop.run文件中读取）。\n"
-      " -G, --get-key               从文件中加载加密密钥/密码。\n"
-      "     --stdin                 从stdin读取加密密钥/密码。\n"
-      "     --fd                    指定从中读取加密密钥/密码的文件描述符。\n"
-      " -k, --key-gen               生成SPA Rijndael + HMAC密钥。\n"
-      " -K, --key-gen-file          将生成的Rijndael + HMAC密钥写入文件。\n"
-      "     --key-rijndael          指定Rijndael密钥。由于密码对实用程序（如Unix下的'ps'）可见，此形式仅在安全性不重要时使用。\n"
-      "     --key-base64-rijndael   指定Base64编码的Rijndael密钥。由于密码对实用程序（如Unix下的'ps'）可见，此形式仅在安全性不重要时使用。\n"
-      "     --key-base64-hmac       指定Base64编码的HMAC密钥。由于密码对实用程序（如Unix下的'ps'）可见，此形式仅在安全性不重要时使用。\n"
-      " -r, --rand-port             通过随机分配的端口发送SPA数据包（服务器端需要比默认的udp 62201更广泛的pcap过滤器）。\n"
-      " -T, --test                  构建SPA数据包但不通过网络发送。\n"
-      " -v, --verbose               设置详细模式（可以多次指定）。\n"
-      " -V, --version               打印版本号。\n"
-      " -m, --digest-type           指定要使用的消息摘要算法（md5、sha1、sha256、sha384或sha512）。默认是sha256。\n"
-      " -M, --encryption-mode       指定AES用于加密SPA数据包时的加密模式。\n"
-      "                             默认是CBC模式，但也可以选择其他模式，如CFB或OFB，只要在服务器端的access.conf文件中也指定了相应模式。\n"
-      "                             注意：可以使用字符串“legacy”来指定使用旧版本的*fwknop* 2.5之前使用的初始化向量策略来生成SPA数据包。\n"
-      " -f, --fw-timeout            从客户端端指定SPA服务器防火墙超时时间。\n"
-      "     --hmac-digest-type      设置HMAC摘要算法（默认是sha256）。选项为md5、sha1、sha256、sha384或sha512。\n"
-      "     --icmp-type             设置ICMP类型（与'-P icmp'一起使用）。\n"
-      "     --icmp-code             设置ICMP代码（与'-P icmp'一起使用）。\n"
-      "     --gpg-encryption        使用GPG加密（默认是Rijndael）。\n"
-      "     --gpg-recipient-key     指定接收者GPG密钥的名称或ID。\n"
-      "     --gpg-signer-key        指定签名者的GPG密钥名称或ID。\n"
-      "     --gpg-no-signing-pw     允许没有与GPG密钥关联的签名密码。\n"
-      "     --gpg-home-dir          指定GPG的主目录。\n"
-      "     --gpg-agent             如果可用，使用GPG代理。\n"
-      "     --gpg-exe               设置GPG二进制文件的路径。\n"
-      "     --no-save-args          不要将fwknop命令行参数保存到$HOME/fwknop.run文件中。\n"
-      "     --rc-file               指定fwknop rc文件的路径（默认是$HOME/.fwknoprc）。\n"
-      "     --server-resolve-ipv4   当使用主机名时，强制从DNS解析出SPA服务器的IPv4地址。\n"
-      "     --save-rc-stanza        将命令行参数保存到通过-n选项指定的$HOME/.fwknoprc节中。\n"
-      "     --force-stanza          与--save-rc-stanza一起使用，用于覆盖指定节的所有变量。\n"
-      "     --stanza-list           显示$HOME/.fwknoprc中找到的节列表。\n"
-      "     --nat-local             通过fwknopd服务器系统上的转发端口访问本地服务。\n"
-      "     --nat-port              指定用于NAT访问服务的端口。\n"
-      "     --nat-rand-port         由fwknop客户端分配一个随机端口以进行NAT访问。\n"
-      "     --no-home-dir           不允许fwknop客户端寻找用户的主目录。\n"
-      "     --no-rc-file            在没有引用~/.fwknoprc文件的情况下执行fwknop客户端操作。\n"
-      "     --show-last             显示上次fwknop命令行参数。\n"
-      "     --time-offset-plus      从出站的SPA数据包时间戳中添加时间。\n"
-      "     --time-offset-minus     从出站的SPA数据包时间戳中减去时间。\n"
-    */
+    /* 中文的日志解释 */
     log_msg(LOG_VERBOSITY_NORMAL,
       "Usage: fwknop -A <port list> [-s|-R|-a] -D <spa_server> [options]\n\n"
       " -n, --named-config          Specify a named configuration stanza in the\n"
@@ -2805,4 +2480,4 @@ int register_ts_config_init(void)
     return register_ts(&TEST_SUITE(config_init));
 }
 
-#endif /* HAVE_C_UNIT_TESTS */ /* LCOV_EXCL_STOP */
+#endif /* 有_单元_测试 */ /* LCOV_EXCL_STOP */

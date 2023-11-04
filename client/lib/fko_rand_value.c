@@ -1,32 +1,4 @@
-/**
- * \file lib/fko_rand_value.c
- *
- * \ Generate a 16-byte random numeric value.
- */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #include "fko_common.h"
 #include "fko.h"
 
@@ -44,8 +16,7 @@
   #define RAND_FILE "/dev/urandom"
 #endif
 
-/* Set/Generate the SPA data random value string.
-*/
+/* 设置/生成SPA数据随机值字符串。 */
 int
 fko_set_rand_value(fko_ctx_t ctx, const char * const new_val)
 {
@@ -63,13 +34,11 @@ fko_set_rand_value(fko_ctx_t ctx, const char * const new_val)
     fiu_return_on("fko_set_rand_value_init", FKO_ERROR_CTX_NOT_INITIALIZED);
 #endif
 
-    /* Context must be initialized.
-    */
+    /* 必须初始化上下文。 */
     if(!CTX_INITIALIZED(ctx))
         return FKO_ERROR_CTX_NOT_INITIALIZED;
 
-    /* If a valid value was given, use it and return happy.
-    */
+    /* 如果给定了一个有效的值，请使用它并返回happy。 */
     if(new_val != NULL)
     {
 
@@ -98,14 +67,10 @@ fko_set_rand_value(fko_ctx_t ctx, const char * const new_val)
 	_ftime_s(&tb);
 	seed = ((tb.time * 1000) + tb.millitm) & 0xFFFFFFFF;
 #else
-    /* Attempt to read seed data from /dev/urandom.  If that does not
-     * work, then fall back to a time-based method (less secure, but
-     * probably more portable).
-    */
+    /* 尝试从/dev/urandom读取种子数据。如果没有 */
     if((rfd = fopen(RAND_FILE, "r")) != NULL)
     {
-        /* Read seed from /dev/urandom
-        */
+        /* 从/dev/urandom读取种子 */
         amt_read = fread(&seed, 4, 1, rfd);
         fclose(rfd);
 
@@ -117,8 +82,7 @@ fko_set_rand_value(fko_ctx_t ctx, const char * const new_val)
     }
     else
     {
-        /* Seed based on time (current usecs).
-        */
+        /* 基于时间的种子（当前用途）。 */
         gettimeofday(&tv, NULL);
 
         seed = tv.tv_usec;
@@ -159,13 +123,11 @@ fko_set_rand_value(fko_ctx_t ctx, const char * const new_val)
     return(FKO_SUCCESS);
 }
 
-/* Return the current rand value.
-*/
+/* 返回当前rand值。 */
 int
 fko_get_rand_value(fko_ctx_t ctx, char **rand_value)
 {
-    /* Must be initialized
-    */
+    /* 必须初始化 */
     if(!CTX_INITIALIZED(ctx))
         return(FKO_ERROR_CTX_NOT_INITIALIZED);
 
@@ -177,4 +139,4 @@ fko_get_rand_value(fko_ctx_t ctx, char **rand_value)
     return(FKO_SUCCESS);
 }
 
-/***EOF***/
+/* **EOF** */

@@ -1,37 +1,10 @@
-/**
- * \file common/common.h
- *
- * \brief Common header file for fwknop client and server programs.
- */
+/* * */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- ******************************************************************************
-*/
+/* Fwknop主要由文件“AUTHORS”中列出的人员开发。 */
 #ifndef _COMMON_H
 #define _COMMON_H
 
-/* Common includes for our other fwknop client and server source files.
-*/
+/* 常见的包括我们的其他fwknop客户端和服务器源文件。 */
 #if HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -41,7 +14,7 @@
   #include <fiu-control.h>
 #endif
 
-/* Include cunit header if c unit testing support is enabled. */
+/* 如果启用了c单元测试支持，则包括cunit标头。 */
 #ifdef HAVE_C_UNIT_TESTS
     #include "CUnit/Basic.h"
     #include "cunit_common.h"
@@ -62,7 +35,7 @@
   #include <string.h>
 #elif HAVE_STRINGS_H
   #include <strings.h>
-#endif /* STDC_HEADERS*/
+#endif /* STDC_HEADERS */
 
 #if HAVE_UNISTD_H
   #include <unistd.h>
@@ -84,8 +57,7 @@
   #include <time.h>
 #endif
 
-/* Some hoops for accommodating Windows
-*/
+/* 一些用于容纳Windows的箍带 */
 #ifdef WIN32
   #include <io.h>
   #define strcasecmp	_stricmp
@@ -127,8 +99,7 @@
 #include "fko_limits.h"
 #include "fko_util.h"
 
-/* Get our program version from VERSION (defined in config.h).
-*/
+/* 从version（在config.h中定义）获取我们的程序版本。 */
 #define MY_VERSION VERSION
 
 enum {
@@ -140,14 +111,13 @@ enum {
     FKO_PROTO_HTTP,
 };
 
-/* Other common defines
-*/
+/* 其他常见定义 */
 #define FKO_DEFAULT_PROTO   FKO_PROTO_UDP
 #define FKO_DEFAULT_PORT    62201
 #define DEFAULT_NAT_PORT    55000
-#define MIN_HIGH_PORT       10000  /* sensible minimum for SPA dest port */
-#define ANY_PORT            0      /* used as a wildcard */
-#define ANY_PROTO           0      /* used as a wildcard */
+#define MIN_HIGH_PORT       10000  /* SPA目标端口的合理最小值 */
+#define ANY_PORT            0      /* 用作通配符 */
+#define ANY_PROTO           0      /* 用作通配符 */
 #define NAT_ANY_PORT        ANY_PORT
 #define MAX_SERVER_STR_LEN  50
 #define MAX_ICMP_TYPE       40
@@ -166,33 +136,27 @@ enum {
   #define MAX_FAULT_TAG_LEN 128
 #endif
 
-/* Some convenience macros */
+/* 一些方便的宏 */
 
-/* Get the number of elements of an array
- */
+/* 获取数组的元素数 */
 #define ARRAY_SIZE(t)   (sizeof(t) / sizeof(t[0]))
 
-/* Characters allowed between a config parameter and its value.
-*/
+/* 配置参数及其值之间允许有字符。 */
 #define IS_CONFIG_PARAM_DELIMITER(x) (x == ' ' || x == '\t' || x == '=');
 
-/* End of line characters.
-*/
+/* 行尾字符。 */
 #define IS_LINE_END(x) (x == '\n' || x == '\r' || x == ';');
 
-/* Characters in the first position of a line that make it considered
- * empty or otherwise non-interesting (like a comment).
-*/
+/* 行的第一个位置的字符使其被考虑 */
 #define IS_EMPTY_LINE(x) ( \
     x == '#' || x == '\n' || x == '\r' || x == ';' || x == '\0' \
 )
 
-/* Work-around for not having strnlen
-*/
+/* 解决没有strnlen的问题 */
 #if !HAVE_STRNLEN
   #define strnlen(s, l) (strlen(s) < l ? strlen(s) : l)
 #endif
 
 #endif /* _COMMON_H */
 
-/***EOF***/
+/* **EOF** */

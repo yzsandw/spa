@@ -1,37 +1,4 @@
-/**
- * \file lib/base64.c
- *
- * \brief Implementation of the Base64 encode/decode algorithim.
- */
 
-/* This code was derived from the base64.c part of FFmpeg written
- * by Ryan Martell. (rdm4@martellventures.com).
- *
- * Copyright (C) Ryan Martell. (rdm4@martellventures.com)
- *
- *  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
- *  list of contributors, see the file 'CREDITS'.
- *
- *  License (GNU General Public License):
- *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- *  USA
- *
- *****************************************************************************
-*/
 #include "base64.h"
 #include "fko_common.h"
 
@@ -66,9 +33,7 @@ b64_decode(const char *in, unsigned char *out)
 #endif
 
 #if AFL_FUZZING
-    /* short circuit base64 decoding in AFL fuzzing mode - just copy
-     * data as-is.
-    */
+    /* AFL模糊模式下的短路base64解码-仅复制 */
     for (i = 0; in[i]; i++)
         *dst++ = in[i];
 #else
@@ -91,12 +56,7 @@ b64_decode(const char *in, unsigned char *out)
     return(dst - out);
 }
 
-/*****************************************************************************
- * b64_encode: Stolen from VLC's http.c
- * Simplified by michael
- * fixed edge cases and made it work from data (vs. strings) by ryan.
- *****************************************************************************
-*/
+/* **************************************************************************** */
 int
 b64_encode(unsigned char *in, char *out, int in_len)
 {
@@ -108,7 +68,7 @@ b64_encode(unsigned char *in, char *out, int in_len)
 
     char *dst = out;
 
-    if (in_len > 0) { /* Special edge case, what should we really do here? */
+    if (in_len > 0) { /* 特殊的边缘情况，我们在这里真正应该做什么？ */
         while (bytes_remaining) {
             i_bits = (i_bits << 8) + *in++;
             bytes_remaining--;
@@ -128,9 +88,7 @@ b64_encode(unsigned char *in, char *out, int in_len)
     return(dst - out);
 }
 
-/* Strip trailing equals ("=") charcters from a base64-encoded
- * message digest.
-*/
+/* 从base64编码的字符中去掉尾随的等于（“=”）个字符 */
 void
 strip_b64_eq(char *data)
 {
@@ -249,4 +207,4 @@ int register_base64_test(void)
     return register_ts(&TEST_SUITE(base64_test));
 }
 #endif /* LCOV_EXCL_STOP */
-/***EOF***/
+/* **EOF** */

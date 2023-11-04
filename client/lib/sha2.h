@@ -1,40 +1,6 @@
-/**
- * \file lib/sha2.h
- *
- * \brief Header for sha2.c - Implementation of the SHA 26/384/512 digests.
- */
+/* * */
 
-/* AUTHOR:	Aaron D. Gifford - http://www.aarongifford.com/
- *
- * Copyright (c) 2000-2001, Aaron D. Gifford
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the copyright holder nor the names of contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTOR(S) ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTOR(S) BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- *****************************************************************************
-*/
+/* 作者：Aaron D.Gifford-http://www.aarongifford.com/ */
 #ifndef __SHA2_H__
 #define __SHA2_H__
 
@@ -44,11 +10,7 @@ extern "C" {
 
 #include "common.h"
 
-/*
- * Import u_intXX_t size_t type definitions from system headers.  You
- * may need to change this, or define these things yourself in this
- * file.
- */
+/* *从系统标头导入u_intXX_t size_t类型定义。你 */
 #include <sys/types.h>
 
 #if HAVE_INTTYPES_H
@@ -59,13 +21,12 @@ extern "C" {
   #include <inttypes.h>
 #endif /* SHA2_USE_INTTYPES_H */
 
-/* Make sure we keep this below the check above.
- */
+/* 请确保我们将其保持在上面的检查之下。 */
 #ifdef WIN32
   #define SHA2_USE_INTTYPES_H 1
 #endif
 
-/*** SHA-256/384/512 Various Length Definitions ***********************/
+/* **SHA-256/384/512各种长度定义********************** */
 #define SHA256_BLOCK_LEN        64
 #define SHA256_DIGEST_LEN       32
 #define SHA256_DIGEST_STR_LEN   (SHA256_DIGEST_LEN * 2 + 1)
@@ -82,32 +43,14 @@ extern "C" {
 #define SHA512_B64_LEN          86
 
 
-/*** SHA-256/384/512 Context Structures *******************************/
-/* NOTE: If your architecture does not define either u_intXX_t types or
- * uintXX_t (from inttypes.h), you may need to define things by hand
- * for your system:
- */
+/* **SHA-256/384/512上下文结构****************************** */
+/* 注意：如果您的体系结构没有定义u_intXX_t类型或 */
 #if 0
-typedef unsigned char u_int8_t;		/* 1-byte  (8-bits)  */
-typedef unsigned int u_int32_t;		/* 4-bytes (32-bits) */
-typedef unsigned long long u_int64_t;	/* 8-bytes (64-bits) */
+typedef unsigned char u_int8_t;		/* 1字节（8位） */
+typedef unsigned int u_int32_t;		/* 4字节（32位） */
+typedef unsigned long long u_int64_t;	/* 8字节（64位） */
 #endif
-/*
- * Most BSD systems already define u_intXX_t types, as does Linux.
- * Some systems, however, like Compaq's Tru64 Unix instead can use
- * uintXX_t types defined by very recent ANSI C standards and included
- * in the file:
- *
- *   #include <inttypes.h>
- *
- * If you choose to use <inttypes.h> then please define:
- *
- *   #define SHA2_USE_INTTYPES_H
- *
- * Or on the command line during compile:
- *
- *   cc -DSHA2_USE_INTTYPES_H ...
- */
+/* *大多数BSD系统已经定义了u_intXX_t类型，Linux也是如此。 */
 #ifdef SHA2_USE_INTTYPES_H
 
 typedef struct _SHA256_CTX {
@@ -139,7 +82,7 @@ typedef struct _SHA512_CTX {
 typedef SHA512_CTX SHA384_CTX;
 
 
-/*** SHA-256/384/512 Function Prototypes ******************************/
+/* **SHA-256/384/512功能原型***************************** */
 #ifndef NOPROTO
 #ifdef SHA2_USE_INTTYPES_H
 

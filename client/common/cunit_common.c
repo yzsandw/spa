@@ -1,8 +1,4 @@
-/**
- * \file common/cunit_common.c
- *
- * \brief CUnit test functions
- */
+/* * */
 
 #ifdef HAVE_C_UNIT_TESTS
 
@@ -39,7 +35,7 @@ int register_ts(c_unit_test_suite_t *ts)
       return CU_get_error();
    }
 
-   /* add the tests to the suite */
+   /* 将测试添加到套件 */
    for (ix_utest=0 ; ix_utest<ts->nb_c_unit_test ; ix_utest++)
    {
        c_unit_test_t* utest = &(ts->test_array[ix_utest]);
@@ -53,4 +49,4 @@ int register_ts(c_unit_test_suite_t *ts)
    return 0;
 }
 
-#endif /* HAVE_C_UNIT_TESTS */
+#endif /* 有_单元_测试 */
