@@ -162,7 +162,7 @@ is_valid_hostname(const char * const hostname_str, const int len)
         {
             if (label_size > 63)
                 return 0;
-            if (!isalnum((int)(unsigned char)*(ndx-1)))  //checks that previous character was not a . or -
+            if (!isalnum((int)(unsigned char)*(ndx-1)))  
                 return 0;
 
             label_size = 0;

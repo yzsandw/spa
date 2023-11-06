@@ -54,10 +54,14 @@ try_url(struct url *url, fko_cli_options_t *options)
 #endif
 
     /* 构建我们的HTTP请求以解析外部IP（这类似于 */
-    snprintf(http_buf, HTTP_MAX_REQUEST_LEN,
-        "GET %s HTTP/1.1\r\nUser-Agent: %s\r\nAccept: */* \\r\n“ */
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
+ snprintf(http_buf, HTTP_MAX_REQUEST_LEN,
+        "GET %s HTTP/1.1\r\nUser-Agent: %s\r\nAccept: */*\r\n"
+        "Host: %s\r\nConnection: close\r\n\r\n",
+        url->path,
+        options->http_user_agent,
+        url->host
+    );
+
 
 #if AFL_FUZZING
     /* 确保编译时不生成任何解析请求 */

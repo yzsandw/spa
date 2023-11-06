@@ -34,10 +34,7 @@
 #define TIME_OFFSET_HOURS       3600
 #define TIME_OFFSET_DAYS        86400
 
-/* For resolving allow IP - the default is to do this via HTTPS with
- * wget to https://www.cipherdyne.org/cgi-bin/myip, and if the user
- * permit it, to fall back to the same URL but via HTTP.
-*/
+
 //解析允许IP - 默认情况下，这是通过HTTPS解析的
 //wget到https://www.cipherdyne.org/cgi-bin/myip，如果用户
 //允许它，回到相同的URL，但通过HTTP。
@@ -95,16 +92,14 @@ typedef struct fko_cli_options
     int  have_hmac_base64_key; //是否有HMAC密钥的base64编码
     int  hmac_type; //HMAC类型(应该是指定用哪种哈希算法)
 
-    /* NAT access
-    */
+   
    //NAT穿透
     char nat_access_str[MAX_PATH_LEN]; //NAT的类型
     int  nat_local; //是否为本地NAT，便于转发及修改数据包
     int  nat_port; //NAT端口号
     int  nat_rand_port; //是否启用随机端口
 
-    /* External IP resolution via HTTP
-    */
+   
    //外部IP解析
     int  resolve_ip_http_https; //是否通过HTTP解析外部代理
     int  resolve_http_only; //是否仅使用HTTP解析外部代理
@@ -118,8 +113,7 @@ typedef struct fko_cli_options
    //http代理
     char http_proxy[HTTP_MAX_REQUEST_LEN]; //HTTP代理
 
-    /* SPA packet transmission port and protocol
-    */
+   
    //spa包传输端口和协议
     int spa_proto; //SPA协议的传输协议
     unsigned int spa_dst_port; //SPA协议的目标端口

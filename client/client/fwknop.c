@@ -1024,15 +1024,7 @@ set_access_buf(fko_ctx_t ctx, fko_cli_options_t *options, char *access_buf)
 
         if(nat_port > 0 && nat_port <= MAX_PORT)
         {
-            /* Replace the access string port with the NAT port since the
-             * NAT port is manually specified (--nat-port) or derived from
-             * random data (--nat-rand-port).  In the NAT modes, the fwknopd
-             * server uses the port in the access string as the one to NAT,
-             * and access is granted via this translated port to whatever is
-             * specified with --nat-access <IP:port> (so this service is the
-             * utlimate target of the incoming connection after the SPA
-             * packet is sent).
-            */
+            
         //    将访问字符串的端口替换为NAT端口，因为NAT端口是手动指定的（--nat-port）
         //    或从随机数据中派生的（--nat-rand-port）。在NAT模式下，fwknopd服务器使
         //    用访问字符串中的端口作为NAT的端口，并且通过此转换后的端口授予访问权限给
@@ -1381,8 +1373,7 @@ run_last_args(fko_cli_options_t *options, const char * const args_save_file)
     if(args_broken)
         return 0;
 
-    /* Reset the options index so we can run through them again.
-    */
+   
    //重置选项索引，以便我们可以再次运行它们。
     optind = 0;
 

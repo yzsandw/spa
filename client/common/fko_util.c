@@ -272,6 +272,7 @@ hmac_digest_strtoint(const char *dt_str)
         return(-1);
 }
 
+
 /* 返回加密类型字符串表示形式 */
 const char *
 enc_type_inttostr(const int type)

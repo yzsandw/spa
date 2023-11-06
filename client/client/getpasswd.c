@@ -1,8 +1,3 @@
-/**
- * \file client/getpasswd.c
- *
- * \brief Routines for obtaining a password from a user.
- */
 
 #include <stdio.h>
 #include <signal.h>
@@ -143,22 +138,6 @@ read_passwd_from_stream(FILE *stream)
     return password;
 }
 
-/**
- * @brief Function for accepting password input from users
- *
- * The functions reads chars from a buffered stream and store them in a buffer of
- * chars. If a file descriptor is supplied then, the password is read from
- * the associated stream, otherwise a new buffered stream is created and a
- * prompt is displayed to the user.
- *
- * @param prompt String displayed on the terminal to prompt the user for a
- *               password or an encryption key
- * @param fd     File descriptor to use to read the pasword from. If fd is set
- *               to FD_INVALID, then a new stream is opened.
- *
- * @return NULL if a problem occurred or the user killed the terminal (Ctrl-C)\n
- *         otherwise the password - empty password is accepted.
- */
 
 /*
 2023/7/20 15:25:27
@@ -271,8 +250,7 @@ getpasswd(const char *prompt, int fd)
     return (ptr);
 }
 
-/* Function for accepting password input from a file
-*/
+
 /*
 2023/7/20 15:26:27
 

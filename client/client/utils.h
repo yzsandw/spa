@@ -17,13 +17,11 @@
   #include <netdb.h>
 #endif
 
-#define PROTOCOL_BUFSIZE    16      /*!< Maximum number of chars for a protocol string (TCP for example) */
-
+#define PROTOCOL_BUFSIZE    16      /*最大的协议字符串长度（例如TCP）*/
 #define FD_INVALID          -1
 #define FD_IS_VALID(x)      ((x)>=0)
 
-/* Prototypes
-*/
+
 //检测文件所有权
 int     verify_file_perms_ownership(const char *file, int fd);
 //解析目标地址

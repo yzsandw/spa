@@ -1,8 +1,3 @@
-/**
- * \file client/fwknop.h
- *
- * \brief Header file for fwknop client test program.
- */
 
 
 #ifndef FWKNOP_H
