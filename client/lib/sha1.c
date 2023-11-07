@@ -1,6 +1,6 @@
 
 #include "sha1.h"
-#include "fko_common.h"
+#include "ztn_common.h"
 
 /* SHA f（）-函数 */
 #define f1(x,y,z)    ((x & y) | (~x & z))

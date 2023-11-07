@@ -1,16 +1,16 @@
 /**
  * \file server/process_packet.c
  *
- * \brief Packet parser/decoder for fwknopd server.
+ * \brief Packet parser/decoder for spad server.
  *
  *          Takes the raw packet
  *          data from libpcap and parses/extracts the packet data payload,
- *          then creates an FKO context with that data.  If the context
+ *          then creates an ZTN context with that data.  If the context
  *          creation is successful, it is queued for processing.
  */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
+/*  Spa is developed primarily by the people listed in the file 'AUTHORS'.
+ *  Copyright (C) 2009-2015 spa developers and contributors. For a full
  *  list of contributors, see the file 'CREDITS'.
  *
  *  License (GNU General Public License):
@@ -33,7 +33,7 @@
  *****************************************************************************
 */
 
-#include "fwknopd_common.h"
+#include "spad_common.h"
 #include "netinet_common.h"
 #include "process_packet.h"
 #include "incoming_spa.h"
@@ -67,7 +67,7 @@ process_packet(PROCESS_PKT_ARGS_TYPE *args, PACKET_HEADER_META,
 
     unsigned short      eth_type;
 
-    fko_srv_options_t   *opts = (fko_srv_options_t *)args;
+    ztn_srv_options_t   *opts = (ztn_srv_options_t *)args;
 
     int                 offset = opts->data_link_offset;
 

@@ -4,7 +4,7 @@
  * \brief 通过UDP服务器收集SPA数据包。
  */
 
-#include "fwknopd_common.h"
+#include "spad_common.h"
 #include "sig_handler.h"
 #include "incoming_spa.h"
 #include "log_msg.h"
@@ -27,7 +27,7 @@
 #include <sys/select.h>
 
 int
-run_udp_server(fko_srv_options_t *opts)
+run_udp_server(ztn_srv_options_t *opts)
 {
     int                 s_sock, sfd_flags, selval, pkt_len;
     int                 rv=1, chk_rm_all=0;

@@ -5,7 +5,7 @@
  */
 
 
-#include "fwknopd_common.h"
+#include "spad_common.h"
 
 #if FIREWALL_FIREWALLD
 
@@ -35,7 +35,7 @@ zero_cmd_buffers(void)
 static int pid_status = 0;
 
 static int
-rule_exists_no_chk_support(const fko_srv_options_t * const opts,
+rule_exists_no_chk_support(const ztn_srv_options_t * const opts,
         const struct fw_chain * const fwc,
         const unsigned int proto,
         const char * const srcip,
@@ -65,7 +65,7 @@ rule_exists_no_chk_support(const fko_srv_options_t * const opts,
 
 #if CODE_COVERAGE
     /* 如果我们正在最大化代码覆盖率，那么使用run_extcmd_write()函数，通常只用于PF防火墙。
-    * 这是为了与测试套件一起最大化代码覆盖率，永远不会编译为fwknop的生产发布
+    * 这是为了与测试套件一起最大化代码覆盖率，永远不会编译为spa的生产发布
     */
     if(run_extcmd_write("/bin/grep -v test", "/bin/echo test", &pid_status, opts) == 0)
         log_msg(LOG_WARNING, "[ignore] Code coverage: Executed command");
@@ -154,7 +154,7 @@ rule_exists_no_chk_support(const fko_srv_options_t * const opts,
 }
 
 static int
-rule_exists_chk_support(const fko_srv_options_t * const opts,
+rule_exists_chk_support(const ztn_srv_options_t * const opts,
         const char * const chain, const char * const rule)
 {
     int     rule_exists = 0;
@@ -191,7 +191,7 @@ rule_exists_chk_support(const fko_srv_options_t * const opts,
 }
 
 static int
-rule_exists(const fko_srv_options_t * const opts,
+rule_exists(const ztn_srv_options_t * const opts,
         const struct fw_chain * const fwc,
         const char * const rule,
         const unsigned int proto,
@@ -222,7 +222,7 @@ rule_exists(const fko_srv_options_t * const opts,
 }
 
 static void
-firewd_chk_support(const fko_srv_options_t * const opts)
+firewd_chk_support(const ztn_srv_options_t * const opts)
 {
     int               res = 1;
     struct fw_chain  *in_chain = &(opts->fw_config->chain[FIREWD_INPUT_ACCESS]);
@@ -293,7 +293,7 @@ firewd_chk_support(const fko_srv_options_t * const opts)
 }
 
 static int
-comment_match_exists(const fko_srv_options_t * const opts)
+comment_match_exists(const ztn_srv_options_t * const opts)
 {
     int               res = 1;
     char             *ndx = NULL;
@@ -366,7 +366,7 @@ comment_match_exists(const fko_srv_options_t * const opts)
 }
 
 static int
-add_jump_rule(const fko_srv_options_t * const opts, const int chain_num)
+add_jump_rule(const ztn_srv_options_t * const opts, const int chain_num)
 {
     int res = 0, rv = 0;
 
@@ -401,7 +401,7 @@ add_jump_rule(const fko_srv_options_t * const opts, const int chain_num)
 }
 
 static int
-chain_exists(const fko_srv_options_t * const opts, const int chain_num)
+chain_exists(const ztn_srv_options_t * const opts, const int chain_num)
 {
     int res = 0, rv = 0;
 
@@ -436,7 +436,7 @@ chain_exists(const fko_srv_options_t * const opts, const int chain_num)
 }
 
 static int
-jump_rule_exists_chk_support(const fko_srv_options_t * const opts, const int chain_num)
+jump_rule_exists_chk_support(const ztn_srv_options_t * const opts, const int chain_num)
 {
     int    exists = 0;
     char   rule_buf[CMD_BUFSIZE] = {0};
@@ -458,7 +458,7 @@ jump_rule_exists_chk_support(const fko_srv_options_t * const opts, const int cha
 }
 
 static int
-jump_rule_exists_no_chk_support(const fko_srv_options_t * const opts,
+jump_rule_exists_no_chk_support(const ztn_srv_options_t * const opts,
         const int chain_num)
 {
     int     exists = 0;
@@ -490,7 +490,7 @@ jump_rule_exists_no_chk_support(const fko_srv_options_t * const opts,
 }
 
 static int
-jump_rule_exists(const fko_srv_options_t * const opts, const int chain_num)
+jump_rule_exists(const ztn_srv_options_t * const opts, const int chain_num)
 {
     int    exists = 0;
 
@@ -502,9 +502,9 @@ jump_rule_exists(const fko_srv_options_t * const opts, const int chain_num)
     return exists;
 }
 
-/* 打印当前正在运行的fwknopd守护进程实例化的所有防火墙规则到标准输出。 */
+/* 打印当前正在运行的spad守护进程实例化的所有防火墙规则到标准输出。 */
 int
-fw_dump_rules(const fko_srv_options_t * const opts)
+fw_dump_rules(const ztn_srv_options_t * const opts)
 {
     int     i;
     int     res, got_err = 0;
@@ -516,7 +516,7 @@ fw_dump_rules(const fko_srv_options_t * const opts)
         fprintf(stdout, "Listing all firewalld rules in applicable tables...\n");
         fflush(stdout);
 
-        for(i=0; i < NUM_FWKNOP_ACCESS_TYPES; i++)
+        for(i=0; i < NUM_SPA_ACCESS_TYPES; i++)
         {
             if(fwc.chain[i].target[0] == '\0')
                 continue;
@@ -546,10 +546,10 @@ fw_dump_rules(const fko_srv_options_t * const opts)
     }
     else
     {
-        fprintf(stdout, "Listing rules in fwknopd firewalld chains...\n");
+        fprintf(stdout, "Listing rules in spad firewalld chains...\n");
         fflush(stdout);
 
-        for(i=0; i < NUM_FWKNOP_ACCESS_TYPES; i++)
+        for(i=0; i < NUM_SPA_ACCESS_TYPES; i++)
         {
             if(fwc.chain[i].target[0] == '\0')
                 continue;
@@ -585,13 +585,13 @@ fw_dump_rules(const fko_srv_options_t * const opts)
     return(got_err);
 }
 
-/* 静默清空并删除所有 fwknop 自定义链。 */
+/* 静默清空并删除所有 spa 自定义链。 */
 static void
-delete_all_chains(const fko_srv_options_t * const opts)
+delete_all_chains(const ztn_srv_options_t * const opts)
 {
     int     i, res, cmd_ctr = 0;
 
-    for(i=0; i < NUM_FWKNOP_ACCESS_TYPES; i++)
+    for(i=0; i < NUM_SPA_ACCESS_TYPES; i++)
     {
         if(fwc.chain[i].target[0] == '\0')
             continue;
@@ -736,7 +736,7 @@ delete_all_chains(const fko_srv_options_t * const opts)
 }
 
 static int
-create_chain(const fko_srv_options_t * const opts, const int chain_num)
+create_chain(const ztn_srv_options_t * const opts, const int chain_num)
 {
     int res = 0, rv = 0;
 
@@ -768,7 +768,7 @@ create_chain(const fko_srv_options_t * const opts, const int chain_num)
 }
 
 static int
-mk_chain(const fko_srv_options_t * const opts, const int chain_num)
+mk_chain(const ztn_srv_options_t * const opts, const int chain_num)
 {
     int err = 0;
 
@@ -785,17 +785,17 @@ mk_chain(const fko_srv_options_t * const opts, const int chain_num)
     return err;
 }
 
-/* 创建 fwknop 自定义链（至少创建已配置的链）
+/* 创建 spa 自定义链（至少创建已配置的链）
 */
 static int
-create_fw_chains(const fko_srv_options_t * const opts)
+create_fw_chains(const ztn_srv_options_t * const opts)
 {
     int     i, got_err = 0;
 #if USE_LIBNETFILTER_QUEUE
     int     res = 0;
 #endif
 
-    for(i=0; i < NUM_FWKNOP_ACCESS_TYPES; i++)
+    for(i=0; i < NUM_SPA_ACCESS_TYPES; i++)
     {
         if(fwc.chain[i].target[0] == '\0')
             continue;
@@ -969,7 +969,7 @@ set_fw_chain_conf(const int type, const char * const conf_str)
     /* 提取并设置跳转规则位置 */
     chain->jump_rule_pos = strtol_wrapper(chain_fields[3],
             0, RCHK_MAX_FIREWD_RULE_NUM, NO_EXIT_UPON_ERR, &is_err);
-    if(is_err != FKO_SUCCESS)
+    if(is_err != ZTN_SUCCESS)
     {
         log_msg(LOG_ERR, "[*] invalid jump rule position in Line: %s",
             conf_str);
@@ -982,7 +982,7 @@ set_fw_chain_conf(const int type, const char * const conf_str)
     /* 提取并设置到达链的规则位置 */
     chain->rule_pos = strtol_wrapper(chain_fields[5],
             0, RCHK_MAX_FIREWD_RULE_NUM, NO_EXIT_UPON_ERR, &is_err);
-    if(is_err != FKO_SUCCESS)
+    if(is_err != ZTN_SUCCESS)
     {
         log_msg(LOG_ERR, "[*] invalid to_chain rule position in Line: %s",
             conf_str);
@@ -992,7 +992,7 @@ set_fw_chain_conf(const int type, const char * const conf_str)
 }
 
 int
-fw_config_init(fko_srv_options_t * const opts)
+fw_config_init(ztn_srv_options_t * const opts)
 {
     memset(&fwc, 0x0, sizeof(struct fw_config));
 
@@ -1011,13 +1011,13 @@ fw_config_init(fko_srv_options_t * const opts)
     fiu_return_on("fw_config_init", 0);
 #endif
 
-    /* 提取 fwknop 链配置信息并设置我们的内部配置结构。
+    /* 提取 spa 链配置信息并设置我们的内部配置结构。
     *FIREWD_INPUT 是唯一必需的，其余是可选的
     */
     if(set_fw_chain_conf(FIREWD_INPUT_ACCESS, opts->config[CONF_FIREWD_INPUT_ACCESS]) != 1)
         return 0;
 
-    /* FWKNOP_OUTPUT_ACCESS 需要启用 ENABLE_FIREWD_OUTPUT_ACCESS == Y。
+    /* SPA_OUTPUT_ACCESS 需要启用 ENABLE_FIREWD_OUTPUT_ACCESS == Y。
     */
     if(strncasecmp(opts->config[CONF_ENABLE_FIREWD_OUTPUT], "Y", 1)==0)
         if(set_fw_chain_conf(FIREWD_OUTPUT_ACCESS, opts->config[CONF_FIREWD_OUTPUT_ACCESS]) != 1)
@@ -1063,7 +1063,7 @@ fw_config_init(fko_srv_options_t * const opts)
 }
 
 int
-fw_initialize(const fko_srv_options_t * const opts)
+fw_initialize(const ztn_srv_options_t * const opts)
 {
     int res = 1;
 
@@ -1085,7 +1085,7 @@ fw_initialize(const fko_srv_options_t * const opts)
     if(create_fw_chains(opts) != 0)
     {
         log_msg(LOG_WARNING,
-                "fw_initialize() Warning: Errors detected during fwknop custom chain creation");
+                "fw_initialize() Warning: Errors detected during spa custom chain creation");
         res = 0;
     }
 
@@ -1108,7 +1108,7 @@ fw_initialize(const fko_srv_options_t * const opts)
 }
 
 int
-fw_cleanup(const fko_srv_options_t * const opts)
+fw_cleanup(const ztn_srv_options_t * const opts)
 {
     if(strncasecmp(opts->config[CONF_FLUSH_FIREWD_AT_EXIT], "N", 1) == 0
             && opts->fw_flush == 0)
@@ -1119,7 +1119,7 @@ fw_cleanup(const fko_srv_options_t * const opts)
 }
 
 static int
-create_rule(const fko_srv_options_t * const opts,
+create_rule(const ztn_srv_options_t * const opts,
         const char * const fw_chain, const char * const fw_rule)
 {
     int res = 0;
@@ -1154,7 +1154,7 @@ create_rule(const fko_srv_options_t * const opts,
 }
 
 static void
-firewd_rule(const fko_srv_options_t * const opts,
+firewd_rule(const ztn_srv_options_t * const opts,
         const char * const complete_rule_buf,
         const char * const fw_rule_macro,
         const char * const srcip,
@@ -1216,7 +1216,7 @@ firewd_rule(const fko_srv_options_t * const opts,
     return;
 }
 
-static void forward_access_rule(const fko_srv_options_t * const opts,
+static void forward_access_rule(const ztn_srv_options_t * const opts,
         const acc_stanza_t * const acc,
         struct fw_chain * const fwd_chain,
         const char * const nat_ip,
@@ -1269,7 +1269,7 @@ static void forward_access_rule(const fko_srv_options_t * const opts,
     return;
 }
 
-static void dnat_rule(const fko_srv_options_t * const opts,
+static void dnat_rule(const ztn_srv_options_t * const opts,
         const acc_stanza_t * const acc,
         struct fw_chain * const dnat_chain,
         const char * const nat_ip,
@@ -1328,7 +1328,7 @@ static void dnat_rule(const fko_srv_options_t * const opts,
     return;
 }
 
-static void snat_rule(const fko_srv_options_t * const opts,
+static void snat_rule(const ztn_srv_options_t * const opts,
         const acc_stanza_t * const acc,
         const char * const nat_ip,
         const unsigned int nat_port,
@@ -1445,7 +1445,7 @@ static void snat_rule(const fko_srv_options_t * const opts,
 /* 规则处理 - 创建一个访问请求...
 */
 int
-process_spa_request(const fko_srv_options_t * const opts,
+process_spa_request(const ztn_srv_options_t * const opts,
         const acc_stanza_t * const acc, spa_data_t * const spadat)
 {
     char            nat_ip[MAX_IPV4_STR_LEN] = {0};
@@ -1495,10 +1495,10 @@ process_spa_request(const fko_srv_options_t * const opts,
 
     /* 处理自身请求 NAT 操作的 SPA 数据包。
     */
-    if(spadat->message_type == FKO_LOCAL_NAT_ACCESS_MSG
-      || spadat->message_type == FKO_CLIENT_TIMEOUT_LOCAL_NAT_ACCESS_MSG
-      || spadat->message_type == FKO_NAT_ACCESS_MSG
-      || spadat->message_type == FKO_CLIENT_TIMEOUT_NAT_ACCESS_MSG
+    if(spadat->message_type == ZTN_LOCAL_NAT_ACCESS_MSG
+      || spadat->message_type == ZTN_CLIENT_TIMEOUT_LOCAL_NAT_ACCESS_MSG
+      || spadat->message_type == ZTN_NAT_ACCESS_MSG
+      || spadat->message_type == ZTN_CLIENT_TIMEOUT_NAT_ACCESS_MSG
       || acc->force_nat)
     {
         if(acc->force_nat)
@@ -1549,7 +1549,7 @@ process_spa_request(const fko_srv_options_t * const opts,
 
                 nat_port = strtol_wrapper(ndx+1, 0, MAX_PORT,
                         NO_EXIT_UPON_ERR, &is_err);
-                if(is_err != FKO_SUCCESS)
+                if(is_err != ZTN_SUCCESS)
                 {
                     log_msg(LOG_INFO, "Invalid NAT port in SPA message");
                     free_acc_port_list(port_list);
@@ -1565,8 +1565,8 @@ process_spa_request(const fko_srv_options_t * const opts,
             }
         }
 
-        if(spadat->message_type == FKO_LOCAL_NAT_ACCESS_MSG
-                || spadat->message_type == FKO_CLIENT_TIMEOUT_LOCAL_NAT_ACCESS_MSG)
+        if(spadat->message_type == ZTN_LOCAL_NAT_ACCESS_MSG
+                || spadat->message_type == ZTN_CLIENT_TIMEOUT_LOCAL_NAT_ACCESS_MSG)
         {
             firewd_rule(opts, NULL, FIREWD_RULE_ARGS, spadat->use_src_ip,
                 (fwc.use_destination ? spadat->pkt_destination_ip : FIREWD_ANY_IP),
@@ -1624,7 +1624,7 @@ process_spa_request(const fko_srv_options_t * const opts,
 }
 
 static void
-rm_expired_rules(const fko_srv_options_t * const opts,
+rm_expired_rules(const ztn_srv_options_t * const opts,
         const char * const fw_output_buf,
         char *ndx, struct fw_chain *ch, int cpos, time_t now)
 {
@@ -1699,7 +1699,7 @@ rm_expired_rules(const fko_srv_options_t * const opts,
 
             rule_num = strtol_wrapper(rule_num_str, rn_offset, RCHK_MAX_FIREWD_RULE_NUM,
                     NO_EXIT_UPON_ERR, &is_err);
-            if(is_err != FKO_SUCCESS)
+            if(is_err != ZTN_SUCCESS)
             {
                 log_msg(LOG_ERR,
                     "Rule parse error while finding rule number in chain %i",
@@ -1770,7 +1770,7 @@ rm_expired_rules(const fko_srv_options_t * const opts,
 /* 迭代配置的防火墙访问链并清除过期的防火墙规则
 */
 void
-check_firewall_rules(const fko_srv_options_t * const opts,
+check_firewall_rules(const ztn_srv_options_t * const opts,
         const int chk_rm_all)
 {
     char            *ndx;
@@ -1785,7 +1785,7 @@ check_firewall_rules(const fko_srv_options_t * const opts,
 
     /* 迭代每个链并查找要删除的活动规则。
     */
-    for(i=0; i < NUM_FWKNOP_ACCESS_TYPES; i++)
+    for(i=0; i < NUM_SPA_ACCESS_TYPES; i++)
     {
         /* 如果没有活动规则或者我们还没有达到预期的下一个过期时间，请继续。
         */
@@ -1800,7 +1800,7 @@ check_firewall_rules(const fko_srv_options_t * const opts,
 
         /* 获取该链的当前规则列表并删除任何已过期的规则。请注意，
          * chk_rm_all 使我们处于垃圾收集模式，并允许任何已手动添加的规则
-         * （可能是由 fwknopd 以外的程序添加的）利用 fwknopd 的超时机制
+         * （可能是由 spad 以外的程序添加的）利用 spad 的超时机制
          * 
         */
         snprintf(cmd_buf, CMD_BUFSIZE-1, "%s " FIREWD_LIST_RULES_ARGS,

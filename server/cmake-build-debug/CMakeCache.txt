@@ -195,15 +195,6 @@ Server_IS_TOP_LEVEL:STATIC=ON
 //Value Computed by CMake
 Server_SOURCE_DIR:STATIC=/home/catlee/work/server
 
-//Value Computed by CMake
-untitled5_BINARY_DIR:STATIC=/home/catlee/work/server/cmake-build-debug
-
-//Value Computed by CMake
-untitled5_IS_TOP_LEVEL:STATIC=ON
-
-//Value Computed by CMake
-untitled5_SOURCE_DIR:STATIC=/home/catlee/work/server
-
 
 ########################
 # INTERNAL cache entries

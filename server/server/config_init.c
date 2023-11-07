@@ -1,11 +1,11 @@
 /**
  * \file server/config_init.c
  *
- * \brief Command-line and config file processing for fwknop server.
+ * \brief Command-line and config file processing for spa server.
  */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
+/*  Spa is developed primarily by the people listed in the file 'AUTHORS'.
+ *  Copyright (C) 2009-2015 spa developers and contributors. For a full
  *  list of contributors, see the file 'CREDITS'.
  *
  *  License (GNU General Public License):
@@ -27,8 +27,8 @@
  *
  ******************************************************************************
 */
-#include "fwknopd_common.h"
-#include "fwknopd_errors.h"
+#include "spad_common.h"
+#include "spad_errors.h"
 #include "config_init.h"
 #include "access.h"
 #include "cmd_opts.h"
@@ -45,12 +45,12 @@
  * specific range
 */
 static int
-range_check(fko_srv_options_t *opts, char *var, char *val, int low, int high)
+range_check(ztn_srv_options_t *opts, char *var, char *val, int low, int high)
 {
     int     is_err, rv;
 
     rv = strtol_wrapper(val, low, high, NO_EXIT_UPON_ERR, &is_err);
-    if(is_err != FKO_SUCCESS)
+    if(is_err != ZTN_SUCCESS)
     {
         log_msg(LOG_ERR, "[*] var %s value '%s' not in the range %d-%d",
                 var, val, low, high);
@@ -64,7 +64,7 @@ range_check(fko_srv_options_t *opts, char *var, char *val, int low, int high)
  * and assign it to the array at the specified index.
 */
 static void
-set_config_entry(fko_srv_options_t *opts, const int var_ndx, const char *value)
+set_config_entry(ztn_srv_options_t *opts, const int var_ndx, const char *value)
 {
     int space_needed;
 
@@ -110,7 +110,7 @@ set_config_entry(fko_srv_options_t *opts, const int var_ndx, const char *value)
 /* Given a config parameter name, return its index or -1 if not found.
 */
 static int
-config_entry_index(const fko_srv_options_t *opts, const char *var)
+config_entry_index(const ztn_srv_options_t *opts, const char *var)
 {
     int i;
 
@@ -124,7 +124,7 @@ config_entry_index(const fko_srv_options_t *opts, const char *var)
 /* Free the config memory
 */
 void
-free_configs(fko_srv_options_t *opts)
+free_configs(ztn_srv_options_t *opts)
 {
     int i;
 
@@ -136,10 +136,10 @@ free_configs(fko_srv_options_t *opts)
 }
 
 static void
-validate_int_var_ranges(fko_srv_options_t *opts)
+validate_int_var_ranges(ztn_srv_options_t *opts)
 {
 #if FIREWALL_IPFW
-    int     is_err = FKO_SUCCESS;
+    int     is_err = ZTN_SUCCESS;
 #endif
 
     opts->pcap_loop_sleep = range_check(opts,
@@ -197,7 +197,7 @@ validate_int_var_ranges(fko_srv_options_t *opts)
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
 
-    if(is_err != FKO_SUCCESS)
+    if(is_err != ZTN_SUCCESS)
     {
         log_msg(LOG_ERR, "[*] invalid integer conversion error.\n");
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
@@ -215,10 +215,10 @@ validate_int_var_ranges(fko_srv_options_t *opts)
 /**
  * @brief Generate Rijndael + HMAC keys from /dev/urandom (base64 encoded).
  *
- * @param options FKO command line option structure
+ * @param options ZTN command line option structure
  */
 static void
-generate_keys(fko_srv_options_t *options)
+generate_keys(ztn_srv_options_t *options)
 {
     char key_base64[MAX_B64_KEY_LEN+1];
     char hmac_key_base64[MAX_B64_KEY_LEN+1];
@@ -229,27 +229,27 @@ generate_keys(fko_srv_options_t *options)
     /* Set defaults and validate for --key-gen mode
     */
     if(options->key_len == 0)
-        options->key_len = FKO_DEFAULT_KEY_LEN;
+        options->key_len = ZTN_DEFAULT_KEY_LEN;
 
     if(options->hmac_key_len == 0)
-        options->hmac_key_len = FKO_DEFAULT_HMAC_KEY_LEN;
+        options->hmac_key_len = ZTN_DEFAULT_HMAC_KEY_LEN;
 
     if(options->hmac_type == 0)
-        options->hmac_type = FKO_DEFAULT_HMAC_MODE;
+        options->hmac_type = ZTN_DEFAULT_HMAC_MODE;
 
     /* Zero out the key buffers */
     memset(key_base64, 0x00, sizeof(key_base64));
     memset(hmac_key_base64, 0x00, sizeof(hmac_key_base64));
 
-    /* Generate the key through libfko */
-    res = fko_key_gen(key_base64, options->key_len,
+    /* Generate the key through libztn */
+    res = ztn_key_gen(key_base64, options->key_len,
                       hmac_key_base64, options->hmac_key_len,
                       options->hmac_type);
 
-    if(res != FKO_SUCCESS)
+    if(res != ZTN_SUCCESS)
     {
-        log_msg(LOG_ERR, "%s: fko_key_gen: Error %i - %s",
-                MY_NAME, res, fko_errstr(res));
+        log_msg(LOG_ERR, "%s: ztn_key_gen: Error %i - %s",
+                MY_NAME, res, ztn_errstr(res));
         clean_exit(options, NO_FW_CLEANUP, EXIT_FAILURE);
     }
 
@@ -278,7 +278,7 @@ generate_keys(fko_srv_options_t *options)
 /* Parse the config file...
 */
 static void
-parse_config_file(fko_srv_options_t *opts, const char *config_file)
+parse_config_file(ztn_srv_options_t *opts, const char *config_file)
 {
     FILE           *cfile_ptr;
     unsigned int    numLines = 0;
@@ -387,14 +387,14 @@ parse_config_file(fko_srv_options_t *opts, const char *config_file)
 /* Set defaults, and do sanity and bounds checks for the various options.
 */
 static void
-validate_options(fko_srv_options_t *opts)
+validate_options(ztn_srv_options_t *opts)
 {
     char tmp_path[MAX_PATH_LEN] = {0};
 
     /* If no conf dir is set in the config file, use the default.
     */
-    if(opts->config[CONF_FWKNOP_CONF_DIR] == NULL)
-        set_config_entry(opts, CONF_FWKNOP_CONF_DIR, DEF_CONF_DIR);
+    if(opts->config[CONF_SPA_CONF_DIR] == NULL)
+        set_config_entry(opts, CONF_SPA_CONF_DIR, DEF_CONF_DIR);
 
     /* If no access.conf path was specified on the command line or set in
      * the config file, use the default.
@@ -406,19 +406,19 @@ validate_options(fko_srv_options_t *opts)
      * via command-line, then grab the defaults. Start with RUN_DIR as the
      * files may depend on that.
     */
-    if(opts->config[CONF_FWKNOP_RUN_DIR] == NULL)
-        set_config_entry(opts, CONF_FWKNOP_RUN_DIR, DEF_RUN_DIR);
+    if(opts->config[CONF_SPA_RUN_DIR] == NULL)
+        set_config_entry(opts, CONF_SPA_RUN_DIR, DEF_RUN_DIR);
 
-    if(opts->config[CONF_FWKNOP_PID_FILE] == NULL)
+    if(opts->config[CONF_SPA_PID_FILE] == NULL)
     {
-        strlcpy(tmp_path, opts->config[CONF_FWKNOP_RUN_DIR], sizeof(tmp_path));
+        strlcpy(tmp_path, opts->config[CONF_SPA_RUN_DIR], sizeof(tmp_path));
 
         if(tmp_path[strlen(tmp_path)-1] != '/')
             strlcat(tmp_path, "/", sizeof(tmp_path));
 
         strlcat(tmp_path, DEF_PID_FILENAME, sizeof(tmp_path));
 
-        set_config_entry(opts, CONF_FWKNOP_PID_FILE, tmp_path);
+        set_config_entry(opts, CONF_SPA_PID_FILE, tmp_path);
     }
 
 #if USE_FILE_CACHE
@@ -427,7 +427,7 @@ validate_options(fko_srv_options_t *opts)
     if(opts->config[CONF_DIGEST_DB_FILE] == NULL)
 #endif
     {
-        strlcpy(tmp_path, opts->config[CONF_FWKNOP_RUN_DIR], sizeof(tmp_path));
+        strlcpy(tmp_path, opts->config[CONF_SPA_RUN_DIR], sizeof(tmp_path));
 
         if(tmp_path[strlen(tmp_path)-1] != '/')
             strlcat(tmp_path, "/", sizeof(tmp_path));
@@ -508,7 +508,7 @@ validate_options(fko_srv_options_t *opts)
                          DEF_ENABLE_DIGEST_PERSISTENCE);
 
     /* Set firewall rule "deep" collection interval - this allows
-     * fwknopd to remove rules with proper _exp_<time> expiration
+     * spad to remove rules with proper _exp_<time> expiration
      * times even when added by a different program.
     */
     if(opts->config[CONF_RULES_CHECK_THRESHOLD] == NULL)
@@ -588,7 +588,7 @@ validate_options(fko_srv_options_t *opts)
     if(validate_firewd_chain_conf(opts->config[CONF_FIREWD_INPUT_ACCESS]) != 1)
     {
         log_msg(LOG_ERR,
-            "Invalid FIREWD_INPUT_ACCESS specification, see fwknopd.conf comments"
+            "Invalid FIREWD_INPUT_ACCESS specification, see spad.conf comments"
         );
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
@@ -602,7 +602,7 @@ validate_options(fko_srv_options_t *opts)
     if(validate_firewd_chain_conf(opts->config[CONF_FIREWD_OUTPUT_ACCESS]) != 1)
     {
         log_msg(LOG_ERR,
-            "Invalid FIREWD_OUTPUT_ACCESS specification, see fwknopd.conf comments"
+            "Invalid FIREWD_OUTPUT_ACCESS specification, see spad.conf comments"
         );
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
@@ -616,7 +616,7 @@ validate_options(fko_srv_options_t *opts)
     if(validate_firewd_chain_conf(opts->config[CONF_FIREWD_FORWARD_ACCESS]) != 1)
     {
         log_msg(LOG_ERR,
-            "Invalid FIREWD_FORWARD_ACCESS specification, see fwknopd.conf comments"
+            "Invalid FIREWD_FORWARD_ACCESS specification, see spad.conf comments"
         );
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
@@ -630,7 +630,7 @@ validate_options(fko_srv_options_t *opts)
     if(validate_firewd_chain_conf(opts->config[CONF_FIREWD_DNAT_ACCESS]) != 1)
     {
         log_msg(LOG_ERR,
-            "Invalid FIREWD_DNAT_ACCESS specification, see fwknopd.conf comments"
+            "Invalid FIREWD_DNAT_ACCESS specification, see spad.conf comments"
         );
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
@@ -644,7 +644,7 @@ validate_options(fko_srv_options_t *opts)
     if(validate_firewd_chain_conf(opts->config[CONF_FIREWD_SNAT_ACCESS]) != 1)
     {
         log_msg(LOG_ERR,
-            "Invalid FIREWD_SNAT_ACCESS specification, see fwknopd.conf comments"
+            "Invalid FIREWD_SNAT_ACCESS specification, see spad.conf comments"
         );
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
@@ -658,7 +658,7 @@ validate_options(fko_srv_options_t *opts)
     if(validate_firewd_chain_conf(opts->config[CONF_FIREWD_MASQUERADE_ACCESS]) != 1)
     {
         log_msg(LOG_ERR,
-            "Invalid FIREWD_MASQUERADE_ACCESS specification, see fwknopd.conf comments"
+            "Invalid FIREWD_MASQUERADE_ACCESS specification, see spad.conf comments"
         );
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
@@ -731,7 +731,7 @@ validate_options(fko_srv_options_t *opts)
     if(validate_ipt_chain_conf(opts->config[CONF_IPT_INPUT_ACCESS]) != 1)
     {
         log_msg(LOG_ERR,
-            "Invalid IPT_INPUT_ACCESS specification, see fwknopd.conf comments"
+            "Invalid IPT_INPUT_ACCESS specification, see spad.conf comments"
         );
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
@@ -745,7 +745,7 @@ validate_options(fko_srv_options_t *opts)
     if(validate_ipt_chain_conf(opts->config[CONF_IPT_OUTPUT_ACCESS]) != 1)
     {
         log_msg(LOG_ERR,
-            "Invalid IPT_OUTPUT_ACCESS specification, see fwknopd.conf comments"
+            "Invalid IPT_OUTPUT_ACCESS specification, see spad.conf comments"
         );
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
@@ -759,7 +759,7 @@ validate_options(fko_srv_options_t *opts)
     if(validate_ipt_chain_conf(opts->config[CONF_IPT_FORWARD_ACCESS]) != 1)
     {
         log_msg(LOG_ERR,
-            "Invalid IPT_FORWARD_ACCESS specification, see fwknopd.conf comments"
+            "Invalid IPT_FORWARD_ACCESS specification, see spad.conf comments"
         );
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
@@ -773,7 +773,7 @@ validate_options(fko_srv_options_t *opts)
     if(validate_ipt_chain_conf(opts->config[CONF_IPT_DNAT_ACCESS]) != 1)
     {
         log_msg(LOG_ERR,
-            "Invalid IPT_DNAT_ACCESS specification, see fwknopd.conf comments"
+            "Invalid IPT_DNAT_ACCESS specification, see spad.conf comments"
         );
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
@@ -787,7 +787,7 @@ validate_options(fko_srv_options_t *opts)
     if(validate_ipt_chain_conf(opts->config[CONF_IPT_SNAT_ACCESS]) != 1)
     {
         log_msg(LOG_ERR,
-            "Invalid IPT_SNAT_ACCESS specification, see fwknopd.conf comments"
+            "Invalid IPT_SNAT_ACCESS specification, see spad.conf comments"
         );
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
@@ -801,7 +801,7 @@ validate_options(fko_srv_options_t *opts)
     if(validate_ipt_chain_conf(opts->config[CONF_IPT_MASQUERADE_ACCESS]) != 1)
     {
         log_msg(LOG_ERR,
-            "Invalid IPT_MASQUERADE_ACCESS specification, see fwknopd.conf comments"
+            "Invalid IPT_MASQUERADE_ACCESS specification, see spad.conf comments"
         );
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
@@ -912,8 +912,8 @@ validate_options(fko_srv_options_t *opts)
                          DEF_ENABLE_SPA_OVER_HTTP);
 
     /* When CONF_ENABLE_SPA_OVER_HTTP is enabled, control whether to require the
-     * User-Agent string to begin with 'Fwknop'. The default is 'N', but setting
-     * this to 'Y' in the fwknopd.conf file allows any User-Agent to be used.
+     * User-Agent string to begin with 'Spa'. The default is 'N', but setting
+     * this to 'Y' in the spad.conf file allows any User-Agent to be used.
      * Then, from the client, a custom User-Agent can be set with the
      * '--user-agent' command line option.
     */
@@ -1015,7 +1015,7 @@ validate_options(fko_srv_options_t *opts)
     validate_int_var_ranges(opts);
 
     /* Some options just trigger some output of information, or trigger an
-     * external function, but do not actually start fwknopd.  If any of those
+     * external function, but do not actually start spad.  If any of those
      * are set, we can return here an skip the validation routines as all
      * other options will be ignored anyway.
      *
@@ -1035,7 +1035,7 @@ validate_options(fko_srv_options_t *opts)
     if(opts->config[CONF_FIREWALL_EXE] == NULL)
     {
         log_msg(LOG_ERR,
-                "[*] No firewall command executable is set. Please check FIREWALL_EXE in fwknopd.conf."
+                "[*] No firewall command executable is set. Please check FIREWALL_EXE in spad.conf."
         );
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
@@ -1044,7 +1044,7 @@ validate_options(fko_srv_options_t *opts)
 }
 
 void
-set_preconfig_entries(fko_srv_options_t *opts)
+set_preconfig_entries(ztn_srv_options_t *opts)
 {
     /* First, set any default or otherwise static settings here.  Some may
      * end up being overwritten via config file or command-line.
@@ -1064,7 +1064,7 @@ set_preconfig_entries(fko_srv_options_t *opts)
  * switches.
 */
 void
-config_init(fko_srv_options_t *opts, int argc, char **argv)
+config_init(ztn_srv_options_t *opts, int argc, char **argv)
 {
     int             cmd_arg, index, is_err;
     unsigned char   got_conf_file = 0, got_override_config = 0;
@@ -1074,7 +1074,7 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
 
     /* Zero out options and opts_track.
     */
-    memset(opts, 0x00, sizeof(fko_srv_options_t));
+    memset(opts, 0x00, sizeof(ztn_srv_options_t));
 
     /* Set some preconfiguration options (i.e. build-time defaults)
     */
@@ -1090,7 +1090,7 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
 
     /* First, scan the command-line args to see if we are in key-generation
      * mode. This is independent of config parsing and other operations, so
-     * it is done as the very first thing. Also handle printing of the fwknop
+     * it is done as the very first thing. Also handle printing of the spa
      * version string since we don't need to parse a config for this.
     */
     while ((cmd_arg = getopt_long(argc, argv,
@@ -1098,7 +1098,7 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
 
         switch(cmd_arg) {
             case 'V':
-                fprintf(stdout, "fwknopd server %s, compiled for firewall bin: %s\n",
+                fprintf(stdout, "spad server %s, compiled for firewall bin: %s\n",
                         MY_VERSION, FIREWALL_EXE);
                 clean_exit(opts, NO_FW_CLEANUP, EXIT_SUCCESS);
             case 'k':
@@ -1111,7 +1111,7 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
             case KEY_LEN:  /* used in --key-gen mode only */
                 opts->key_len = strtol_wrapper(optarg, 1,
                                                MAX_KEY_LEN, NO_EXIT_UPON_ERR, &is_err);
-                if(is_err != FKO_SUCCESS)
+                if(is_err != ZTN_SUCCESS)
                 {
                     log_msg(LOG_ERR,
                             "Invalid key length '%s', must be in [%d-%d]",
@@ -1131,7 +1131,7 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
             case HMAC_KEY_LEN:  /* used in --key-gen mode only */
                 opts->hmac_key_len = strtol_wrapper(optarg, 1,
                                                     MAX_KEY_LEN, NO_EXIT_UPON_ERR, &is_err);
-                if(is_err != FKO_SUCCESS)
+                if(is_err != ZTN_SUCCESS)
                 {
                     log_msg(LOG_ERR,
                             "Invalid hmac key length '%s', must be in [%d-%d]",
@@ -1241,7 +1241,7 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
     {
         opts->verbose = strtol_wrapper(opts->config[CONF_VERBOSE], 0, -1,
                                        NO_EXIT_UPON_ERR, &is_err);
-        if(is_err != FKO_SUCCESS)
+        if(is_err != ZTN_SUCCESS)
         {
             log_msg(LOG_ERR, "[*] VERBOSE value '%s' not in the range (>0)",
                     opts->config[CONF_VERBOSE]);
@@ -1264,7 +1264,7 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
 #if AFL_FUZZING
                 opts->afl_fuzzing = 1;
 #else
-                log_msg(LOG_ERR, "[*] fwknopd not compiled with AFL fuzzing support");
+                log_msg(LOG_ERR, "[*] spad not compiled with AFL fuzzing support");
                 clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
 #endif
                 break;
@@ -1273,7 +1273,7 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
                 opts->afl_fuzzing = 1;
                 set_config_entry(opts, CONF_AFL_PKT_FILE, optarg);
 #else
-                log_msg(LOG_ERR, "[*] fwknopd not compiled with AFL fuzzing support");
+                log_msg(LOG_ERR, "[*] spad not compiled with AFL fuzzing support");
                 clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
 #endif
                 break;
@@ -1305,7 +1305,7 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
             case 'C':
                 opts->packet_ctr_limit = strtol_wrapper(optarg,
                                                         0, (2 << 30), NO_EXIT_UPON_ERR, &is_err);
-                if(is_err != FKO_SUCCESS)
+                if(is_err != ZTN_SUCCESS)
                 {
                     log_msg(LOG_ERR,
                             "[*] invalid -C packet count limit '%s'",
@@ -1341,7 +1341,7 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
 #if HAVE_LIBFIU
                 set_config_entry(opts, CONF_FAULT_INJECTION_TAG, optarg);
 #else
-                log_msg(LOG_ERR, "[*] fwknopd not compiled with libfiu support");
+                log_msg(LOG_ERR, "[*] spad not compiled with libfiu support");
                 clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
 #endif
                 break;
@@ -1402,7 +1402,7 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
                 /* This was handled earlier */
                 break;
             case 'p':
-                set_config_entry(opts, CONF_FWKNOP_PID_FILE, optarg);
+                set_config_entry(opts, CONF_SPA_PID_FILE, optarg);
                 break;
             case 'P':
                 set_config_entry(opts, CONF_PCAP_FILTER, optarg);
@@ -1427,7 +1427,7 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
                 opts->restart = 1;
                 break;
             case 'r':
-                set_config_entry(opts, CONF_FWKNOP_RUN_DIR, optarg);
+                set_config_entry(opts, CONF_SPA_RUN_DIR, optarg);
                 break;
             case 'S':
                 opts->status = 1;
@@ -1463,7 +1463,7 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
     }
 
     /* Now that we have all of our options set, and we are actually going to
-     * start fwknopd, we can validate them.
+     * start spad, we can validate them.
     */
     validate_options(opts);
 
@@ -1473,11 +1473,11 @@ config_init(fko_srv_options_t *opts, int argc, char **argv)
 /* Dump the configuration
 */
 void
-dump_config(const fko_srv_options_t *opts)
+dump_config(const ztn_srv_options_t *opts)
 {
     int i;
 
-    fprintf(stdout, "Current fwknopd config settings:\n");
+    fprintf(stdout, "Current spad config settings:\n");
 
     for(i=0; i<NUMBER_OF_CONFIG_ENTRIES; i++)
         fprintf(stdout, "%3i. %-28s =  '%s'\n",
@@ -1495,23 +1495,23 @@ dump_config(const fko_srv_options_t *opts)
 void
 usage(void)
 {
-    fprintf(stdout, "\n%s server version %s\n%s - http://www.cipherdyne.org/fwknop/\n\n",
+    fprintf(stdout, "\n%s server version %s\n%s - http://www.cipherdyne.org/spa/\n\n",
             MY_NAME, MY_VERSION, MY_DESC);
     fprintf(stdout,
-            "Usage: fwknopd [options]\n\n"
+            "Usage: spad [options]\n\n"
             " -a, --access-file       - Specify an alternate access.conf file.\n"
             "     --access-folder     - Specify an access.conf folder. All .conf\n"
             "                           files in this folder will be processed.\n"
             " -c, --config-file       - Specify an alternate configuration file.\n"
-            " -f, --foreground        - Run fwknopd in the foreground (do not become\n"
+            " -f, --foreground        - Run spad in the foreground (do not become\n"
             "                           a background daemon).\n"
             " -i, --interface         - Specify interface to listen for incoming SPA\n"
             "                           packets.\n"
             " -C, --packet-limit      - Limit the number of candidate SPA packets to\n"
             "                           process and exit when this limit is reached.\n"
             " -d, --digest-file       - Specify an alternate digest.cache file.\n"
-            " -D, --dump-config       - Dump the current fwknop configuration values.\n"
-            " -K, --kill              - Kill the currently running fwknopd.\n"
+            " -D, --dump-config       - Dump the current spa configuration values.\n"
+            " -K, --kill              - Kill the currently running spad.\n"
             " -l, --locale            - Provide a locale setting other than the system\n"
             "                           default.\n"
             #if USE_LIBNETFILTER_QUEUE
@@ -1519,18 +1519,18 @@ usage(void)
       "                           back to UDP server mode if not used).\n"
             #endif
             " -O, --override-config   - Specify a file with configuration entries that will\n"
-            "                           override those in fwknopd.conf.\n"
-            " -p, --pid-file          - Specify an alternate fwknopd.pid file.\n"
+            "                           override those in spad.conf.\n"
+            " -p, --pid-file          - Specify an alternate spad.pid file.\n"
             " -P, --pcap-filter       - Specify a Berkeley packet filter statement to\n"
-            "                           override the PCAP_FILTER variable in fwknopd.conf.\n"
-            " -R, --restart           - Force the currently running fwknopd to restart.\n"
+            "                           override the PCAP_FILTER variable in spad.conf.\n"
+            " -R, --restart           - Force the currently running spad to restart.\n"
             "     --rotate-digest-cache\n"
             "                         - Rotate the digest cache file by renaming the file\n"
             "                           to the same path with the -old suffix.\n"
             " -r, --run-dir           - Set path to local state run directory.\n"
             "                         - Rotate the digest cache file by renaming it to\n"
             "                           '<name>-old', and starting a new one.\n"
-            " -S, --status            - Display the status of any running fwknopd process.\n"
+            " -S, --status            - Display the status of any running spad process.\n"
             " -t, --test              - Test mode, process SPA packets but do not make any\n"
             "                           firewall modifications.\n"
             " -U, --udp-server        - Set UDP server mode.\n"
@@ -1549,16 +1549,16 @@ usage(void)
             "                           test suite).\n"
             " --pcap-file             - Read potential SPA packets from an existing pcap\n"
             "                           file.\n"
-            " --pcap-any-direction    - By default fwknopd processes packets that are\n"
+            " --pcap-any-direction    - By default spad processes packets that are\n"
             "                           sent to the sniffing interface, but this option\n"
             "                           enables processing of packets that originate from\n"
             "                           an interface (such as in a forwarding situation).\n"
-            "     --fw-list           - List all firewall rules that fwknop has created\n"
+            "     --fw-list           - List all firewall rules that spa has created\n"
             "                           and then exit.\n"
             "     --fw-list-all       - List all firewall rules in the complete policy,\n"
             "                           including those that have nothing to do with\n"
-            "                           fwknop.\n"
-            "     --fw-flush          - Flush all firewall rules created by fwknop.\n"
+            "                           spa.\n"
+            "     --fw-flush          - Flush all firewall rules created by spa.\n"
             "     --gpg-home-dir      - Specify the GPG home directory (this is normally\n"
             "                           done in the access.conf file).\n"
             "     --gpg-exe           - Specify the path to GPG (this is normally done in\n"

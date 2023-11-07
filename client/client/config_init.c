@@ -1,5 +1,5 @@
 
-#include "fwknop_common.h"
+#include "spanop_common.h"
 #include "netinet_common.h"
 #include "config_init.h"
 #include "cmd_opts.h"
@@ -12,14 +12,14 @@
 #endif
 
 #define RC_PARAM_TEMPLATE           "%-24s    %s\n"                     /* ！<在rc文件中定义param=val的模板 */
-#define RC_SECTION_DEFAULT          "default"                           /* ！<fwknoprc中默认节的名称 */
+#define RC_SECTION_DEFAULT          "default"                           /* ！<sparc中默认节的名称 */
 #define RC_SECTION_TEMPLATE         "[%s]\n"                            /* ！<在rc文件中定义节的模板 */
-#define FWKNOPRC_OFLAGS             (O_WRONLY|O_CREAT|O_EXCL)           /* ！<用于使用open函数创建fwknoprc文件的O_flags */
-#define FWKNOPRC_MODE               (S_IRUSR|S_IWUSR)                   /* ！<用于使用open函数创建fwknoprc文件的模式 */
-#define PARAM_YES_VALUE             "Y"                                 /* ！<表示fwknoprc中参数的YES值的字符串 */
-#define PARAM_NO_VALUE              "N"                                 /* ！<表示fwknoprc中参数的NO值的字符串 */
+#define SPARC_OFLAGS             (O_WRONLY|O_CREAT|O_EXCL)           /* ！<用于使用open函数创建sparc文件的O_flags */
+#define SPARC_MODE               (S_IRUSR|S_IWUSR)                   /* ！<用于使用open函数创建sparc文件的模式 */
+#define PARAM_YES_VALUE             "Y"                                 /* ！<表示sparc中参数的YES值的字符串 */
+#define PARAM_NO_VALUE              "N"                                 /* ！<表示sparc中参数的NO值的字符串 */
 #define POSITION_TO_BITMASK(x)      ((uint32_t)(1) << ((x) % 32))       /* ！<宏确实从某个位置获取位掩码 */
-#define BITMASK_ARRAY_SIZE          2                                   /* ！<用于处理fko_var_bitmask_t结构中的位掩码的32位整数的数目 */
+#define BITMASK_ARRAY_SIZE          2                                   /* ！<用于处理ztn_var_bitmask_t结构中的位掩码的32位整数的数目 */
 #define LF_CHAR                     0x0A                                /* ！<与LF字符关联的十六进制值 */
 
 #ifdef HAVE_C_UNIT_TESTS /* LCOV_EXCL_START */
@@ -28,10 +28,10 @@
 #endif /* LCOV_EXCL_STOP */
 
 /* * */
-typedef struct fko_var_bitmask
+typedef struct ztn_var_bitmask
 {
     uint32_t dw[BITMASK_ARRAY_SIZE];        /* ！<位掩码数组 */
-} fko_var_bitmask_t;
+} ztn_var_bitmask_t;
 
 /* * */
 //这个结构体用来处理rc文件中的变量（名称和值）
@@ -42,127 +42,127 @@ typedef struct rc_file_param
 } rc_file_param_t;
 
 /* * */
-typedef struct fko_var
+typedef struct ztn_var
 {
-    const char      name[32];   /* ！<fwknoprc中的变量名称 */
-    unsigned int    pos;        /* ！<fwknop_cli_arg_t枚举中的变量位置 */
-} fko_var_t;
+    const char      name[32];   /* ！<sparc中的变量名称 */
+    unsigned int    pos;        /* ！<spa_cli_arg_t枚举中的变量位置 */
+} ztn_var_t;
 
 enum
 {
-    FWKNOP_CLI_FIRST_ARG = 0,
-    FWKNOP_CLI_ARG_DIGEST_TYPE = 0,
-    FWKNOP_CLI_ARG_SPA_SERVER_PROTO,
-    FWKNOP_CLI_ARG_SPA_SERVER_PORT,
-    FWKNOP_CLI_ARG_SPA_SOURCE_PORT,
-    FWKNOP_CLI_ARG_FW_TIMEOUT,
-    FWKNOP_CLI_ARG_ALLOW_IP,
-    FWKNOP_CLI_ARG_TIME_OFFSET,
-    FWKNOP_CLI_ARG_ENCRYPTION_MODE,
-    FWKNOP_CLI_ARG_USE_GPG,
-    FWKNOP_CLI_ARG_USE_GPG_AGENT,
-    FWKNOP_CLI_ARG_GPG_NO_SIGNING_PW,
-    FWKNOP_CLI_ARG_GPG_RECIPIENT,
-    FWKNOP_CLI_ARG_GPG_SIGNER,
-    FWKNOP_CLI_ARG_GPG_HOMEDIR,
-    FWKNOP_CLI_ARG_GPG_EXE_PATH,
-    FWKNOP_CLI_ARG_SPOOF_USER,
-    FWKNOP_CLI_ARG_SPOOF_SOURCE_IP,
-    FWKNOP_CLI_ARG_ACCESS,
-    FWKNOP_CLI_ARG_SPA_SERVER,
-    FWKNOP_CLI_ARG_RAND_PORT,
-    FWKNOP_CLI_ARG_KEY_RIJNDAEL,
-    FWKNOP_CLI_ARG_KEY_RIJNDAEL_BASE64,
-    FWKNOP_CLI_ARG_GPG_SIGNING_PW,
-    FWKNOP_CLI_ARG_GPG_SIGNING_PW_BASE64,
-    FWKNOP_CLI_ARG_HMAC_DIGEST_TYPE,
-    FWKNOP_CLI_ARG_KEY_HMAC_BASE64,
-    FWKNOP_CLI_ARG_KEY_HMAC,
-    FWKNOP_CLI_ARG_USE_HMAC,
-    FWKNOP_CLI_ARG_USE_WGET_USER_AGENT,
-    FWKNOP_CLI_ARG_KEY_FILE,
-    FWKNOP_CLI_ARG_HMAC_KEY_FILE,
-    FWKNOP_CLI_ARG_NAT_ACCESS,
-    FWKNOP_CLI_ARG_HTTP_USER_AGENT,
-    FWKNOP_CLI_ARG_RESOLVE_URL,
-    FWKNOP_CLI_ARG_SERVER_RESOLVE_IPV4,
-    FWKNOP_CLI_ARG_NAT_LOCAL,
-    FWKNOP_CLI_ARG_NAT_RAND_PORT,
-    FWKNOP_CLI_ARG_NAT_PORT,
-    FWKNOP_CLI_ARG_VERBOSE,
-    FWKNOP_CLI_ARG_RESOLVE_IP_HTTP,
-    FWKNOP_CLI_ARG_RESOLVE_IP_HTTPS,
-    FWKNOP_CLI_ARG_RESOLVE_HTTP_ONLY,
-    FWKNOP_CLI_ARG_WGET_CMD,
-    FWKNOP_CLI_ARG_NO_SAVE_ARGS,
-    FWKNOP_CLI_LAST_ARG
-} fwknop_cli_arg_t;
+    SPA_CLI_FIRST_ARG = 0,
+    SPA_CLI_ARG_DIGEST_TYPE = 0,
+    SPA_CLI_ARG_SPA_SERVER_PROTO,
+    SPA_CLI_ARG_SPA_SERVER_PORT,
+    SPA_CLI_ARG_SPA_SOURCE_PORT,
+    SPA_CLI_ARG_FW_TIMEOUT,
+    SPA_CLI_ARG_ALLOW_IP,
+    SPA_CLI_ARG_TIME_OFFSET,
+    SPA_CLI_ARG_ENCRYPTION_MODE,
+    SPA_CLI_ARG_USE_GPG,
+    SPA_CLI_ARG_USE_GPG_AGENT,
+    SPA_CLI_ARG_GPG_NO_SIGNING_PW,
+    SPA_CLI_ARG_GPG_RECIPIENT,
+    SPA_CLI_ARG_GPG_SIGNER,
+    SPA_CLI_ARG_GPG_HOMEDIR,
+    SPA_CLI_ARG_GPG_EXE_PATH,
+    SPA_CLI_ARG_SPOOF_USER,
+    SPA_CLI_ARG_SPOOF_SOURCE_IP,
+    SPA_CLI_ARG_ACCESS,
+    SPA_CLI_ARG_SPA_SERVER,
+    SPA_CLI_ARG_RAND_PORT,
+    SPA_CLI_ARG_KEY_RIJNDAEL,
+    SPA_CLI_ARG_KEY_RIJNDAEL_BASE64,
+    SPA_CLI_ARG_GPG_SIGNING_PW,
+    SPA_CLI_ARG_GPG_SIGNING_PW_BASE64,
+    SPA_CLI_ARG_HMAC_DIGEST_TYPE,
+    SPA_CLI_ARG_KEY_HMAC_BASE64,
+    SPA_CLI_ARG_KEY_HMAC,
+    SPA_CLI_ARG_USE_HMAC,
+    SPA_CLI_ARG_USE_WGET_USER_AGENT,
+    SPA_CLI_ARG_KEY_FILE,
+    SPA_CLI_ARG_HMAC_KEY_FILE,
+    SPA_CLI_ARG_NAT_ACCESS,
+    SPA_CLI_ARG_HTTP_USER_AGENT,
+    SPA_CLI_ARG_RESOLVE_URL,
+    SPA_CLI_ARG_SERVER_RESOLVE_IPV4,
+    SPA_CLI_ARG_NAT_LOCAL,
+    SPA_CLI_ARG_NAT_RAND_PORT,
+    SPA_CLI_ARG_NAT_PORT,
+    SPA_CLI_ARG_VERBOSE,
+    SPA_CLI_ARG_RESOLVE_IP_HTTP,
+    SPA_CLI_ARG_RESOLVE_IP_HTTPS,
+    SPA_CLI_ARG_RESOLVE_HTTP_ONLY,
+    SPA_CLI_ARG_WGET_CMD,
+    SPA_CLI_ARG_NO_SAVE_ARGS,
+    SPA_CLI_LAST_ARG
+} spa_cli_arg_t;
 
-static fko_var_t fko_var_array[FWKNOP_CLI_LAST_ARG] =
+static ztn_var_t ztn_var_array[SPA_CLI_LAST_ARG] =
 {
-    { "DIGEST_TYPE",           FWKNOP_CLI_ARG_DIGEST_TYPE           },
-    { "SPA_SERVER_PROTO",      FWKNOP_CLI_ARG_SPA_SERVER_PROTO      },
-    { "SPA_SERVER_PORT",       FWKNOP_CLI_ARG_SPA_SERVER_PORT       },
-    { "SPA_SOURCE_PORT",       FWKNOP_CLI_ARG_SPA_SOURCE_PORT       },
-    { "FW_TIMEOUT",            FWKNOP_CLI_ARG_FW_TIMEOUT            },
-    { "ALLOW_IP",              FWKNOP_CLI_ARG_ALLOW_IP              },
-    { "TIME_OFFSET",           FWKNOP_CLI_ARG_TIME_OFFSET           },
-    { "ENCRYPTION_MODE",       FWKNOP_CLI_ARG_ENCRYPTION_MODE       },
-    { "USE_GPG",               FWKNOP_CLI_ARG_USE_GPG               },
-    { "USE_GPG_AGENT",         FWKNOP_CLI_ARG_USE_GPG_AGENT         },
-    { "GPG_RECIPIENT",         FWKNOP_CLI_ARG_GPG_RECIPIENT         },
-    { "GPG_SIGNER",            FWKNOP_CLI_ARG_GPG_SIGNER            },
-    { "GPG_HOMEDIR",           FWKNOP_CLI_ARG_GPG_HOMEDIR           },
-    { "GPG_EXE",               FWKNOP_CLI_ARG_GPG_EXE_PATH          },
-    { "GPG_SIGNING_PW",        FWKNOP_CLI_ARG_GPG_SIGNING_PW        },
-    { "GPG_SIGNING_PW_BASE64", FWKNOP_CLI_ARG_GPG_SIGNING_PW_BASE64 },
-    { "GPG_NO_SIGNING_PW",     FWKNOP_CLI_ARG_GPG_NO_SIGNING_PW     },
-    { "SPOOF_USER",            FWKNOP_CLI_ARG_SPOOF_USER            },
-    { "SPOOF_SOURCE_IP",       FWKNOP_CLI_ARG_SPOOF_SOURCE_IP       },
-    { "ACCESS",                FWKNOP_CLI_ARG_ACCESS                },
-    { "SPA_SERVER",            FWKNOP_CLI_ARG_SPA_SERVER            },
-    { "RAND_PORT",             FWKNOP_CLI_ARG_RAND_PORT             },
-    { "KEY",                   FWKNOP_CLI_ARG_KEY_RIJNDAEL          },
-    { "KEY_BASE64",            FWKNOP_CLI_ARG_KEY_RIJNDAEL_BASE64   },
-    { "HMAC_DIGEST_TYPE",      FWKNOP_CLI_ARG_HMAC_DIGEST_TYPE      },
-    { "HMAC_KEY_BASE64",       FWKNOP_CLI_ARG_KEY_HMAC_BASE64       },
-    { "HMAC_KEY",              FWKNOP_CLI_ARG_KEY_HMAC              },
-    { "USE_HMAC",              FWKNOP_CLI_ARG_USE_HMAC              },
-    { "USE_WGET_USER_AGENT",   FWKNOP_CLI_ARG_USE_WGET_USER_AGENT   },
-    { "KEY_FILE",              FWKNOP_CLI_ARG_KEY_FILE              },
-    { "HMAC_KEY_FILE",         FWKNOP_CLI_ARG_HMAC_KEY_FILE         },
-    { "NAT_ACCESS",            FWKNOP_CLI_ARG_NAT_ACCESS            },
-    { "HTTP_USER_AGENT",       FWKNOP_CLI_ARG_HTTP_USER_AGENT       },
-    { "RESOLVE_URL",           FWKNOP_CLI_ARG_RESOLVE_URL           },
-    { "SERVER_RESOLVE_IPV4",   FWKNOP_CLI_ARG_SERVER_RESOLVE_IPV4   },
-    { "NAT_LOCAL",             FWKNOP_CLI_ARG_NAT_LOCAL             },
-    { "NAT_RAND_PORT",         FWKNOP_CLI_ARG_NAT_RAND_PORT         },
-    { "NAT_PORT",              FWKNOP_CLI_ARG_NAT_PORT              },
-    { "VERBOSE",               FWKNOP_CLI_ARG_VERBOSE               },
-    { "RESOLVE_IP_HTTP",       FWKNOP_CLI_ARG_RESOLVE_IP_HTTP       },
-    { "RESOLVE_IP_HTTPS",      FWKNOP_CLI_ARG_RESOLVE_IP_HTTPS      },
-    { "RESOLVE_HTTP_ONLY",     FWKNOP_CLI_ARG_RESOLVE_HTTP_ONLY     },
-    { "WGET_CMD",              FWKNOP_CLI_ARG_WGET_CMD              },
-    { "NO_SAVE_ARGS",          FWKNOP_CLI_ARG_NO_SAVE_ARGS          }
+    { "DIGEST_TYPE",           SPA_CLI_ARG_DIGEST_TYPE           },
+    { "SPA_SERVER_PROTO",      SPA_CLI_ARG_SPA_SERVER_PROTO      },
+    { "SPA_SERVER_PORT",       SPA_CLI_ARG_SPA_SERVER_PORT       },
+    { "SPA_SOURCE_PORT",       SPA_CLI_ARG_SPA_SOURCE_PORT       },
+    { "FW_TIMEOUT",            SPA_CLI_ARG_FW_TIMEOUT            },
+    { "ALLOW_IP",              SPA_CLI_ARG_ALLOW_IP              },
+    { "TIME_OFFSET",           SPA_CLI_ARG_TIME_OFFSET           },
+    { "ENCRYPTION_MODE",       SPA_CLI_ARG_ENCRYPTION_MODE       },
+    { "USE_GPG",               SPA_CLI_ARG_USE_GPG               },
+    { "USE_GPG_AGENT",         SPA_CLI_ARG_USE_GPG_AGENT         },
+    { "GPG_RECIPIENT",         SPA_CLI_ARG_GPG_RECIPIENT         },
+    { "GPG_SIGNER",            SPA_CLI_ARG_GPG_SIGNER            },
+    { "GPG_HOMEDIR",           SPA_CLI_ARG_GPG_HOMEDIR           },
+    { "GPG_EXE",               SPA_CLI_ARG_GPG_EXE_PATH          },
+    { "GPG_SIGNING_PW",        SPA_CLI_ARG_GPG_SIGNING_PW        },
+    { "GPG_SIGNING_PW_BASE64", SPA_CLI_ARG_GPG_SIGNING_PW_BASE64 },
+    { "GPG_NO_SIGNING_PW",     SPA_CLI_ARG_GPG_NO_SIGNING_PW     },
+    { "SPOOF_USER",            SPA_CLI_ARG_SPOOF_USER            },
+    { "SPOOF_SOURCE_IP",       SPA_CLI_ARG_SPOOF_SOURCE_IP       },
+    { "ACCESS",                SPA_CLI_ARG_ACCESS                },
+    { "SPA_SERVER",            SPA_CLI_ARG_SPA_SERVER            },
+    { "RAND_PORT",             SPA_CLI_ARG_RAND_PORT             },
+    { "KEY",                   SPA_CLI_ARG_KEY_RIJNDAEL          },
+    { "KEY_BASE64",            SPA_CLI_ARG_KEY_RIJNDAEL_BASE64   },
+    { "HMAC_DIGEST_TYPE",      SPA_CLI_ARG_HMAC_DIGEST_TYPE      },
+    { "HMAC_KEY_BASE64",       SPA_CLI_ARG_KEY_HMAC_BASE64       },
+    { "HMAC_KEY",              SPA_CLI_ARG_KEY_HMAC              },
+    { "USE_HMAC",              SPA_CLI_ARG_USE_HMAC              },
+    { "USE_WGET_USER_AGENT",   SPA_CLI_ARG_USE_WGET_USER_AGENT   },
+    { "KEY_FILE",              SPA_CLI_ARG_KEY_FILE              },
+    { "HMAC_KEY_FILE",         SPA_CLI_ARG_HMAC_KEY_FILE         },
+    { "NAT_ACCESS",            SPA_CLI_ARG_NAT_ACCESS            },
+    { "HTTP_USER_AGENT",       SPA_CLI_ARG_HTTP_USER_AGENT       },
+    { "RESOLVE_URL",           SPA_CLI_ARG_RESOLVE_URL           },
+    { "SERVER_RESOLVE_IPV4",   SPA_CLI_ARG_SERVER_RESOLVE_IPV4   },
+    { "NAT_LOCAL",             SPA_CLI_ARG_NAT_LOCAL             },
+    { "NAT_RAND_PORT",         SPA_CLI_ARG_NAT_RAND_PORT         },
+    { "NAT_PORT",              SPA_CLI_ARG_NAT_PORT              },
+    { "VERBOSE",               SPA_CLI_ARG_VERBOSE               },
+    { "RESOLVE_IP_HTTP",       SPA_CLI_ARG_RESOLVE_IP_HTTP       },
+    { "RESOLVE_IP_HTTPS",      SPA_CLI_ARG_RESOLVE_IP_HTTPS      },
+    { "RESOLVE_HTTP_ONLY",     SPA_CLI_ARG_RESOLVE_HTTP_ONLY     },
+    { "WGET_CMD",              SPA_CLI_ARG_WGET_CMD              },
+    { "NO_SAVE_ARGS",          SPA_CLI_ARG_NO_SAVE_ARGS          }
 };
 
 /* 数组来定义哪些配置变量是关键的，不应该是 */
 /* 数组用于定义哪些配置变量是关键的，当使用 --保存rc节参数 */
 static int critical_var_array[] =
 {
-    FWKNOP_CLI_ARG_KEY_RIJNDAEL,
-    FWKNOP_CLI_ARG_KEY_RIJNDAEL_BASE64,
-    FWKNOP_CLI_ARG_KEY_HMAC,
-    FWKNOP_CLI_ARG_KEY_HMAC_BASE64,
-    FWKNOP_CLI_ARG_GPG_RECIPIENT,
-    FWKNOP_CLI_ARG_GPG_SIGNER,
-    FWKNOP_CLI_ARG_GPG_SIGNING_PW,
-    FWKNOP_CLI_ARG_GPG_SIGNING_PW_BASE64
+    SPA_CLI_ARG_KEY_RIJNDAEL,
+    SPA_CLI_ARG_KEY_RIJNDAEL_BASE64,
+    SPA_CLI_ARG_KEY_HMAC,
+    SPA_CLI_ARG_KEY_HMAC_BASE64,
+    SPA_CLI_ARG_GPG_RECIPIENT,
+    SPA_CLI_ARG_GPG_SIGNER,
+    SPA_CLI_ARG_GPG_SIGNING_PW,
+    SPA_CLI_ARG_GPG_SIGNING_PW_BASE64
 };
 
 /* * */
 static void
-generate_keys(fko_cli_options_t *options)
+generate_keys(ztn_cli_options_t *options)
 {
     int res;
 
@@ -173,16 +173,16 @@ generate_keys(fko_cli_options_t *options)
         memset(&(options->key_base64), 0x00, sizeof(options->key_base64));
         memset(&(options->hmac_key_base64), 0x00, sizeof(options->hmac_key_base64));
 
-        /* 通过libfko生成密钥 */
-        res = fko_key_gen(options->key_base64, options->key_len,
+        /* 通过libztn生成密钥 */
+        res = ztn_key_gen(options->key_base64, options->key_len,
                 options->hmac_key_base64, options->hmac_key_len,
                 options->hmac_type);
 
         /* 密钥生成失败时退出 */
-        if(res != FKO_SUCCESS)
+        if(res != ZTN_SUCCESS)
         {
-            log_msg(LOG_VERBOSITY_ERROR, "%s: fko_key_gen: Error %i - %s",
-                MY_NAME, res, fko_errstr(res));
+            log_msg(LOG_VERBOSITY_ERROR, "%s: ztn_key_gen: Error %i - %s",
+                MY_NAME, res, ztn_errstr(res));
             exit(EXIT_FAILURE);
         }
 
@@ -217,7 +217,7 @@ var_is_critical(short var_pos)
 
 /* * */
 static void
-add_var_to_bitmask(short var_pos, fko_var_bitmask_t *bm)
+add_var_to_bitmask(short var_pos, ztn_var_bitmask_t *bm)
 {
     unsigned int bitmask_ndx;
 
@@ -236,7 +236,7 @@ add_var_to_bitmask(short var_pos, fko_var_bitmask_t *bm)
 
 /* * */
 static void
-remove_var_from_bitmask(short var_pos, fko_var_bitmask_t *bm)
+remove_var_from_bitmask(short var_pos, ztn_var_bitmask_t *bm)
 {
     unsigned int bitmask_ndx;
 
@@ -255,7 +255,7 @@ remove_var_from_bitmask(short var_pos, fko_var_bitmask_t *bm)
 
 /* * */
 static int
-bitmask_has_var(short var_pos, fko_var_bitmask_t *bm)
+bitmask_has_var(short var_pos, ztn_var_bitmask_t *bm)
 {
     unsigned int    bitmask_ndx;
     int             var_found = 0;
@@ -304,18 +304,18 @@ ask_overwrite_var(const char *var, const char *stanza)
 }
 
 /* * */
-static fko_var_t *
+static ztn_var_t *
 lookup_var_by_name(const char *var_name)
 {
-    short       ndx;            /* fko_var_array表上的索引 */
-    fko_var_t  *var = NULL;
+    short       ndx;            /* ztn_var_array表上的索引 */
+    ztn_var_t  *var = NULL;
 
-    /* 根据fko_var_array中的每个可用变量检查str */
-    for (ndx=0 ; ndx<ARRAY_SIZE(fko_var_array) ; ndx++)
+    /* 根据ztn_var_array中的每个可用变量检查str */
+    for (ndx=0 ; ndx<ARRAY_SIZE(ztn_var_array) ; ndx++)
     {
-        if (CONF_VAR_IS(var_name, fko_var_array[ndx].name))
+        if (CONF_VAR_IS(var_name, ztn_var_array[ndx].name))
         {
-            var = &(fko_var_array[ndx]);
+            var = &(ztn_var_array[ndx]);
             break;
         }
     }
@@ -324,18 +324,18 @@ lookup_var_by_name(const char *var_name)
 }
 
 /* * */
-static fko_var_t *
+static ztn_var_t *
 lookup_var_by_position(short var_pos)
 {
-    short       ndx;            /* fko_var_array表上的索引 */
-    fko_var_t  *var = NULL;
+    short       ndx;            /* ztn_var_array表上的索引 */
+    ztn_var_t  *var = NULL;
 
-    /* 根据fko_var_array中的每个可用变量检查str */
-    for (ndx=0 ; ndx<ARRAY_SIZE(fko_var_array) ; ndx++)
+    /* 根据ztn_var_array中的每个可用变量检查str */
+    for (ndx=0 ; ndx<ARRAY_SIZE(ztn_var_array) ; ndx++)
     {
-        if (var_pos == fko_var_array[ndx].pos)
+        if (var_pos == ztn_var_array[ndx].pos)
         {
-            var = &(fko_var_array[ndx]);
+            var = &(ztn_var_array[ndx]);
             break;
         }
     }
@@ -489,9 +489,9 @@ dump_configured_stanzas_from_rcfile(const char* rcfile)
     return EXIT_SUCCESS;
 }
 
-/* 为fwknop rc文件分配路径 */
+/* 为spa rc文件分配路径 */
 static void
-set_rc_file(char *rcfile, fko_cli_options_t *options)
+set_rc_file(char *rcfile, ztn_cli_options_t *options)
 {
     int     rcf_offset;
     char    *homedir;
@@ -515,7 +515,7 @@ set_rc_file(char *rcfile, fko_cli_options_t *options)
         if(homedir == NULL)
         {
             log_msg(LOG_VERBOSITY_ERROR, "Warning: Unable to determine HOME directory.\n"
-                " No .fwknoprc file processed.");
+                " No .sparc file processed.");
             exit(EXIT_FAILURE);
         }
 
@@ -526,13 +526,13 @@ set_rc_file(char *rcfile, fko_cli_options_t *options)
         /* Sanity检查到.fknoprc的路径。 */
         if(rcf_offset > (MAX_PATH_LEN - 11))
         {
-            log_msg(LOG_VERBOSITY_ERROR, "Warning: Path to .fwknoprc file is too long.\n"
-                " No .fwknoprc file processed.");
+            log_msg(LOG_VERBOSITY_ERROR, "Warning: Path to .sparc file is too long.\n"
+                " No .sparc file processed.");
             exit(EXIT_FAILURE);
         }
 
         rcfile[rcf_offset] = PATH_SEP;
-        strlcat(rcfile, ".fwknoprc", MAX_PATH_LEN);
+        strlcat(rcfile, ".sparc", MAX_PATH_LEN);
     }
     else
     {
@@ -547,7 +547,7 @@ set_rc_file(char *rcfile, fko_cli_options_t *options)
 }
 
 static void
-keys_status(fko_cli_options_t *options)
+keys_status(ztn_cli_options_t *options)
 {
     FILE  *key_gen_file_ptr = NULL;
     char   rcfile[MAX_PATH_LEN] = {0};
@@ -583,7 +583,7 @@ keys_status(fko_cli_options_t *options)
                         options->key_base64, options->hmac_key_base64);
         }
 
-        /* 由于fwknopd服务器，始终以--key-gen模式退出 */
+        /* 由于spad服务器，始终以--key-gen模式退出 */
         exit(EXIT_SUCCESS);
     }
 }
@@ -636,7 +636,7 @@ parse_time_offset(const char *offset_str, int *offset)
 }
 
 static int
-create_fwknoprc(const char *rcfile)
+create_sparc(const char *rcfile)
 {
     FILE *rc = NULL;
     int   rcfile_fd = -1;
@@ -644,7 +644,7 @@ create_fwknoprc(const char *rcfile)
     log_msg(LOG_VERBOSITY_NORMAL, "[*] Creating initial rc file: %s.", rcfile);
 
     /* 尝试仅使用用户读/写权限创建初始rcfile。 */
-    rcfile_fd = open(rcfile, FWKNOPRC_OFLAGS ,FWKNOPRC_MODE);
+    rcfile_fd = open(rcfile, SPARC_OFLAGS ,SPARC_MODE);
 
     // If an error occurred ...
     if (rcfile_fd == -1) {
@@ -664,17 +664,17 @@ create_fwknoprc(const char *rcfile)
     }
 
     fprintf(rc,
-        "# .fwknoprc\n"
+        "# .sparc\n"
         "##############################################################################\n"
         "#\n"
-        "# Firewall Knock Operator (fwknop) client rc file.\n"
+        "# Firewall Knock Operator (spa) client rc file.\n"
         "#\n"
-        "# This file contains user-specific fwknop client configuration default\n"
-        "# and named parameter sets for specific invocations of the fwknop client.\n"
+        "# This file contains user-specific spa client configuration default\n"
+        "# and named parameter sets for specific invocations of the spa client.\n"
         "#\n"
         "# Each section (or stanza) is identified and started by a line in this\n"
         "# file that contains a single identifier surrounded by square brackets.\n"
-        "# It is this identifier (or name) that is used from the fwknop command line\n"
+        "# It is this identifier (or name) that is used from the spa command line\n"
         "# via the '-n <name>' argument to reference the corresponding stanza.\n"
         "#\n"
         "# The parameters within the stanza typically match corresponding client \n"
@@ -691,7 +691,7 @@ create_fwknoprc(const char *rcfile)
         "#\n"
         "# Lines starting with `#' and empty lines are ignored.\n"
         "#\n"
-        "# See the fwknop.8 man page for a complete list of valid parameters\n"
+        "# See the spa.8 man page for a complete list of valid parameters\n"
         "# and their values.\n"
         "#\n"
         "##############################################################################\n"
@@ -745,11 +745,11 @@ create_fwknoprc(const char *rcfile)
 }
 
 static int
-parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
+parse_rc_param(ztn_cli_options_t *options, const char *var_name, char * val)
 {
     int         tmpint, is_err;
     int         parse_error = 0;    /* 如果变量已成功处理，则为0，否则为<0 */
-    fko_var_t  *var;                /* fwknop变量结构上的指针 */
+    ztn_var_t  *var;                /* spa变量结构上的指针 */
 
     log_msg(LOG_VERBOSITY_DEBUG, "parse_rc_param() : Parsing variable %s...", var_name);
 
@@ -761,7 +761,7 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
         parse_error = -1;
 
     /* 摘要类型 */
-    else if (var->pos == FWKNOP_CLI_ARG_DIGEST_TYPE)
+    else if (var->pos == SPA_CLI_ARG_DIGEST_TYPE)
     {
         tmpint = digest_strtoint(val);
         if(tmpint < 0)
@@ -770,7 +770,7 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
             options->digest_type = tmpint;
     }
     /* 服务器协议 */
-    else if (var->pos == FWKNOP_CLI_ARG_SPA_SERVER_PROTO)
+    else if (var->pos == SPA_CLI_ARG_SPA_SERVER_PROTO)
     {
         tmpint = proto_strtoint(val);
         if(tmpint < 0)
@@ -779,34 +779,34 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
             options->spa_proto = tmpint;
     }
     /* 服务器端口 */
-    else if (var->pos == FWKNOP_CLI_ARG_SPA_SERVER_PORT)
+    else if (var->pos == SPA_CLI_ARG_SPA_SERVER_PORT)
     {
         tmpint = strtol_wrapper(val, 0, MAX_PORT, NO_EXIT_UPON_ERR, &is_err);
-        if(is_err == FKO_SUCCESS)
+        if(is_err == ZTN_SUCCESS)
             options->spa_dst_port = tmpint;
         else
             parse_error = -1;
     }
     /* 源端口 */
-    else if (var->pos == FWKNOP_CLI_ARG_SPA_SOURCE_PORT)
+    else if (var->pos == SPA_CLI_ARG_SPA_SOURCE_PORT)
     {
         tmpint = strtol_wrapper(val, 0, MAX_PORT, NO_EXIT_UPON_ERR, &is_err);
-        if(is_err == FKO_SUCCESS)
+        if(is_err == ZTN_SUCCESS)
             options->spa_src_port = tmpint;
         else
             parse_error = -1;
     }
     /* 防火墙规则超时 */
-    else if (var->pos == FWKNOP_CLI_ARG_FW_TIMEOUT)
+    else if (var->pos == SPA_CLI_ARG_FW_TIMEOUT)
     {
         tmpint = strtol_wrapper(val, 0, (2 << 15), NO_EXIT_UPON_ERR, &is_err);
-        if(is_err == FKO_SUCCESS)
+        if(is_err == ZTN_SUCCESS)
             options->fw_timeout = tmpint;
         else
             parse_error = -1;
     }
     /* 允许IP */
-    else if (var->pos == FWKNOP_CLI_ARG_ALLOW_IP)
+    else if (var->pos == SPA_CLI_ARG_ALLOW_IP)
     {
         /* 如果这是以前设置的 */
         options->resolve_ip_http_https = 0;
@@ -824,7 +824,7 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
         }
     }
     /* 时间偏移 */
-    else if (var->pos == FWKNOP_CLI_ARG_TIME_OFFSET)
+    else if (var->pos == SPA_CLI_ARG_TIME_OFFSET)
     {
         if(val[0] == '-')
         {
@@ -841,7 +841,7 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
                     "TIME_OFFSET argument '%s' invalid.", val);
     }
     /* 对称加密模式 */
-    else if (var->pos == FWKNOP_CLI_ARG_ENCRYPTION_MODE)
+    else if (var->pos == SPA_CLI_ARG_ENCRYPTION_MODE)
     {
         tmpint = enc_mode_strtoint(val);
         if(tmpint < 0)
@@ -850,81 +850,81 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
             options->encryption_mode = tmpint;
     }
     /* 使用GPG？ */
-    else if (var->pos == FWKNOP_CLI_ARG_USE_GPG)
+    else if (var->pos == SPA_CLI_ARG_USE_GPG)
     {
         if (is_yes_str(val))
             options->use_gpg = 1;
         else;
     }
     /* 使用GPG代理？ */
-    else if (var->pos == FWKNOP_CLI_ARG_USE_GPG_AGENT)
+    else if (var->pos == SPA_CLI_ARG_USE_GPG_AGENT)
     {
         if (is_yes_str(val))
             options->use_gpg_agent = 1;
         else;
     }
     /* 没有GPG签名密码？ */
-    else if (var->pos == FWKNOP_CLI_ARG_GPG_NO_SIGNING_PW)
+    else if (var->pos == SPA_CLI_ARG_GPG_NO_SIGNING_PW)
     {
         if (is_yes_str(val))
             options->gpg_no_signing_pw = 1;
         else;
     }
     /* GPG收件人 */
-    else if (var->pos == FWKNOP_CLI_ARG_GPG_RECIPIENT)
+    else if (var->pos == SPA_CLI_ARG_GPG_RECIPIENT)
     {
         strlcpy(options->gpg_recipient_key, val, sizeof(options->gpg_recipient_key));
     }
     /* GPG签署人 */
-    else if (var->pos == FWKNOP_CLI_ARG_GPG_SIGNER)
+    else if (var->pos == SPA_CLI_ARG_GPG_SIGNER)
     {
         strlcpy(options->gpg_signer_key, val, sizeof(options->gpg_signer_key));
     }
     /* GPG主页目录 */
-    else if (var->pos == FWKNOP_CLI_ARG_GPG_HOMEDIR)
+    else if (var->pos == SPA_CLI_ARG_GPG_HOMEDIR)
     {
         strlcpy(options->gpg_home_dir, val, sizeof(options->gpg_home_dir));
     }
     /* GPG路径 */
-    else if (var->pos == FWKNOP_CLI_ARG_GPG_EXE_PATH)
+    else if (var->pos == SPA_CLI_ARG_GPG_EXE_PATH)
     {
         strlcpy(options->gpg_exe, val, sizeof(options->gpg_exe));
     }
     /* 后台处理用户 */
-    else if (var->pos == FWKNOP_CLI_ARG_SPOOF_USER)
+    else if (var->pos == SPA_CLI_ARG_SPOOF_USER)
     {
         strlcpy(options->spoof_user, val, sizeof(options->spoof_user));
     }
     /* 后台处理源IP */
-    else if (var->pos == FWKNOP_CLI_ARG_SPOOF_SOURCE_IP)
+    else if (var->pos == SPA_CLI_ARG_SPOOF_SOURCE_IP)
     {
         strlcpy(options->spoof_ip_src_str, val, sizeof(options->spoof_ip_src_str));
     }
     /* ACCESS请求 */
-    else if (var->pos == FWKNOP_CLI_ARG_ACCESS)
+    else if (var->pos == SPA_CLI_ARG_ACCESS)
     {
         strlcpy(options->access_str, val, sizeof(options->access_str));
     }
     /* SPA服务器（目标） */
-    else if (var->pos == FWKNOP_CLI_ARG_SPA_SERVER)
+    else if (var->pos == SPA_CLI_ARG_SPA_SERVER)
     {
         strlcpy(options->spa_server_str, val, sizeof(options->spa_server_str));
     }
     /* 兰德端口？ */
-    else if (var->pos == FWKNOP_CLI_ARG_RAND_PORT)
+    else if (var->pos == SPA_CLI_ARG_RAND_PORT)
     {
         if (is_yes_str(val))
             options->rand_port = 1;
         else;
     }
     /* Rijndael钥匙 */
-    else if (var->pos == FWKNOP_CLI_ARG_KEY_RIJNDAEL)
+    else if (var->pos == SPA_CLI_ARG_KEY_RIJNDAEL)
     {
         strlcpy(options->key, val, sizeof(options->key));
         options->have_key = 1;
     }
     /* Rijndael密钥（base-64编码） */
-    else if (var->pos == FWKNOP_CLI_ARG_KEY_RIJNDAEL_BASE64)
+    else if (var->pos == SPA_CLI_ARG_KEY_RIJNDAEL_BASE64)
     {
         if (! is_base64((unsigned char *) val, strlen(val)))
         {
@@ -937,13 +937,13 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
         options->have_base64_key = 1;
     }
     /* GnuPG签名密码 */
-    else if (var->pos == FWKNOP_CLI_ARG_GPG_SIGNING_PW)
+    else if (var->pos == SPA_CLI_ARG_GPG_SIGNING_PW)
     {
         strlcpy(options->key, val, sizeof(options->key));
         options->have_key = 1;
     }
     /* GnuPG签名密码短语（base-64编码） */
-    else if (var->pos == FWKNOP_CLI_ARG_GPG_SIGNING_PW_BASE64)
+    else if (var->pos == SPA_CLI_ARG_GPG_SIGNING_PW_BASE64)
     {
         if (! is_base64((unsigned char *) val, strlen(val)))
         {
@@ -956,7 +956,7 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
         options->have_base64_key = 1;
     }
     /* HMAC摘要类型 */
-    else if (var->pos == FWKNOP_CLI_ARG_HMAC_DIGEST_TYPE)
+    else if (var->pos == SPA_CLI_ARG_HMAC_DIGEST_TYPE)
     {
         tmpint = hmac_digest_strtoint(val);
         if(tmpint < 0)
@@ -972,7 +972,7 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
         }
     }
     /* HMAC密钥（base64编码） */
-    else if (var->pos == FWKNOP_CLI_ARG_KEY_HMAC_BASE64)
+    else if (var->pos == SPA_CLI_ARG_KEY_HMAC_BASE64)
     {
         if (! is_base64((unsigned char *) val, strlen(val)))
         {
@@ -987,7 +987,7 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
     }
 
     /* HMAC密钥 */
-    else if (var->pos == FWKNOP_CLI_ARG_KEY_HMAC)
+    else if (var->pos == SPA_CLI_ARG_KEY_HMAC)
     {
         strlcpy(options->hmac_key, val, sizeof(options->hmac_key));
         options->have_hmac_key = 1;
@@ -995,40 +995,40 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
     }
 
     /* --使用hmac */
-    else if (var->pos == FWKNOP_CLI_ARG_USE_HMAC)
+    else if (var->pos == SPA_CLI_ARG_USE_HMAC)
     {
         if (is_yes_str(val))
             options->use_hmac = 1;
     }
     /* --使用wget用户代理 */
-    else if (var->pos == FWKNOP_CLI_ARG_USE_WGET_USER_AGENT)
+    else if (var->pos == SPA_CLI_ARG_USE_WGET_USER_AGENT)
     {
         if (is_yes_str(val))
             options->use_wget_user_agent = 1;
     }
     /* 密钥文件 */
-    else if (var->pos == FWKNOP_CLI_ARG_KEY_FILE)
+    else if (var->pos == SPA_CLI_ARG_KEY_FILE)
     {
         strlcpy(options->get_key_file, val, sizeof(options->get_key_file));
     }
     /* HMAC密钥文件 */
-    else if (var->pos == FWKNOP_CLI_ARG_HMAC_KEY_FILE)
+    else if (var->pos == SPA_CLI_ARG_HMAC_KEY_FILE)
     {
         strlcpy(options->get_key_file, val,
             sizeof(options->get_hmac_key_file));
     }
     /* NAT访问请求 */
-    else if (var->pos == FWKNOP_CLI_ARG_NAT_ACCESS)
+    else if (var->pos == SPA_CLI_ARG_NAT_ACCESS)
     {
         strlcpy(options->nat_access_str, val, sizeof(options->nat_access_str));
     }
     /* HTTP用户代理 */
-    else if (var->pos == FWKNOP_CLI_ARG_HTTP_USER_AGENT)
+    else if (var->pos == SPA_CLI_ARG_HTTP_USER_AGENT)
     {
         strlcpy(options->http_user_agent, val, sizeof(options->http_user_agent));
     }
     /* 解析URL */
-    else if (var->pos == FWKNOP_CLI_ARG_RESOLVE_URL)
+    else if (var->pos == SPA_CLI_ARG_RESOLVE_URL)
     {
         if(options->resolve_url != NULL)
             free(options->resolve_url);
@@ -1042,7 +1042,7 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
         strlcpy(options->resolve_url, val, tmpint);
     }
     /* 解析SPA服务器（通过DNS）-仅接受IPv4地址？ */
-    else if (var->pos == FWKNOP_CLI_ARG_SERVER_RESOLVE_IPV4)
+    else if (var->pos == SPA_CLI_ARG_SERVER_RESOLVE_IPV4)
     {
         if (is_yes_str(val))
         {
@@ -1050,7 +1050,7 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
         }
     }
     /* wget命令 */
-    else if (var->pos == FWKNOP_CLI_ARG_WGET_CMD)
+    else if (var->pos == SPA_CLI_ARG_WGET_CMD)
     {
         if(options->wget_bin != NULL)
             free(options->wget_bin);
@@ -1064,37 +1064,37 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
         strlcpy(options->wget_bin, val, tmpint);
     }
     /* NAT本地？ */
-    else if (var->pos == FWKNOP_CLI_ARG_NAT_LOCAL)
+    else if (var->pos == SPA_CLI_ARG_NAT_LOCAL)
     {
         if (is_yes_str(val))
             options->nat_local = 1;
         else;
     }
     /* NAT rand端口？ */
-    else if (var->pos == FWKNOP_CLI_ARG_NAT_RAND_PORT)
+    else if (var->pos == SPA_CLI_ARG_NAT_RAND_PORT)
     {
         if (is_yes_str(val))
             options->nat_rand_port = 1;
         else;
     }
     /* NAT端口 */
-    else if (var->pos == FWKNOP_CLI_ARG_NAT_PORT)
+    else if (var->pos == SPA_CLI_ARG_NAT_PORT)
     {
         tmpint = strtol_wrapper(val, 0, MAX_PORT, NO_EXIT_UPON_ERR, &is_err);
-        if(is_err == FKO_SUCCESS)
+        if(is_err == ZTN_SUCCESS)
             options->nat_port = tmpint;
         else
             parse_error = -1;
     }
     /* VERBOSE级别 */
-    else if (var->pos == FWKNOP_CLI_ARG_VERBOSE)
+    else if (var->pos == SPA_CLI_ARG_VERBOSE)
     {
         if (is_yes_str(val))
             options->verbose = 1;
         else
         {
             tmpint = strtol_wrapper(val, 0, LOG_LAST_VERBOSITY - 1, NO_EXIT_UPON_ERR, &is_err);
-            if(is_err == FKO_SUCCESS)
+            if(is_err == ZTN_SUCCESS)
                 options->verbose = tmpint;
             else
                 parse_error = -1;
@@ -1104,28 +1104,28 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
             log_set_verbosity(LOG_DEFAULT_VERBOSITY + options->verbose);
     }
     /* RESOLVE_IP_HTTPS？ */
-    else if (var->pos == FWKNOP_CLI_ARG_RESOLVE_IP_HTTPS)
+    else if (var->pos == SPA_CLI_ARG_RESOLVE_IP_HTTPS)
     {
         if (is_yes_str(val))
             options->resolve_ip_http_https = 1;
         else;
     }
     /* RESOLVE_IP_HTTP？这实际上会在默认情况下导致HTTPS解析 */
-    else if (var->pos == FWKNOP_CLI_ARG_RESOLVE_IP_HTTP)
+    else if (var->pos == SPA_CLI_ARG_RESOLVE_IP_HTTP)
     {
         if (is_yes_str(val))
             options->resolve_ip_http_https = 1;
         else;
     }
     /* 仅解决HTTP_ONLY？强制HTTP而不是HTTPS IP解析。 */
-    else if (var->pos == FWKNOP_CLI_ARG_RESOLVE_HTTP_ONLY)
+    else if (var->pos == SPA_CLI_ARG_RESOLVE_HTTP_ONLY)
     {
         if (is_yes_str(val))
             options->resolve_http_only = 1;
         else;
     }
-    /* 避免保存。默认情况下运行fwknop.run */
-    else if (var->pos == FWKNOP_CLI_ARG_NO_SAVE_ARGS)
+    /* 避免保存。默认情况下运行spa.run */
+    else if (var->pos == SPA_CLI_ARG_NO_SAVE_ARGS)
     {
         if (is_yes_str(val))
             options->no_save_args = 1;
@@ -1142,10 +1142,10 @@ parse_rc_param(fko_cli_options_t *options, const char *var_name, char * val)
 
 /* * */
 static void
-add_single_var_to_rc(FILE* fhandle, short var_pos, fko_cli_options_t *options)
+add_single_var_to_rc(FILE* fhandle, short var_pos, ztn_cli_options_t *options)
 {
     char        val[MAX_LINE_LEN] = {0};
-    fko_var_t  *var;
+    ztn_var_t  *var;
 
     var = lookup_var_by_position(var_pos);
 
@@ -1158,140 +1158,140 @@ add_single_var_to_rc(FILE* fhandle, short var_pos, fko_cli_options_t *options)
     /* 选择要添加的参数并将其字符串值存储到val中 */
     switch (var->pos)
     {
-        case FWKNOP_CLI_ARG_DIGEST_TYPE :
+        case SPA_CLI_ARG_DIGEST_TYPE :
             digest_inttostr(options->digest_type, val, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_SPA_SERVER_PROTO :
+        case SPA_CLI_ARG_SPA_SERVER_PROTO :
             proto_inttostr(options->spa_proto, val, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_SPA_SERVER_PORT :
+        case SPA_CLI_ARG_SPA_SERVER_PORT :
             snprintf(val, sizeof(val)-1, "%d", options->spa_dst_port);
             break;
-        case FWKNOP_CLI_ARG_SPA_SOURCE_PORT :
+        case SPA_CLI_ARG_SPA_SOURCE_PORT :
             snprintf(val, sizeof(val)-1, "%d", options->spa_src_port);
             break;
-        case FWKNOP_CLI_ARG_FW_TIMEOUT :
+        case SPA_CLI_ARG_FW_TIMEOUT :
             snprintf(val, sizeof(val)-1, "%d", options->fw_timeout);
             break;
-        case FWKNOP_CLI_ARG_ALLOW_IP :
+        case SPA_CLI_ARG_ALLOW_IP :
             strlcpy(val, options->allow_ip_str, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_TIME_OFFSET :
+        case SPA_CLI_ARG_TIME_OFFSET :
             if (options->time_offset_minus != 0)
                 snprintf(val, sizeof(val)-1, "-%d", options->time_offset_minus);
             else if (options->time_offset_plus != 0)
                 snprintf(val, sizeof(val)-1, "%d", options->time_offset_plus);
             else;
             break;
-        case FWKNOP_CLI_ARG_ENCRYPTION_MODE :
+        case SPA_CLI_ARG_ENCRYPTION_MODE :
             enc_mode_inttostr(options->encryption_mode, val, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_USE_GPG :
+        case SPA_CLI_ARG_USE_GPG :
             bool_to_yesno(options->use_gpg, val, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_USE_GPG_AGENT :
+        case SPA_CLI_ARG_USE_GPG_AGENT :
             bool_to_yesno(options->use_gpg_agent, val, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_GPG_RECIPIENT :
+        case SPA_CLI_ARG_GPG_RECIPIENT :
             strlcpy(val, options->gpg_recipient_key, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_GPG_SIGNER :
+        case SPA_CLI_ARG_GPG_SIGNER :
             strlcpy(val, options->gpg_signer_key, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_GPG_HOMEDIR :
+        case SPA_CLI_ARG_GPG_HOMEDIR :
             strlcpy(val, options->gpg_home_dir, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_GPG_EXE_PATH :
+        case SPA_CLI_ARG_GPG_EXE_PATH :
             strlcpy(val, options->gpg_exe, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_GPG_NO_SIGNING_PW :
+        case SPA_CLI_ARG_GPG_NO_SIGNING_PW :
             bool_to_yesno(options->gpg_no_signing_pw, val, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_SPOOF_USER :
+        case SPA_CLI_ARG_SPOOF_USER :
             strlcpy(val, options->spoof_user, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_SPOOF_SOURCE_IP :
+        case SPA_CLI_ARG_SPOOF_SOURCE_IP :
             strlcpy(val, options->spoof_ip_src_str, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_ACCESS :
+        case SPA_CLI_ARG_ACCESS :
             strlcpy(val, options->access_str, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_SPA_SERVER :
+        case SPA_CLI_ARG_SPA_SERVER :
             strlcpy(val, options->spa_server_str, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_RAND_PORT :
+        case SPA_CLI_ARG_RAND_PORT :
             bool_to_yesno(options->rand_port, val, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_KEY_FILE :
+        case SPA_CLI_ARG_KEY_FILE :
             strlcpy(val, options->get_key_file, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_HMAC_KEY_FILE :
+        case SPA_CLI_ARG_HMAC_KEY_FILE :
             strlcpy(val, options->get_hmac_key_file, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_KEY_RIJNDAEL:
+        case SPA_CLI_ARG_KEY_RIJNDAEL:
             strlcpy(val, options->key, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_KEY_RIJNDAEL_BASE64:
+        case SPA_CLI_ARG_KEY_RIJNDAEL_BASE64:
             strlcpy(val, options->key_base64, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_KEY_HMAC_BASE64:
+        case SPA_CLI_ARG_KEY_HMAC_BASE64:
             strlcpy(val, options->hmac_key_base64, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_KEY_HMAC:
+        case SPA_CLI_ARG_KEY_HMAC:
             strlcpy(val, options->hmac_key, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_HMAC_DIGEST_TYPE :
+        case SPA_CLI_ARG_HMAC_DIGEST_TYPE :
             hmac_digest_inttostr(options->hmac_type, val, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_USE_HMAC :
+        case SPA_CLI_ARG_USE_HMAC :
             bool_to_yesno(options->use_hmac, val, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_USE_WGET_USER_AGENT :
+        case SPA_CLI_ARG_USE_WGET_USER_AGENT :
             bool_to_yesno(options->use_wget_user_agent, val, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_NAT_ACCESS :
+        case SPA_CLI_ARG_NAT_ACCESS :
             strlcpy(val, options->nat_access_str, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_HTTP_USER_AGENT :
+        case SPA_CLI_ARG_HTTP_USER_AGENT :
             strlcpy(val, options->http_user_agent, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_RESOLVE_URL :
+        case SPA_CLI_ARG_RESOLVE_URL :
             if (options->resolve_url != NULL)
                 strlcpy(val, options->resolve_url, sizeof(val));
             else;
             break;
-        case FWKNOP_CLI_ARG_SERVER_RESOLVE_IPV4:
+        case SPA_CLI_ARG_SERVER_RESOLVE_IPV4:
             bool_to_yesno(options->spa_server_resolve_ipv4, val, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_NAT_LOCAL :
+        case SPA_CLI_ARG_NAT_LOCAL :
             bool_to_yesno(options->nat_local, val, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_NAT_RAND_PORT :
+        case SPA_CLI_ARG_NAT_RAND_PORT :
             bool_to_yesno(options->nat_rand_port, val, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_NAT_PORT :
+        case SPA_CLI_ARG_NAT_PORT :
             snprintf(val, sizeof(val)-1, "%d", options->nat_port);
             break;
-        case FWKNOP_CLI_ARG_VERBOSE:
+        case SPA_CLI_ARG_VERBOSE:
             if((options->verbose == 0) || (options->verbose == 1))
                 bool_to_yesno(options->verbose, val, sizeof(val));
             else
                 snprintf(val, sizeof(val)-1, "%d", options->verbose);
             break;
-        case FWKNOP_CLI_ARG_RESOLVE_IP_HTTPS:
+        case SPA_CLI_ARG_RESOLVE_IP_HTTPS:
             bool_to_yesno(options->resolve_ip_http_https, val, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_RESOLVE_IP_HTTP:
+        case SPA_CLI_ARG_RESOLVE_IP_HTTP:
             bool_to_yesno(options->resolve_ip_http_https, val, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_RESOLVE_HTTP_ONLY:
+        case SPA_CLI_ARG_RESOLVE_HTTP_ONLY:
             bool_to_yesno(options->resolve_http_only, val, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_WGET_CMD :
+        case SPA_CLI_ARG_WGET_CMD :
             if (options->wget_bin != NULL)
                 strlcpy(val, options->wget_bin, sizeof(val));
             break;
-        case FWKNOP_CLI_ARG_NO_SAVE_ARGS :
+        case SPA_CLI_ARG_NO_SAVE_ARGS :
             bool_to_yesno(options->no_save_args, val, sizeof(val));
             break;
         default:
@@ -1311,14 +1311,14 @@ add_single_var_to_rc(FILE* fhandle, short var_pos, fko_cli_options_t *options)
 
 /* * */
 static void
-add_multiple_vars_to_rc(FILE* rc, fko_cli_options_t *options, fko_var_bitmask_t *bitmask)
+add_multiple_vars_to_rc(FILE* rc, ztn_cli_options_t *options, ztn_var_bitmask_t *bitmask)
 {
-    short ndx = 0;      /* fko_var_array表中配置变量的索引 */
+    short ndx = 0;      /* ztn_var_array表中配置变量的索引 */
     short position;     /* 配置变量的位置 */
 
-    for (ndx=0 ; ndx<ARRAY_SIZE(fko_var_array) ; ndx++)
+    for (ndx=0 ; ndx<ARRAY_SIZE(ztn_var_array) ; ndx++)
     {
-        position = fko_var_array[ndx].pos;
+        position = ztn_var_array[ndx].pos;
         if (bitmask_has_var(position, bitmask))
             add_single_var_to_rc(rc, position, options);
     }
@@ -1326,7 +1326,7 @@ add_multiple_vars_to_rc(FILE* rc, fko_cli_options_t *options, fko_var_bitmask_t 
 
 /* * */
 static int
-process_rc_section(char *section_name, fko_cli_options_t *options)
+process_rc_section(char *section_name, ztn_cli_options_t *options)
 {
     FILE           *rc;
     int             line_num = 0, do_exit = 0;
@@ -1343,7 +1343,7 @@ process_rc_section(char *section_name, fko_cli_options_t *options)
     {
         if(errno == ENOENT)
         {
-            if(create_fwknoprc(rcfile) != 0)
+            if(create_sparc(rcfile) != 0)
                 return -1;
         }
         else
@@ -1410,7 +1410,7 @@ process_rc_section(char *section_name, fko_cli_options_t *options)
 
 /* * */
 static void
-update_rc(fko_cli_options_t *options, fko_var_bitmask_t *bitmask)
+update_rc(ztn_cli_options_t *options, ztn_var_bitmask_t *bitmask)
 {
     FILE           *rc;
     FILE           *rc_update;
@@ -1422,7 +1422,7 @@ update_rc(fko_cli_options_t *options, fko_var_bitmask_t *bitmask)
     char            rcfile_update[MAX_PATH_LEN] = {0};
     char            curr_stanza[MAX_LINE_LEN]   = {0};
     rc_file_param_t param;                              /* 结构，以包含一个具有其值的conf.变量名 */
-    fko_var_t      *var;
+    ztn_var_t      *var;
 
     set_rc_file(rcfile, options);
 
@@ -1430,7 +1430,7 @@ update_rc(fko_cli_options_t *options, fko_var_bitmask_t *bitmask)
     strlcat(rcfile_update, ".updated", sizeof(rcfile_update));
 
     /* 创建一个新的临时rc文件 */
-    rcfile_fd = open(rcfile_update, FWKNOPRC_OFLAGS, FWKNOPRC_MODE);
+    rcfile_fd = open(rcfile_update, SPARC_OFLAGS, SPARC_MODE);
     if (rcfile_fd == -1)
     {
         log_msg(LOG_VERBOSITY_WARNING,
@@ -1572,7 +1572,7 @@ update_rc(fko_cli_options_t *options, fko_var_bitmask_t *bitmask)
 
 /* 各种选项的健康度和边界检查。 */
 static void
-validate_options(fko_cli_options_t *options)
+validate_options(ztn_cli_options_t *options)
 {
     if ( (options->use_rc_stanza[0] != 0x0)
         && (options->got_named_stanza == 0)
@@ -1652,9 +1652,9 @@ validate_options(fko_cli_options_t *options)
             log_msg(LOG_VERBOSITY_ERROR, "Invalid spoof IP");
             exit(EXIT_FAILURE);
         }
-        if(options->spa_proto != FKO_PROTO_TCP_RAW
-                && options->spa_proto != FKO_PROTO_UDP_RAW
-                && options->spa_proto != FKO_PROTO_ICMP)
+        if(options->spa_proto != ZTN_PROTO_TCP_RAW
+                && options->spa_proto != ZTN_PROTO_UDP_RAW
+                && options->spa_proto != ZTN_PROTO_ICMP)
         {
             log_msg(LOG_VERBOSITY_ERROR,
                     "Must set -P <udpraw|tcpraw|icmp> with a spoofed source IP");
@@ -1662,12 +1662,12 @@ validate_options(fko_cli_options_t *options)
         }
     }
 
-    if(options->resolve_ip_http_https || options->spa_proto == FKO_PROTO_HTTP)
+    if(options->resolve_ip_http_https || options->spa_proto == ZTN_PROTO_HTTP)
         if (options->http_user_agent[0] == '\0')
             snprintf(options->http_user_agent, HTTP_MAX_USER_AGENT_LEN,
-                "%s%s", "Fwknop/", MY_VERSION);
+                "%s%s", "Spa/", MY_VERSION);
 
-    if(options->http_proxy[0] != 0x0 && options->spa_proto != FKO_PROTO_HTTP)
+    if(options->http_proxy[0] != 0x0 && options->spa_proto != ZTN_PROTO_HTTP)
     {
         log_msg(LOG_VERBOSITY_ERROR,
             "Cannot set --http-proxy with a non-HTTP protocol.");
@@ -1685,7 +1685,7 @@ validate_options(fko_cli_options_t *options)
         }
     }
 
-    if(options->encryption_mode == FKO_ENC_MODE_ASYMMETRIC
+    if(options->encryption_mode == ZTN_ENC_MODE_ASYMMETRIC
             && ! options->use_gpg)
     {
         log_msg(LOG_VERBOSITY_ERROR,
@@ -1693,7 +1693,7 @@ validate_options(fko_cli_options_t *options)
         exit(EXIT_FAILURE);
     }
 
-    if(options->encryption_mode == FKO_ENC_MODE_CBC_LEGACY_IV
+    if(options->encryption_mode == ZTN_ENC_MODE_CBC_LEGACY_IV
             && options->use_hmac)
     {
         log_msg(LOG_VERBOSITY_ERROR,
@@ -1702,26 +1702,26 @@ validate_options(fko_cli_options_t *options)
     }
 
     /* 验证HMAC摘要类型 */
-    if(options->use_hmac && options->hmac_type == FKO_HMAC_UNKNOWN)
-        options->hmac_type = FKO_DEFAULT_HMAC_MODE;
+    if(options->use_hmac && options->hmac_type == ZTN_HMAC_UNKNOWN)
+        options->hmac_type = ZTN_DEFAULT_HMAC_MODE;
 
-    if(options->key_gen && options->hmac_type == FKO_HMAC_UNKNOWN)
-        options->hmac_type = FKO_DEFAULT_HMAC_MODE;
+    if(options->key_gen && options->hmac_type == ZTN_HMAC_UNKNOWN)
+        options->hmac_type = ZTN_DEFAULT_HMAC_MODE;
 
     return;
 }
 
 /* 建立一些默认值，如UDP/62201，用于发送SPA */
 static void
-set_defaults(fko_cli_options_t *options)
+set_defaults(ztn_cli_options_t *options)
 {
-    options->spa_proto      = FKO_DEFAULT_PROTO;
-    options->spa_dst_port   = FKO_DEFAULT_PORT;
+    options->spa_proto      = ZTN_DEFAULT_PROTO;
+    options->spa_dst_port   = ZTN_DEFAULT_PORT;
     options->fw_timeout     = -1;
 
-    options->key_len        = FKO_DEFAULT_KEY_LEN;
-    options->hmac_key_len   = FKO_DEFAULT_HMAC_KEY_LEN;
-    options->hmac_type      = FKO_HMAC_UNKNOWN;  /* 使用HMAC密钥时更新 */
+    options->key_len        = ZTN_DEFAULT_KEY_LEN;
+    options->hmac_key_len   = ZTN_DEFAULT_HMAC_KEY_LEN;
+    options->hmac_type      = ZTN_HMAC_UNKNOWN;  /* 使用HMAC密钥时更新 */
 
     options->spa_icmp_type  = ICMP_ECHOREPLY;  /* 仅用于“-P icmp”模式 */
     options->spa_icmp_code  = 0;               /* 仅用于“-P icmp”模式 */
@@ -1734,17 +1734,17 @@ set_defaults(fko_cli_options_t *options)
 /* 通过配置文件和/或命令行初始化程序配置 */
 //这个函数是用来初始化配置文件的
 void
-config_init(fko_cli_options_t *options, int argc, char **argv)
+config_init(ztn_cli_options_t *options, int argc, char **argv)
 {
     int                 cmd_arg, index, is_err, rlen=0;
-    fko_var_bitmask_t   var_bitmask;
+    ztn_var_bitmask_t   var_bitmask;
     char                rcfile[MAX_PATH_LEN] = {0};
 
     /* 清零选项、opts_track和bitmask。 */
    //初始化
 
-    memset(options, 0x00, sizeof(fko_cli_options_t));
-    memset(&var_bitmask, 0x00, sizeof(fko_var_bitmask_t));
+    memset(options, 0x00, sizeof(ztn_cli_options_t));
+    memset(&var_bitmask, 0x00, sizeof(ztn_var_bitmask_t));
 
     /* 确保设置了一些合理的默认值 */
    //设置一些默认值
@@ -1784,7 +1784,7 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
                 break;
             case 'v':
                 options->verbose++;
-                add_var_to_bitmask(FWKNOP_CLI_ARG_VERBOSE, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_VERBOSE, &var_bitmask);
                 break;
         }
     }
@@ -1839,11 +1839,11 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
         switch(cmd_arg) {
             case 'a':
                 strlcpy(options->allow_ip_str, optarg, sizeof(options->allow_ip_str));
-                add_var_to_bitmask(FWKNOP_CLI_ARG_ALLOW_IP, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_ALLOW_IP, &var_bitmask);
                 break;
             case 'A':
                 strlcpy(options->access_str, optarg, sizeof(options->access_str));
-                add_var_to_bitmask(FWKNOP_CLI_ARG_ACCESS, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_ACCESS, &var_bitmask);
                 break;
             case 'b':
                 options->save_packet_file_append = 1;
@@ -1856,7 +1856,7 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
                 break;
             case 'D':
                 strlcpy(options->spa_server_str, optarg, sizeof(options->spa_server_str));
-                add_var_to_bitmask(FWKNOP_CLI_ARG_SPA_SERVER, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_SPA_SERVER, &var_bitmask);
                 break;
             case 'E':
                 strlcpy(options->args_save_file, optarg, sizeof(options->args_save_file));
@@ -1864,40 +1864,40 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
             case 'f':
                 options->fw_timeout = strtol_wrapper(optarg, 0,
                         (2 << 16), NO_EXIT_UPON_ERR, &is_err);
-                if(is_err != FKO_SUCCESS)
+                if(is_err != ZTN_SUCCESS)
                 {
                     log_msg(LOG_VERBOSITY_ERROR, "--fw-timeout must be within [%d-%d]",
                             0, (2 << 16));
                     exit(EXIT_FAILURE);
                 }
-                add_var_to_bitmask(FWKNOP_CLI_ARG_FW_TIMEOUT, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_FW_TIMEOUT, &var_bitmask);
                 break;
             case FAULT_INJECTION_TAG:
 #if HAVE_LIBFIU
                 strlcpy(options->fault_injection_tag, optarg, sizeof(options->fault_injection_tag));
 #else
                 log_msg(LOG_VERBOSITY_ERROR,
-                    "fwknop not compiled with fault injection support.", optarg);
+                    "spa not compiled with fault injection support.", optarg);
                 exit(EXIT_FAILURE);
 #endif
                 break;
             case 'g':
             case GPG_ENCRYPTION:
                 options->use_gpg = 1;
-                add_var_to_bitmask(FWKNOP_CLI_ARG_USE_GPG, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_USE_GPG, &var_bitmask);
                 break;
             case 'G':
                 strlcpy(options->get_key_file, optarg, sizeof(options->get_key_file));
-                add_var_to_bitmask(FWKNOP_CLI_ARG_KEY_FILE, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_KEY_FILE, &var_bitmask);
                 break;
             case GET_HMAC_KEY:
                 strlcpy(options->get_hmac_key_file, optarg,
                     sizeof(options->get_hmac_key_file));
                 options->use_hmac = 1;
-                add_var_to_bitmask(FWKNOP_CLI_ARG_HMAC_KEY_FILE, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_HMAC_KEY_FILE, &var_bitmask);
                 break;
             case 'H':
-                options->spa_proto = FKO_PROTO_HTTP;
+                options->spa_proto = ZTN_PROTO_HTTP;
                 strlcpy(options->http_proxy, optarg, sizeof(options->http_proxy));
                 break;
             case 'k':
@@ -1910,7 +1910,7 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
             case KEY_RIJNDAEL:
                 strlcpy(options->key, optarg, sizeof(options->key));
                 options->have_key = 1;
-                add_var_to_bitmask(FWKNOP_CLI_ARG_KEY_RIJNDAEL, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_KEY_RIJNDAEL, &var_bitmask);
                 break;
             case KEY_RIJNDAEL_BASE64:
                 if (! is_base64((unsigned char *) optarg, strlen(optarg)))
@@ -1922,7 +1922,7 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
                 }
                 strlcpy(options->key_base64, optarg, sizeof(options->key_base64));
                 options->have_base64_key = 1;
-                add_var_to_bitmask(FWKNOP_CLI_ARG_KEY_RIJNDAEL_BASE64, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_KEY_RIJNDAEL_BASE64, &var_bitmask);
                 break;
             case KEY_HMAC_BASE64:
                 if (! is_base64((unsigned char *) optarg, strlen(optarg)))
@@ -1935,20 +1935,20 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
                 strlcpy(options->hmac_key_base64, optarg, sizeof(options->hmac_key_base64));
                 options->have_hmac_base64_key = 1;
                 options->use_hmac = 1;
-                add_var_to_bitmask(FWKNOP_CLI_ARG_KEY_HMAC_BASE64, &var_bitmask);
-                add_var_to_bitmask(FWKNOP_CLI_ARG_USE_HMAC, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_KEY_HMAC_BASE64, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_USE_HMAC, &var_bitmask);
                 break;
             case KEY_HMAC:
                 strlcpy(options->hmac_key, optarg, sizeof(options->hmac_key));
                 options->have_hmac_key = 1;
                 options->use_hmac = 1;
-                add_var_to_bitmask(FWKNOP_CLI_ARG_KEY_HMAC, &var_bitmask);
-                add_var_to_bitmask(FWKNOP_CLI_ARG_USE_HMAC, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_KEY_HMAC, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_USE_HMAC, &var_bitmask);
                 break;
             case KEY_LEN:
                 options->key_len = strtol_wrapper(optarg, 1,
                         MAX_KEY_LEN, NO_EXIT_UPON_ERR, &is_err);
-                if(is_err != FKO_SUCCESS)
+                if(is_err != ZTN_SUCCESS)
                 {
                     log_msg(LOG_VERBOSITY_ERROR,
                             "Invalid key length '%s', must be in [%d-%d]",
@@ -1964,27 +1964,27 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
                         optarg);
                     exit(EXIT_FAILURE);
                 }
-                add_var_to_bitmask(FWKNOP_CLI_ARG_HMAC_DIGEST_TYPE, &var_bitmask);
-                add_var_to_bitmask(FWKNOP_CLI_ARG_USE_HMAC, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_HMAC_DIGEST_TYPE, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_USE_HMAC, &var_bitmask);
                 options->use_hmac = 1;
                 break;
             case HMAC_KEY_LEN:
                 options->hmac_key_len = strtol_wrapper(optarg, 1,
                         MAX_KEY_LEN, NO_EXIT_UPON_ERR, &is_err);
-                if(is_err != FKO_SUCCESS)
+                if(is_err != ZTN_SUCCESS)
                 {
                     log_msg(LOG_VERBOSITY_ERROR,
                             "Invalid hmac key length '%s', must be in [%d-%d]",
                             optarg, 1, MAX_KEY_LEN);
                     exit(EXIT_FAILURE);
                 }
-                add_var_to_bitmask(FWKNOP_CLI_ARG_USE_HMAC, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_USE_HMAC, &var_bitmask);
                 options->use_hmac = 1;
                 break;
             case SPA_ICMP_TYPE:
                 options->spa_icmp_type = strtol_wrapper(optarg, 0,
                         MAX_ICMP_TYPE, NO_EXIT_UPON_ERR, &is_err);
-                if(is_err != FKO_SUCCESS)
+                if(is_err != ZTN_SUCCESS)
                 {
                     log_msg(LOG_VERBOSITY_ERROR,
                             "Invalid icmp type '%s', must be in [%d-%d]",
@@ -1995,7 +1995,7 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
             case SPA_ICMP_CODE:
                 options->spa_icmp_code = strtol_wrapper(optarg, 0,
                         MAX_ICMP_CODE, NO_EXIT_UPON_ERR, &is_err);
-                if(is_err != FKO_SUCCESS)
+                if(is_err != ZTN_SUCCESS)
                 {
                     log_msg(LOG_VERBOSITY_ERROR,
                             "Invalid icmp code '%s', must be in [%d-%d]",
@@ -2007,7 +2007,7 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
                 options->run_last_command = 1;
                 break;
             case 'm':
-            case FKO_DIGEST_NAME:
+            case ZTN_DIGEST_NAME:
                 if((options->digest_type = digest_strtoint(optarg)) < 0)
                 {
                     log_msg(LOG_VERBOSITY_ERROR,
@@ -2015,7 +2015,7 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
                     optarg);
                     exit(EXIT_FAILURE);
                 }
-                add_var_to_bitmask(FWKNOP_CLI_ARG_DIGEST_TYPE, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_DIGEST_TYPE, &var_bitmask);
                 break;
             case 'M':
             case ENCRYPTION_MODE:
@@ -2026,23 +2026,23 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
                     optarg);
                     exit(EXIT_FAILURE);
                 }
-                add_var_to_bitmask(FWKNOP_CLI_ARG_ENCRYPTION_MODE, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_ENCRYPTION_MODE, &var_bitmask);
                 break;
             case NO_SAVE_ARGS:
                 options->no_save_args = 1;
-                add_var_to_bitmask(FWKNOP_CLI_ARG_NO_SAVE_ARGS, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_NO_SAVE_ARGS, &var_bitmask);
                 break;
             case 'n':
                 /* 我们早些时候已经处理过了，所以我们在这里什么都不做 */
                 break;
             case 'N':
                 strlcpy(options->nat_access_str, optarg, sizeof(options->nat_access_str));
-                add_var_to_bitmask(FWKNOP_CLI_ARG_NAT_ACCESS, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_NAT_ACCESS, &var_bitmask);
                 break;
             case 'p':
                 options->spa_dst_port = strtol_wrapper(optarg, 0,
                         MAX_PORT, EXIT_UPON_ERR, &is_err);
-                add_var_to_bitmask(FWKNOP_CLI_ARG_SPA_SERVER_PORT, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_SPA_SERVER_PORT, &var_bitmask);
                 break;
             case 'P':
                 if((options->spa_proto = proto_strtoint(optarg)) < 0)
@@ -2050,28 +2050,28 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
                     log_msg(LOG_VERBOSITY_ERROR, "Unrecognized protocol: %s", optarg);
                     exit(EXIT_FAILURE);
                 }
-                add_var_to_bitmask(FWKNOP_CLI_ARG_SPA_SERVER_PROTO, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_SPA_SERVER_PROTO, &var_bitmask);
                 break;
             case 'Q':
                 strlcpy(options->spoof_ip_src_str, optarg, sizeof(options->spoof_ip_src_str));
-                add_var_to_bitmask(FWKNOP_CLI_ARG_SPOOF_SOURCE_IP, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_SPOOF_SOURCE_IP, &var_bitmask);
                 break;
             case RC_FILE_PATH:
                 strlcpy(options->rc_file, optarg, sizeof(options->rc_file));
                 break;
             case 'r':
                 options->rand_port = 1;
-                add_var_to_bitmask(FWKNOP_CLI_ARG_RAND_PORT, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_RAND_PORT, &var_bitmask);
                 break;
             case 'R':
                 options->resolve_ip_http_https = 1;
-                add_var_to_bitmask(FWKNOP_CLI_ARG_RESOLVE_IP_HTTPS, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_RESOLVE_IP_HTTPS, &var_bitmask);
                 break;
             case RESOLVE_HTTP_ONLY:
                 options->resolve_http_only = 1;
                 options->resolve_ip_http_https = 1;
-                add_var_to_bitmask(FWKNOP_CLI_ARG_RESOLVE_HTTP_ONLY, &var_bitmask);
-                add_var_to_bitmask(FWKNOP_CLI_ARG_RESOLVE_IP_HTTPS, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_RESOLVE_HTTP_ONLY, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_RESOLVE_IP_HTTPS, &var_bitmask);
                 break;
             case RESOLVE_URL:
                 if(options->resolve_url != NULL)
@@ -2084,11 +2084,11 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
                     exit(EXIT_FAILURE);
                 }
                 strlcpy(options->resolve_url, optarg, rlen);
-                add_var_to_bitmask(FWKNOP_CLI_ARG_RESOLVE_URL, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_RESOLVE_URL, &var_bitmask);
                 break;
             case SERVER_RESOLVE_IPV4:
                 options->spa_server_resolve_ipv4 = 1;
-                add_var_to_bitmask(FWKNOP_CLI_ARG_SERVER_RESOLVE_IPV4, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_SERVER_RESOLVE_IPV4, &var_bitmask);
                 break;
             case 'w':
                 if(options->wget_bin != NULL)
@@ -2101,7 +2101,7 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
                     exit(EXIT_FAILURE);
                 }
                 strlcpy(options->wget_bin, optarg, rlen);
-                add_var_to_bitmask(FWKNOP_CLI_ARG_WGET_CMD, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_WGET_CMD, &var_bitmask);
                 break;
             case SHOW_LAST_ARGS:
                 options->show_last_command = 1;
@@ -2112,7 +2112,7 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
             case 'S':
                 options->spa_src_port = strtol_wrapper(optarg, 0,
                         MAX_PORT, EXIT_UPON_ERR, &is_err);
-                add_var_to_bitmask(FWKNOP_CLI_ARG_SPA_SOURCE_PORT, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_SPA_SOURCE_PORT, &var_bitmask);
                 break;
             case SAVE_RC_STANZA:
                 /* 我们早些时候已经处理过了，所以我们在这里什么都不做 */
@@ -2122,11 +2122,11 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
                 break;
             case 'u':
                 strlcpy(options->http_user_agent, optarg, sizeof(options->http_user_agent));
-                add_var_to_bitmask(FWKNOP_CLI_ARG_HTTP_USER_AGENT, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_HTTP_USER_AGENT, &var_bitmask);
                 break;
             case 'U':
                 strlcpy(options->spoof_user, optarg, sizeof(options->spoof_user));
-                add_var_to_bitmask(FWKNOP_CLI_ARG_SPOOF_USER, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_SPOOF_USER, &var_bitmask);
                 break;
             case 'v':
                 /* 处理得更早。 */
@@ -2137,52 +2137,52 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
             case GPG_RECIP_KEY:
                 options->use_gpg = 1;
                 strlcpy(options->gpg_recipient_key, optarg, sizeof(options->gpg_recipient_key));
-                add_var_to_bitmask(FWKNOP_CLI_ARG_USE_GPG, &var_bitmask);
-                add_var_to_bitmask(FWKNOP_CLI_ARG_GPG_RECIPIENT, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_USE_GPG, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_GPG_RECIPIENT, &var_bitmask);
                 break;
             case GPG_SIGNER_KEY:
                 options->use_gpg = 1;
                 strlcpy(options->gpg_signer_key, optarg, sizeof(options->gpg_signer_key));
-                add_var_to_bitmask(FWKNOP_CLI_ARG_USE_GPG, &var_bitmask);
-                add_var_to_bitmask(FWKNOP_CLI_ARG_GPG_SIGNER, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_USE_GPG, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_GPG_SIGNER, &var_bitmask);
                 break;
             case GPG_HOME_DIR:
                 options->use_gpg = 1;
                 strlcpy(options->gpg_home_dir, optarg, sizeof(options->gpg_home_dir));
                 chop_char(options->gpg_home_dir, PATH_SEP);
-                add_var_to_bitmask(FWKNOP_CLI_ARG_USE_GPG, &var_bitmask);
-                add_var_to_bitmask(FWKNOP_CLI_ARG_GPG_HOMEDIR, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_USE_GPG, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_GPG_HOMEDIR, &var_bitmask);
                 break;
             case GPG_EXE_PATH:
                 options->use_gpg = 1;
                 strlcpy(options->gpg_exe, optarg, sizeof(options->gpg_exe));
-                add_var_to_bitmask(FWKNOP_CLI_ARG_USE_GPG, &var_bitmask);
-                add_var_to_bitmask(FWKNOP_CLI_ARG_GPG_EXE_PATH, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_USE_GPG, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_GPG_EXE_PATH, &var_bitmask);
                 break;
             case GPG_AGENT:
                 options->use_gpg = 1;
                 options->use_gpg_agent = 1;
-                add_var_to_bitmask(FWKNOP_CLI_ARG_USE_GPG, &var_bitmask);
-                add_var_to_bitmask(FWKNOP_CLI_ARG_USE_GPG_AGENT, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_USE_GPG, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_USE_GPG_AGENT, &var_bitmask);
                 break;
             case GPG_ALLOW_NO_SIGNING_PW:
                 options->use_gpg = 1;
                 options->gpg_no_signing_pw = 1;
-                add_var_to_bitmask(FWKNOP_CLI_ARG_USE_GPG, &var_bitmask);
-                add_var_to_bitmask(FWKNOP_CLI_ARG_GPG_NO_SIGNING_PW, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_USE_GPG, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_GPG_NO_SIGNING_PW, &var_bitmask);
                 break;
             case NAT_LOCAL:
                 options->nat_local = 1;
-                add_var_to_bitmask(FWKNOP_CLI_ARG_NAT_LOCAL, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_NAT_LOCAL, &var_bitmask);
                 break;
             case NAT_RAND_PORT:
                 options->nat_rand_port = 1;
-                add_var_to_bitmask(FWKNOP_CLI_ARG_NAT_RAND_PORT, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_NAT_RAND_PORT, &var_bitmask);
                 break;
             case NAT_PORT:
                 options->nat_port = strtol_wrapper(optarg, 0,
                         MAX_PORT, EXIT_UPON_ERR, &is_err);
-                add_var_to_bitmask(FWKNOP_CLI_ARG_NAT_PORT, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_NAT_PORT, &var_bitmask);
                 break;
             case NO_HOME_DIR:
                 /* 我们早些时候已经处理过了，所以我们在这里什么都不做 */
@@ -2197,7 +2197,7 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
                         "Invalid time offset: '%s'", optarg);
                     exit(EXIT_FAILURE);
                 }
-                add_var_to_bitmask(FWKNOP_CLI_ARG_TIME_OFFSET, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_TIME_OFFSET, &var_bitmask);
                 break;
             case TIME_OFFSET_MINUS:
                 if (! parse_time_offset(optarg, &options->time_offset_minus))
@@ -2206,14 +2206,14 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
                         "Invalid time offset: '%s'", optarg);
                     exit(EXIT_FAILURE);
                 }
-                add_var_to_bitmask(FWKNOP_CLI_ARG_TIME_OFFSET, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_TIME_OFFSET, &var_bitmask);
                 break;
             case USE_HMAC:
-                add_var_to_bitmask(FWKNOP_CLI_ARG_USE_HMAC, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_USE_HMAC, &var_bitmask);
                 options->use_hmac = 1;
                 break;
             case USE_WGET_USER_AGENT:
-                add_var_to_bitmask(FWKNOP_CLI_ARG_USE_WGET_USER_AGENT, &var_bitmask);
+                add_var_to_bitmask(SPA_CLI_ARG_USE_WGET_USER_AGENT, &var_bitmask);
                 options->use_wget_user_agent = 1;
                 break;
             case FORCE_SAVE_RC_STANZA:
@@ -2251,8 +2251,8 @@ config_init(fko_cli_options_t *options, int argc, char **argv)
         /* 如果我们被要求生成密钥，我们会将它们添加到位掩码中，这样 */
         if (options->key_gen == 1)
         {
-            add_var_to_bitmask(FWKNOP_CLI_ARG_KEY_RIJNDAEL_BASE64, &var_bitmask);
-            add_var_to_bitmask(FWKNOP_CLI_ARG_KEY_HMAC_BASE64, &var_bitmask);
+            add_var_to_bitmask(SPA_CLI_ARG_KEY_RIJNDAEL_BASE64, &var_bitmask);
+            add_var_to_bitmask(SPA_CLI_ARG_KEY_HMAC_BASE64, &var_bitmask);
         }
         else;
 
@@ -2270,13 +2270,13 @@ void
 usage(void)
 {
     log_msg(LOG_VERBOSITY_NORMAL,
-            "\n%s client version %s\n%s - http://%s/fwknop/\n",
+            "\n%s client version %s\n%s - http://%s/spa/\n",
             MY_NAME, MY_VERSION, MY_DESC, HTTP_RESOLVE_HOST);
     /* 中文的日志解释 */
     log_msg(LOG_VERBOSITY_NORMAL,
-      "Usage: fwknop -A <port list> [-s|-R|-a] -D <spa_server> [options]\n\n"
+      "Usage: spa -A <port list> [-s|-R|-a] -D <spa_server> [options]\n\n"
       " -n, --named-config          Specify a named configuration stanza in the\n"
-      "                             '$HOME/.fwknoprc' file to provide some of all\n"
+      "                             '$HOME/.sparc' file to provide some of all\n"
       "                             of the configuration parameters.\n"
       "                             If more arguments are set through the command\n"
       "                             line, the configuration is updated accordingly.\n"
@@ -2285,7 +2285,7 @@ usage(void)
       " -a, --allow-ip              Specify IP address to allow within the SPA\n"
       "                             packet (e.g. '123.2.3.4').\n"
       " -D, --destination           Specify the hostname or IP address of the\n"
-      "                             fwknop server.\n"
+      "                             spa server.\n"
       " --use-hmac                  Add an HMAC to the outbound SPA packet for\n"
       "                             authenticated encryption.\n"
       " -h, --help                  Print this usage message and exit.\n"
@@ -2293,8 +2293,8 @@ usage(void)
       "                             specified file.\n"
       " -b, --save-packet-append    Append the generated packet data to the\n"
       "                             file specified with the -B option.\n"
-      " -C, --server-cmd            Specify a command that the fwknop server will\n"
-      "                             execute on behalf of the fwknop client..\n"
+      " -C, --server-cmd            Specify a command that the spa server will\n"
+      "                             execute on behalf of the spa client..\n"
       " -N, --nat-access            Gain NAT access to an internal service.\n"
       " -p, --server-port           Set the destination port for outgoing SPA\n"
       "                             packet.\n"
@@ -2302,10 +2302,10 @@ usage(void)
       "                             icmp) for the outgoing SPA packet.\n"
       "                             Note: The 'tcpraw' and 'icmp' modes use raw\n"
       "                             sockets and thus require root access to use.\n"
-      " -s, --source-ip             Tell the fwknopd server to accept whatever\n"
+      " -s, --source-ip             Tell the spad server to accept whatever\n"
       "                             source IP the SPA packet has as the IP that\n"
       "                             needs access (not recommended, and the\n"
-      "                             fwknopd server can ignore such requests).\n"
+      "                             spad server can ignore such requests).\n"
       " -S, --source-port           Set the source port for outgoing SPA packet.\n"
       " -Q, --spoof-source          Set the source IP for outgoing SPA packet.\n"
       " -R, --resolve-ip-https      Resolve the external network IP by\n"
@@ -2316,7 +2316,7 @@ usage(void)
       "                             --resolve-url option.\n"
       "     --resolve-http-only     Force external IP resolution via HTTP instead\n"
       "                             HTTPS (via the URL mentioned above). This is\n"
-      "                             not recommended since it would open fwknop\n"
+      "                             not recommended since it would open spa\n"
       "                             to potential MITM attacks if the IP resolution\n"
       "                             HTTP connection is altered en-route by a third\n"
       "                             party.\n"
@@ -2325,18 +2325,18 @@ usage(void)
       " -u, --user-agent            Set the HTTP User-Agent for resolving the\n"
       "                             external IP via -R, or for sending SPA\n"
       "                             packets over HTTP. The default is\n"
-      "                             Fwknop/<version> if this option is not used.\n"
+      "                             Spa/<version> if this option is not used.\n"
       "     --use-wget-user-agent   Use the default wget User-Agent string instead\n"
-      "                             of Fwknop/<version>.\n"
+      "                             of Spa/<version>.\n"
       " -w, --wget-cmd              Manually set the path to wget in -R mode.\n"
       " -H, --http-proxy            Specify an HTTP proxy host through which the\n"
       "                             SPA packet will be sent.  The port can also be\n"
       "                             specified here by following the host/ip with\n"
       "                             \":<port>\".\n"
       " -U, --spoof-user            Set the username within outgoing SPA packet.\n"
-      " -l, --last-cmd              Run the fwknop client with the same command\n"
+      " -l, --last-cmd              Run the spa client with the same command\n"
       "                             line args as the last time it was executed\n"
-      "                             (args are read from the ~/.fwknop.run file).\n"
+      "                             (args are read from the ~/.spa.run file).\n"
       " -G, --get-key               Load an encryption key/password from a file.\n"
       "     --stdin                 Read the encryption key/password from stdin.\n"
       "     --fd                    Specify the file descriptor to read the\n"
@@ -2373,7 +2373,7 @@ usage(void)
       "                             access.conf file on the server side. Note that\n"
       "                             the string ``legacy'' can be specified in order\n"
       "                             to generate SPA packets with the old initialization\n"
-      "                             vector strategy used by versions of *fwknop*\n"
+      "                             vector strategy used by versions of *spa*\n"
       "                             before 2.5.\n"
       " -f, --fw-timeout            Specify SPA server firewall timeout from the\n"
       "                             client side.\n"
@@ -2390,30 +2390,30 @@ usage(void)
       "     --gpg-home-dir          Specify the GPG home directory.\n"
       "     --gpg-agent             Use GPG agent if available.\n"
       "     --gpg-exe               Set path to GPG binary.\n"
-      "     --no-save-args          Do not save fwknop command line args to the\n"
-      "                             $HOME/fwknop.run file.\n"
-      "     --rc-file               Specify path to the fwknop rc file (default\n"
-      "                             is $HOME/.fwknoprc).\n"
+      "     --no-save-args          Do not save spa command line args to the\n"
+      "                             $HOME/spa.run file.\n"
+      "     --rc-file               Specify path to the spa rc file (default\n"
+      "                             is $HOME/.sparc).\n"
       "     --server-resolve-ipv4   Force IPv4 address resolution from DNS for\n"
       "                             SPA server when using a hostname.\n"
       "     --save-rc-stanza        Save command line arguments to the\n"
-      "                             $HOME/.fwknoprc stanza specified with the\n"
+      "                             $HOME/.sparc stanza specified with the\n"
       "                             -n option.\n"
       "     --force-stanza          Used with --save-rc-stanza to overwrite all of\n"
       "                             the variables for the specified stanza.\n"
       "     --stanza-list           Dump a list of the stanzas found in\n"
-      "                             $HOME/.fwknoprc.\n"
+      "                             $HOME/.sparc.\n"
       "     --nat-local             Access a local service via a forwarded port\n"
-      "                             on the fwknopd server system.\n"
+      "                             on the spad server system.\n"
       "     --nat-port              Specify the port to forward to access a\n"
       "                             service via NAT.\n"
-      "     --nat-rand-port         Have the fwknop client assign a random port\n"
+      "     --nat-rand-port         Have the spa client assign a random port\n"
       "                             for NAT access.\n"
-      "     --no-home-dir           Do not allow the fwknop client to look for\n"
+      "     --no-home-dir           Do not allow the spa client to look for\n"
       "                             the user home directory.\n"
-      "     --no-rc-file            Perform fwknop client operations without\n"
-      "                             referencing a ~/.fwknoprc file.\n"
-      "     --show-last             Show the last fwknop command line arguments.\n"
+      "     --no-rc-file            Perform spa client operations without\n"
+      "                             referencing a ~/.sparc file.\n"
+      "     --show-last             Show the last spa command line arguments.\n"
       "     --time-offset-plus      Add time to outgoing SPA packet timestamp.\n"
       "     --time-offset-minus     Subtract time from outgoing SPA packet\n"
       "                             timestamp.\n"

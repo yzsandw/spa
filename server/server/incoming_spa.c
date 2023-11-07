@@ -1,5 +1,5 @@
 
-#include "fwknopd_common.h"
+#include "spad_common.h"
 #include "netinet_common.h"
 
 #if HAVE_SYS_WAIT_H
@@ -13,16 +13,16 @@
 #include "log_msg.h"
 #include "utils.h"
 #include "fw_util.h"
-#include "fwknopd_errors.h"
+#include "spad_errors.h"
 #include "replay_cache.h"
 
-#define CTX_DUMP_BUFSIZE            4096                /*!< Maximum size allocated to a FKO context dump */
+#define CTX_DUMP_BUFSIZE            4096                /*!< Maximum size allocated to a ZTN context dump */
 
 /* 
  * 验证并在某些情况下预处理/重新格式化SPA数据。如果存在任何指示数据不是有效的SPA数据的迹象，则返回错误代码值。
 */
 static int
-preprocess_spa_data(const fko_srv_options_t *opts, spa_pkt_info_t *spa_pkt, spa_data_t *spadat)
+preprocess_spa_data(const ztn_srv_options_t *opts, spa_pkt_info_t *spa_pkt, spa_data_t *spadat)
 {
 
     char    *ndx = (char *)&(spa_pkt->packet_data);
@@ -47,7 +47,7 @@ if(pkt_data_len < MIN_SPA_DATA_SIZE)
 if(pkt_data_len > MAX_SPA_PACKET_LEN)
     return(SPA_MSG_BAD_DATA);
 
-/* 忽略包含 Rijndael 或 GnuPG 前缀的任何 SPA 数据包，因为攻击者可能将它们附加到以前见过的 SPA 数据包中，以试图通过重放检查。而且，我们不会更糟糕，因为合法的 SPA 数据包，如果包含外部前缀之后的前缀，则会被删除，无论如何都不会正确解密，因为 libfko 不会添加新的前缀。
+/* 忽略包含 Rijndael 或 GnuPG 前缀的任何 SPA 数据包，因为攻击者可能将它们附加到以前见过的 SPA 数据包中，以试图通过重放检查。而且，我们不会更糟糕，因为合法的 SPA 数据包，如果包含外部前缀之后的前缀，则会被删除，无论如何都不会正确解密，因为 libztn 不会添加新的前缀。
  * TODO:?
  * 
  */
@@ -63,7 +63,7 @@ if (pkt_data_len > MIN_GNUPG_MSG_SIZE
 /* 初始化 X-Forwarded-For 字段 */
 spadat->pkt_source_xff_ip[0] = '\0';
 
-/* 检测并解析来自 HTTP 请求的 SPA 数据。如果 SPA 数据以 "GET /" 开头，而用户代理以 "Fwknop" 开头，那么假定这是一个通过 HTTP 请求的 SPA。
+/* 检测并解析来自 HTTP 请求的 SPA 数据。如果 SPA 数据以 "GET /" 开头，而用户代理以 "Spa" 开头，那么假定这是一个通过 HTTP 请求的 SPA。
 */
 if (strncasecmp(opts->config[CONF_ENABLE_SPA_OVER_HTTP], "Y", 1) == 0
   && strncasecmp(ndx, "GET /", 5) == 0)
@@ -71,10 +71,10 @@ if (strncasecmp(opts->config[CONF_ENABLE_SPA_OVER_HTTP], "Y", 1) == 0
     /* 这看起来像一个 HTTP 请求，因此让我们看看是否配置为接受这种请求，如果是的话，找到 SPA 数据。
     */
 
-    /* 首先看看我们是否需要 User-Agent 以 'Fwknop' 开头
+    /* 首先看看我们是否需要 User-Agent 以 'Spa' 开头
     */
     if (strncasecmp(opts->config[CONF_ALLOW_ANY_USER_AGENT], "N", 1) == 0
-      && strstr(ndx, "User-Agent: Fwknop") == NULL)
+      && strstr(ndx, "User-Agent: Spa") == NULL)
     {
         return(SPA_MSG_BAD_DATA);
     }
@@ -102,7 +102,7 @@ if (strncasecmp(opts->config[CONF_ENABLE_SPA_OVER_HTTP], "Y", 1) == 0
             strlcpy(spadat->pkt_source_xff_ip, xff, i);
     }
 
-    /* 现在提取、调整（将由 fwknop 客户端转换的字符转换回来）并重置 SPA 消息本身。
+    /* 现在提取、调整（将由 spa 客户端转换的字符转换回来）并重置 SPA 消息本身。
     */
     strlcpy((char *)spa_pkt->packet_data, ndx+5, pkt_data_len);
     pkt_data_len -= 5;
@@ -137,7 +137,7 @@ if (strncasecmp(opts->config[CONF_ENABLE_SPA_OVER_HTTP], "Y", 1) == 0
 
     
    // 如果我们到达这里，我们没有理由认为这不是 SPA 数据。最终的测试将是 SPA 数据是否通过 HMAC 进行身份验证。
-    return(FKO_SUCCESS);
+    return(ZTN_SUCCESS);
 }
 
 /* For replay attack detection
@@ -145,71 +145,71 @@ if (strncasecmp(opts->config[CONF_ENABLE_SPA_OVER_HTTP], "Y", 1) == 0
 static int
 get_raw_digest(char **digest, char *pkt_data)
 {
-    fko_ctx_t    ctx = NULL;
+    ztn_ctx_t    ctx = NULL;
     char        *tmp_digest = NULL;
-    int          res = FKO_SUCCESS;
+    int          res = ZTN_SUCCESS;
     short        raw_digest_type = -1;
 
     
-   // 初始化一个没有解密密钥的 FKO 上下文，以便我们可以获得外部消息摘要
-    res = fko_new_with_data(&ctx, (char *)pkt_data, NULL, 0,
-            FKO_DEFAULT_ENC_MODE, NULL, 0, 0);
+   // 初始化一个没有解密密钥的 ZTN 上下文，以便我们可以获得外部消息摘要
+    res = ztn_new_with_data(&ctx, (char *)pkt_data, NULL, 0,
+            ZTN_DEFAULT_ENC_MODE, NULL, 0, 0);
 
-    if(res != FKO_SUCCESS)
+    if(res != ZTN_SUCCESS)
     {
-        log_msg(LOG_WARNING, "Error initializing FKO context from SPA data: %s",
-            fko_errstr(res));
-        fko_destroy(ctx);
+        log_msg(LOG_WARNING, "Error initializing ZTN context from SPA data: %s",
+            ztn_errstr(res));
+        ztn_destroy(ctx);
         ctx = NULL;
-        return(SPA_MSG_FKO_CTX_ERROR);
+        return(SPA_MSG_ZTN_CTX_ERROR);
     }
 
-    res = fko_set_raw_spa_digest_type(ctx, FKO_DEFAULT_DIGEST);
-    if(res != FKO_SUCCESS)
+    res = ztn_set_raw_spa_digest_type(ctx, ZTN_DEFAULT_DIGEST);
+    if(res != ZTN_SUCCESS)
     {
         log_msg(LOG_WARNING, "Error setting digest type for SPA data: %s",
-            fko_errstr(res));
-        fko_destroy(ctx);
+            ztn_errstr(res));
+        ztn_destroy(ctx);
         ctx = NULL;
         return(SPA_MSG_DIGEST_ERROR);
     }
 
-    res = fko_get_raw_spa_digest_type(ctx, &raw_digest_type);
-    if(res != FKO_SUCCESS)
+    res = ztn_get_raw_spa_digest_type(ctx, &raw_digest_type);
+    if(res != ZTN_SUCCESS)
     {
         log_msg(LOG_WARNING, "Error getting digest type for SPA data: %s",
-            fko_errstr(res));
-        fko_destroy(ctx);
+            ztn_errstr(res));
+        ztn_destroy(ctx);
         ctx = NULL;
         return(SPA_MSG_DIGEST_ERROR);
     }
 
    // 保证摘要类型是我们期望的
-    if(raw_digest_type != FKO_DEFAULT_DIGEST)
+    if(raw_digest_type != ZTN_DEFAULT_DIGEST)
     {
         log_msg(LOG_WARNING, "Error setting digest type for SPA data: %s",
-            fko_errstr(res));
-        fko_destroy(ctx);
+            ztn_errstr(res));
+        ztn_destroy(ctx);
         ctx = NULL;
         return(SPA_MSG_DIGEST_ERROR);
     }
 
-    res = fko_set_raw_spa_digest(ctx);
-    if(res != FKO_SUCCESS)
+    res = ztn_set_raw_spa_digest(ctx);
+    if(res != ZTN_SUCCESS)
     {
         log_msg(LOG_WARNING, "Error setting digest for SPA data: %s",
-            fko_errstr(res));
-        fko_destroy(ctx);
+            ztn_errstr(res));
+        ztn_destroy(ctx);
         ctx = NULL;
         return(SPA_MSG_DIGEST_ERROR);
     }
 
-    res = fko_get_raw_spa_digest(ctx, &tmp_digest);
-    if(res != FKO_SUCCESS)
+    res = ztn_get_raw_spa_digest(ctx, &tmp_digest);
+    if(res != ZTN_SUCCESS)
     {
         log_msg(LOG_WARNING, "Error getting digest from SPA data: %s",
-            fko_errstr(res));
-        fko_destroy(ctx);
+            ztn_errstr(res));
+        ztn_destroy(ctx);
         ctx = NULL;
         return(SPA_MSG_DIGEST_ERROR);
     }
@@ -219,57 +219,57 @@ get_raw_digest(char **digest, char *pkt_data)
     if (*digest == NULL)
         res = SPA_MSG_ERROR;   // 真的是一个 strdup() 内存分配问题
 
-    fko_destroy(ctx);
+    ztn_destroy(ctx);
     ctx = NULL;
 
     return res;
 }
-/*从初始化（并填充）的FKO上下文中弹出spa_data结构。
+/*从初始化（并填充）的ZTN上下文中弹出spa_data结构。
 
 */
 
 static int
-get_spa_data_fields(fko_ctx_t ctx, spa_data_t *spdat)
+get_spa_data_fields(ztn_ctx_t ctx, spa_data_t *spdat)
 {
-    int res = FKO_SUCCESS;
+    int res = ZTN_SUCCESS;
 
-    res = fko_get_username(ctx, &(spdat->username));
-    if(res != FKO_SUCCESS)
+    res = ztn_get_username(ctx, &(spdat->username));
+    if(res != ZTN_SUCCESS)
         return(res);
 
-    res = fko_get_timestamp(ctx, &(spdat->timestamp));
-    if(res != FKO_SUCCESS)
+    res = ztn_get_timestamp(ctx, &(spdat->timestamp));
+    if(res != ZTN_SUCCESS)
         return(res);
 
-    res = fko_get_version(ctx, &(spdat->version));
-    if(res != FKO_SUCCESS)
+    res = ztn_get_version(ctx, &(spdat->version));
+    if(res != ZTN_SUCCESS)
         return(res);
 
-    res = fko_get_spa_message_type(ctx, &(spdat->message_type));
-    if(res != FKO_SUCCESS)
+    res = ztn_get_spa_message_type(ctx, &(spdat->message_type));
+    if(res != ZTN_SUCCESS)
         return(res);
 
-    res = fko_get_spa_message(ctx, &(spdat->spa_message));
-    if(res != FKO_SUCCESS)
+    res = ztn_get_spa_message(ctx, &(spdat->spa_message));
+    if(res != ZTN_SUCCESS)
         return(res);
 
-    res = fko_get_spa_nat_access(ctx, &(spdat->nat_access));
-    if(res != FKO_SUCCESS)
+    res = ztn_get_spa_nat_access(ctx, &(spdat->nat_access));
+    if(res != ZTN_SUCCESS)
         return(res);
 
-    res = fko_get_spa_server_auth(ctx, &(spdat->server_auth));
-    if(res != FKO_SUCCESS)
+    res = ztn_get_spa_server_auth(ctx, &(spdat->server_auth));
+    if(res != ZTN_SUCCESS)
         return(res);
 
-    res = fko_get_spa_client_timeout(ctx, (int *)&(spdat->client_timeout));
-    if(res != FKO_SUCCESS)
+    res = ztn_get_spa_client_timeout(ctx, (int *)&(spdat->client_timeout));
+    if(res != ZTN_SUCCESS)
         return(res);
 
     return(res);
 }
 
 static int
-check_pkt_age(const fko_srv_options_t *opts, spa_data_t *spadat,
+check_pkt_age(const ztn_srv_options_t *opts, spa_data_t *spadat,
         const int stanza_num)
 {
     int         ts_diff;
@@ -331,7 +331,7 @@ is_src_match(acc_stanza_t *acc, const uint32_t ip)
 }
 
 static int
-src_check(fko_srv_options_t *opts, spa_pkt_info_t *spa_pkt,
+src_check(ztn_srv_options_t *opts, spa_pkt_info_t *spa_pkt,
         spa_data_t *spadat, char **raw_digest)
 {
     if (is_src_match(opts->acc_stanzas, ntohl(spa_pkt->packet_src_ip)))
@@ -340,7 +340,7 @@ src_check(fko_srv_options_t *opts, spa_pkt_info_t *spa_pkt,
         {
             
            // 检查重放攻击
-            if(get_raw_digest(raw_digest, (char *)spa_pkt->packet_data) != FKO_SUCCESS)
+            if(get_raw_digest(raw_digest, (char *)spa_pkt->packet_data) != ZTN_SUCCESS)
             {
                 if (*raw_digest != NULL)
                     free(*raw_digest);
@@ -367,7 +367,7 @@ src_check(fko_srv_options_t *opts, spa_pkt_info_t *spa_pkt,
 }
 
 static int
-precheck_pkt(fko_srv_options_t *opts, spa_pkt_info_t *spa_pkt,
+precheck_pkt(ztn_srv_options_t *opts, spa_pkt_info_t *spa_pkt,
         spa_data_t *spadat, char **raw_digest)
 {
     int res = 0, packet_data_len = 0;
@@ -375,7 +375,7 @@ precheck_pkt(fko_srv_options_t *opts, spa_pkt_info_t *spa_pkt,
     packet_data_len = spa_pkt->packet_data_len;
 
     res = preprocess_spa_data(opts, spa_pkt, spadat);
-    if(res != FKO_SUCCESS)
+    if(res != ZTN_SUCCESS)
     {
         log_msg(LOG_DEBUG, "[%s] preprocess_spa_data() returned error %i: '%s' for incoming packet.",
             spadat->pkt_source_ip, res, get_errstr(res));
@@ -413,7 +413,7 @@ src_dst_check(acc_stanza_t *acc, spa_pkt_info_t *spa_pkt,
 
 // 处理命令消息
 static int
-process_cmd_msg(fko_srv_options_t *opts, acc_stanza_t *acc,
+process_cmd_msg(ztn_srv_options_t *opts, acc_stanza_t *acc,
         spa_data_t *spadat, const int stanza_num, int *res)
 {
     int             pid_status=0;
@@ -511,7 +511,7 @@ process_cmd_msg(fko_srv_options_t *opts, acc_stanza_t *acc,
 }
 
 static int
-check_mode_ctx(spa_data_t *spadat, fko_ctx_t *ctx, int attempted_decrypt,
+check_mode_ctx(spa_data_t *spadat, ztn_ctx_t *ctx, int attempted_decrypt,
         const int enc_type, const int stanza_num, const int res)
 {
     if(attempted_decrypt == 0)
@@ -523,14 +523,14 @@ check_mode_ctx(spa_data_t *spadat, fko_ctx_t *ctx, int attempted_decrypt,
     }
 
     
-    if(res != FKO_SUCCESS)
+    if(res != ZTN_SUCCESS)
     {
-        log_msg(LOG_WARNING, "[%s] (stanza #%d) Error creating fko context: %s",
-            spadat->pkt_source_ip, stanza_num, fko_errstr(res));
+        log_msg(LOG_WARNING, "[%s] (stanza #%d) Error creating ztn context: %s",
+            spadat->pkt_source_ip, stanza_num, ztn_errstr(res));
 
         if(IS_GPG_ERROR(res))
             log_msg(LOG_WARNING, "[%s] (stanza #%d) - GPG ERROR: %s",
-                spadat->pkt_source_ip, stanza_num, fko_gpg_errstr(*ctx));
+                spadat->pkt_source_ip, stanza_num, ztn_gpg_errstr(*ctx));
         return 0;
     }
 
@@ -539,17 +539,17 @@ check_mode_ctx(spa_data_t *spadat, fko_ctx_t *ctx, int attempted_decrypt,
 
 static void
 handle_rijndael_enc(acc_stanza_t *acc, spa_pkt_info_t *spa_pkt,
-        spa_data_t *spadat, fko_ctx_t *ctx, int *attempted_decrypt,
+        spa_data_t *spadat, ztn_ctx_t *ctx, int *attempted_decrypt,
         int *cmd_exec_success, const int enc_type, const int stanza_num,
         int *res)
 {
-    if(enc_type == FKO_ENCRYPTION_RIJNDAEL || acc->enable_cmd_exec)
+    if(enc_type == ZTN_ENCRYPTION_RIJNDAEL || acc->enable_cmd_exec)
     {
-        *res = fko_new_with_data(ctx, (char *)spa_pkt->packet_data,
+        *res = ztn_new_with_data(ctx, (char *)spa_pkt->packet_data,
             acc->key, acc->key_len, acc->encryption_mode, acc->hmac_key,
             acc->hmac_key_len, acc->hmac_type);
         *attempted_decrypt = 1;
-        if(*res == FKO_SUCCESS)
+        if(*res == ZTN_SUCCESS)
             *cmd_exec_success = 1;
     }
     return;
@@ -557,25 +557,25 @@ handle_rijndael_enc(acc_stanza_t *acc, spa_pkt_info_t *spa_pkt,
 
 static int
 handle_gpg_enc(acc_stanza_t *acc, spa_pkt_info_t *spa_pkt,
-        spa_data_t *spadat, fko_ctx_t *ctx, int *attempted_decrypt,
+        spa_data_t *spadat, ztn_ctx_t *ctx, int *attempted_decrypt,
         const int cmd_exec_success, const int enc_type,
         const int stanza_num, int *res)
 {
-    if(acc->use_gpg && enc_type == FKO_ENCRYPTION_GPG && cmd_exec_success == 0)
+    if(acc->use_gpg && enc_type == ZTN_ENCRYPTION_GPG && cmd_exec_success == 0)
     {
         
-        // 如果我们有一个 GPG 密码，或者允许没有密码，则创建一个新的 FKO 上下文
+        // 如果我们有一个 GPG 密码，或者允许没有密码，则创建一个新的 ZTN 上下文
         if(acc->gpg_decrypt_pw != NULL || acc->gpg_allow_no_pw)
         {
-            *res = fko_new_with_data(ctx, (char *)spa_pkt->packet_data, NULL,
-                    0, FKO_ENC_MODE_ASYMMETRIC, acc->hmac_key,
+            *res = ztn_new_with_data(ctx, (char *)spa_pkt->packet_data, NULL,
+                    0, ZTN_ENC_MODE_ASYMMETRIC, acc->hmac_key,
                     acc->hmac_key_len, acc->hmac_type);
 
-            if(*res != FKO_SUCCESS)
+            if(*res != ZTN_SUCCESS)
             {
                 log_msg(LOG_WARNING,
-                    "[%s] (stanza #%d) Error creating fko context (before decryption): %s",
-                    spadat->pkt_source_ip, stanza_num, fko_errstr(*res)
+                    "[%s] (stanza #%d) Error creating ztn context (before decryption): %s",
+                    spadat->pkt_source_ip, stanza_num, ztn_errstr(*res)
                 );
                 return 0;
             }
@@ -584,13 +584,13 @@ handle_gpg_enc(acc_stanza_t *acc, spa_pkt_info_t *spa_pkt,
            // 如果我们有一个 GPG 可执行文件路径，则设置它
             if(acc->gpg_exe != NULL)
             {
-                *res = fko_set_gpg_exe(*ctx, acc->gpg_exe);
-                if(*res != FKO_SUCCESS)
+                *res = ztn_set_gpg_exe(*ctx, acc->gpg_exe);
+                if(*res != ZTN_SUCCESS)
                 {
                     log_msg(LOG_WARNING,
                         "[%s] (stanza #%d) Error setting GPG path %s: %s",
                         spadat->pkt_source_ip, stanza_num, acc->gpg_exe,
-                        fko_errstr(*res)
+                        ztn_errstr(*res)
                     );
                     return 0;
                 }
@@ -598,42 +598,42 @@ handle_gpg_enc(acc_stanza_t *acc, spa_pkt_info_t *spa_pkt,
 
             if(acc->gpg_home_dir != NULL)
             {
-                *res = fko_set_gpg_home_dir(*ctx, acc->gpg_home_dir);
-                if(*res != FKO_SUCCESS)
+                *res = ztn_set_gpg_home_dir(*ctx, acc->gpg_home_dir);
+                if(*res != ZTN_SUCCESS)
                 {
                     log_msg(LOG_WARNING,
                         "[%s] (stanza #%d) Error setting GPG keyring path to %s: %s",
                         spadat->pkt_source_ip, stanza_num, acc->gpg_home_dir,
-                        fko_errstr(*res)
+                        ztn_errstr(*res)
                     );
                     return 0;
                 }
             }
 
             if(acc->gpg_decrypt_id != NULL)
-                fko_set_gpg_recipient(*ctx, acc->gpg_decrypt_id);
+                ztn_set_gpg_recipient(*ctx, acc->gpg_decrypt_id);
 
-           /* 如果为此 acc stanza 设置了 GPG_REQUIRE_SIG，则相应地设置 FKO 上下文并检查其他与 GPG 签名相关的参数。当设置了 REMOTE_ID 时，也适用。
+           /* 如果为此 acc stanza 设置了 GPG_REQUIRE_SIG，则相应地设置 ZTN 上下文并检查其他与 GPG 签名相关的参数。当设置了 REMOTE_ID 时，也适用。
 */
 
 if (acc->gpg_require_sig)
 {
-    fko_set_gpg_signature_verify(*ctx, 1);
+    ztn_set_gpg_signature_verify(*ctx, 1);
 
     /* 设置是否忽略签名验证错误。
     */
-    fko_set_gpg_ignore_verify_error(*ctx, acc->gpg_ignore_sig_error);
+    ztn_set_gpg_ignore_verify_error(*ctx, acc->gpg_ignore_sig_error);
 }
 else
 {
-    fko_set_gpg_signature_verify(*ctx, 0);
-    fko_set_gpg_ignore_verify_error(*ctx, 1);
+    ztn_set_gpg_signature_verify(*ctx, 0);
+    ztn_set_gpg_ignore_verify_error(*ctx, 1);
 }
 
 /* 现在解密数据。
 */
 
-            *res = fko_decrypt_spa_data(*ctx, acc->gpg_decrypt_pw, 0);
+            *res = ztn_decrypt_spa_data(*ctx, acc->gpg_decrypt_pw, 0);
             *attempted_decrypt = 1;
         }
     }
@@ -642,30 +642,30 @@ else
 
 static int
 handle_gpg_sigs(acc_stanza_t *acc, spa_data_t *spadat,
-        fko_ctx_t *ctx, const int enc_type, const int stanza_num, int *res)
+        ztn_ctx_t *ctx, const int enc_type, const int stanza_num, int *res)
 {
     char                *gpg_id, *gpg_fpr;
     acc_string_list_t   *gpg_id_ndx;
     acc_string_list_t   *gpg_fpr_ndx;
     unsigned char        is_gpg_match = 0;
 
-    if(enc_type == FKO_ENCRYPTION_GPG && acc->gpg_require_sig)
+    if(enc_type == ZTN_ENCRYPTION_GPG && acc->gpg_require_sig)
     {
-        *res = fko_get_gpg_signature_id(*ctx, &gpg_id);
-        if(*res != FKO_SUCCESS)
+        *res = ztn_get_gpg_signature_id(*ctx, &gpg_id);
+        if(*res != ZTN_SUCCESS)
         {
             log_msg(LOG_WARNING,
                 "[%s] (stanza #%d) Error pulling the GPG signature ID from the context: %s",
-                spadat->pkt_source_ip, stanza_num, fko_gpg_errstr(*ctx));
+                spadat->pkt_source_ip, stanza_num, ztn_gpg_errstr(*ctx));
             return 0;
         }
 
-        *res = fko_get_gpg_signature_fpr(*ctx, &gpg_fpr);
-        if(*res != FKO_SUCCESS)
+        *res = ztn_get_gpg_signature_fpr(*ctx, &gpg_fpr);
+        if(*res != ZTN_SUCCESS)
         {
             log_msg(LOG_WARNING,
                 "[%s] (stanza #%d) Error pulling the GPG fingerprint from the context: %s",
-                spadat->pkt_source_ip, stanza_num, fko_gpg_errstr(*ctx));
+                spadat->pkt_source_ip, stanza_num, ztn_gpg_errstr(*ctx));
             return 0;
         }
 
@@ -681,13 +681,13 @@ handle_gpg_sigs(acc_stanza_t *acc, spa_data_t *spadat,
             for(gpg_fpr_ndx = acc->gpg_remote_fpr_list;
                     gpg_fpr_ndx != NULL; gpg_fpr_ndx=gpg_fpr_ndx->next)
             {
-                *res = fko_gpg_signature_fpr_match(*ctx,
+                *res = ztn_gpg_signature_fpr_match(*ctx,
                         gpg_fpr_ndx->str, &is_gpg_match);
-                if(*res != FKO_SUCCESS)
+                if(*res != ZTN_SUCCESS)
                 {
                     log_msg(LOG_WARNING,
                         "[%s] (stanza #%d) Error in GPG signature comparison: %s",
-                        spadat->pkt_source_ip, stanza_num, fko_gpg_errstr(*ctx));
+                        spadat->pkt_source_ip, stanza_num, ztn_gpg_errstr(*ctx));
                     return 0;
                 }
                 if(is_gpg_match)
@@ -708,13 +708,13 @@ handle_gpg_sigs(acc_stanza_t *acc, spa_data_t *spadat,
             for(gpg_id_ndx = acc->gpg_remote_id_list;
                     gpg_id_ndx != NULL; gpg_id_ndx=gpg_id_ndx->next)
             {
-                *res = fko_gpg_signature_id_match(*ctx,
+                *res = ztn_gpg_signature_id_match(*ctx,
                         gpg_id_ndx->str, &is_gpg_match);
-                if(*res != FKO_SUCCESS)
+                if(*res != ZTN_SUCCESS)
                 {
                     log_msg(LOG_WARNING,
                         "[%s] (stanza #%d) Error in GPG signature comparison: %s",
-                        spadat->pkt_source_ip, stanza_num, fko_gpg_errstr(*ctx));
+                        spadat->pkt_source_ip, stanza_num, ztn_gpg_errstr(*ctx));
                     return 0;
                 }
                 if(is_gpg_match)
@@ -776,13 +776,13 @@ check_username(acc_stanza_t *acc, spa_data_t *spadat, const int stanza_num)
 }
 
 static int
-check_nat_access_types(fko_srv_options_t *opts, acc_stanza_t *acc,
+check_nat_access_types(ztn_srv_options_t *opts, acc_stanza_t *acc,
         spa_data_t *spadat, const int stanza_num)
 {
     int      not_enabled=0;
 
-    if(spadat->message_type == FKO_NAT_ACCESS_MSG
-          || spadat->message_type == FKO_CLIENT_TIMEOUT_NAT_ACCESS_MSG)
+    if(spadat->message_type == ZTN_NAT_ACCESS_MSG
+          || spadat->message_type == ZTN_CLIENT_TIMEOUT_NAT_ACCESS_MSG)
     {
 #if FIREWALL_FIREWALLD
         if(strncasecmp(opts->config[CONF_ENABLE_FIREWD_FORWARDING], "Y", 1)!=0)
@@ -792,8 +792,8 @@ check_nat_access_types(fko_srv_options_t *opts, acc_stanza_t *acc,
             not_enabled = 1;
 #endif
     }
-    else if(spadat->message_type == FKO_LOCAL_NAT_ACCESS_MSG
-          || spadat->message_type == FKO_CLIENT_TIMEOUT_LOCAL_NAT_ACCESS_MSG)
+    else if(spadat->message_type == ZTN_LOCAL_NAT_ACCESS_MSG
+          || spadat->message_type == ZTN_CLIENT_TIMEOUT_LOCAL_NAT_ACCESS_MSG)
     {
 #if FIREWALL_FIREWALLD
         if(strncasecmp(opts->config[CONF_ENABLE_FIREWD_LOCAL_NAT], "Y", 1)!=0)
@@ -816,7 +816,7 @@ check_nat_access_types(fko_srv_options_t *opts, acc_stanza_t *acc,
 }
 
 static int
-add_replay_cache(fko_srv_options_t *opts, acc_stanza_t *acc,
+add_replay_cache(ztn_srv_options_t *opts, acc_stanza_t *acc,
         spa_data_t *spadat, char *raw_digest, int *added_replay_digest,
         const int stanza_num, int *res)
 {
@@ -877,13 +877,13 @@ check_port_proto(acc_stanza_t *acc, spa_data_t *spadat, const int stanza_num)
 
 //处理spa数据包
 void
-incoming_spa(fko_srv_options_t *opts)
+incoming_spa(ztn_srv_options_t *opts)
 {   
     //初始化总是一个好主意，如果它将被使用
-    //重复（特别是使用fko_new_with_data（））。
+    //重复（特别是使用ztn_new_with_data（））。
     
    
-    fko_ctx_t       ctx = NULL;
+    ztn_ctx_t       ctx = NULL;
 
     char            *spa_ip_demark, *raw_digest = NULL;
     int             res, enc_type, stanza_num=0;
@@ -917,19 +917,19 @@ incoming_spa(fko_srv_options_t *opts)
    //现在我们知道有一个匹配的access.conf部分和传入的SPA数据包不是重播，看看我们是否应该授予任何访问
     while(acc)
     {
-        res = FKO_SUCCESS;
+        res = ZTN_SUCCESS;
         cmd_exec_success  = 0;
         attempted_decrypt = 0;
         stanza_num++;
 
         /* 
-         * 使用一个干净的FKO上下文开始访问循环
+         * 使用一个干净的ZTN上下文开始访问循环
         */
         if(ctx != NULL)
         {
-            if(fko_destroy(ctx) == FKO_ERROR_ZERO_OUT_DATA)
+            if(ztn_destroy(ctx) == ZTN_ERROR_ZERO_OUT_DATA)
                 log_msg(LOG_WARNING,
-                    "[%s] (stanza #%d) fko_destroy() could not zero out sensitive data buffer.",
+                    "[%s] (stanza #%d) ztn_destroy() could not zero out sensitive data buffer.",
                     spadat.pkt_source_ip, stanza_num
                 );
             ctx = NULL;
@@ -962,7 +962,7 @@ incoming_spa(fko_srv_options_t *opts)
         /* 
          * 获取加密类型并首先尝试其解码例程（如果已设置该类型的密钥）
         */
-        enc_type = fko_encryption_type((char *)spa_pkt->packet_data);
+        enc_type = ztn_encryption_type((char *)spa_pkt->packet_data);
 
         if(acc->use_rijndael)
             handle_rijndael_enc(acc, spa_pkt, &spadat, &ctx,
@@ -1000,10 +1000,10 @@ incoming_spa(fko_srv_options_t *opts)
             spadat.pkt_source_ip, stanza_num, res);
 
         res = dump_ctx_to_buffer(ctx, dump_buf, sizeof(dump_buf));
-        if (res == FKO_SUCCESS)
+        if (res == ZTN_SUCCESS)
             log_msg(LOG_DEBUG, "%s", dump_buf);
         else
-            log_msg(LOG_WARNING, "Unable to dump FKO context: %s", fko_errstr(res));
+            log_msg(LOG_WARNING, "Unable to dump ZTN context: %s", ztn_errstr(res));
 
         /* 
          * 首先，如果这是一条GPG消息，并且GPG_REMOTE_ID列表不为空，
@@ -1021,11 +1021,11 @@ incoming_spa(fko_srv_options_t *opts)
         */
         res = get_spa_data_fields(ctx, &spadat);
 
-        if(res != FKO_SUCCESS)
+        if(res != ZTN_SUCCESS)
         {
             log_msg(LOG_ERR,
                 "[%s] (stanza #%d) Unexpected error pulling SPA data from the context: %s",
-                spadat.pkt_source_ip, stanza_num, fko_errstr(res));
+                spadat.pkt_source_ip, stanza_num, ztn_errstr(res));
 
             acc = acc->next;
             continue;
@@ -1056,7 +1056,7 @@ incoming_spa(fko_srv_options_t *opts)
         {
             log_msg(LOG_WARNING,
                 "[%s] (stanza #%d) Error parsing SPA message string: %s",
-                spadat.pkt_source_ip, stanza_num, fko_errstr(res));
+                spadat.pkt_source_ip, stanza_num, ztn_errstr(res));
 
             acc = acc->next;
             continue;
@@ -1078,7 +1078,7 @@ incoming_spa(fko_srv_options_t *opts)
         {
             log_msg(LOG_WARNING,
                 "[%s] (stanza #%d) Invalid source IP in SPA message, ignoring SPA packet",
-                spadat.pkt_source_ip, stanza_num, fko_errstr(res));
+                spadat.pkt_source_ip, stanza_num, ztn_errstr(res));
             break;
         }
 
@@ -1123,7 +1123,7 @@ if (acc->cmd_cycle_open != NULL)
    }
 }
 
-        else if(spadat.message_type == FKO_COMMAND_MSG)
+        else if(spadat.message_type == ZTN_COMMAND_MSG)
         {
             if(process_cmd_msg(opts, acc, &spadat, stanza_num, &res))
             {
@@ -1192,9 +1192,9 @@ if (acc->cmd_cycle_open != NULL)
 
     if(ctx != NULL)
     {
-        if(fko_destroy(ctx) == FKO_ERROR_ZERO_OUT_DATA)
+        if(ztn_destroy(ctx) == ZTN_ERROR_ZERO_OUT_DATA)
             log_msg(LOG_WARNING,
-                "[%s] (stanza #%d) fko_destroy() could not zero out sensitive data buffer.",
+                "[%s] (stanza #%d) ztn_destroy() could not zero out sensitive data buffer.",
                 spadat.pkt_source_ip, stanza_num
             );
         ctx = NULL;

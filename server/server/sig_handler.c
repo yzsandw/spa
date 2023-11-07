@@ -1,11 +1,11 @@
 /**
  * \file server/sig_handler.c
  *
- * \brief Signal handling dta and routines for fwknopd.
+ * \brief Signal handling dta and routines for spad.
  */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
+/*  Spa is developed primarily by the people listed in the file 'AUTHORS'.
+ *  Copyright (C) 2009-2015 spa developers and contributors. For a full
  *  list of contributors, see the file 'CREDITS'.
  *
  *  License (GNU General Public License):
@@ -27,7 +27,7 @@
  *
  *****************************************************************************
 */
-#include "fwknopd_common.h"
+#include "spad_common.h"
 #include "log_msg.h"
 #include "sig_handler.h"
 

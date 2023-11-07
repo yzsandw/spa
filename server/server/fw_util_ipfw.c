@@ -1,4 +1,4 @@
-#include "fwknopd_common.h"
+#include "spad_common.h"
 
 #if FIREWALL_IPFW
 
@@ -38,7 +38,7 @@ zero_cmd_buffers(void)
 static int pid_status = 0;
 
 static int
-ipfw_set_exists(const fko_srv_options_t *opts,
+ipfw_set_exists(const ztn_srv_options_t *opts,
     const char *fw_command, const unsigned short set_num)
 {
     int res = 0;
@@ -65,9 +65,9 @@ ipfw_set_exists(const fko_srv_options_t *opts,
     return(1);
 }
 
-/* 打印当前由运行的 fwknopd 守护进程实例化的所有防火墙规则到标准输出。*/
+/* 打印当前由运行的 spad 守护进程实例化的所有防火墙规则到标准输出。*/
 int
-fw_dump_rules(const fko_srv_options_t * const opts)
+fw_dump_rules(const ztn_srv_options_t * const opts)
 {
     int     res, got_err = 0;
 
@@ -98,7 +98,7 @@ fw_dump_rules(const fko_srv_options_t * const opts)
     }
     else
     {
-        fprintf(stdout, "列出 fwknopd ipfw 规则...\n");
+        fprintf(stdout, "列出 spad ipfw 规则...\n");
         fflush(stdout);
 
         zero_cmd_buffers();
@@ -148,7 +148,7 @@ fw_dump_rules(const fko_srv_options_t * const opts)
 }
 
 int
-fw_config_init(fko_srv_options_t * const opts)
+fw_config_init(ztn_srv_options_t * const opts)
 {
     int         is_err;
 
@@ -159,7 +159,7 @@ fw_config_init(fko_srv_options_t * const opts)
 
     fwc.start_rule_num = strtol_wrapper(opts->config[CONF_IPFW_START_RULE_NUM],
             0, RCHK_MAX_IPFW_MAX_RULES, NO_EXIT_UPON_ERR, &is_err);
-    if(is_err != FKO_SUCCESS)
+    if(is_err != ZTN_SUCCESS)
     {
         log_msg(LOG_ERR, "[*] IPFW_START_RULE_NUM '%s' 超出范围 [%d-%d]。",
                 opts->config[CONF_IPFW_START_RULE_NUM], 0, RCHK_MAX_IPFW_MAX_RULES);
@@ -168,7 +168,7 @@ fw_config_init(fko_srv_options_t * const opts)
 
     fwc.max_rules = strtol_wrapper(opts->config[CONF_IPFW_MAX_RULES],
             0, RCHK_MAX_IPFW_MAX_RULES, NO_EXIT_UPON_ERR, &is_err);
-    if(is_err != FKO_SUCCESS)
+    if(is_err != ZTN_SUCCESS)
     {
         log_msg(LOG_ERR, "[*] IPFW_MAX_RULES_INT '%s' 超出范围 [%d-%d]。",
                 opts->config[CONF_IPFW_MAX_RULES], 0, RCHK_MAX_IPFW_MAX_RULES);
@@ -177,7 +177,7 @@ fw_config_init(fko_srv_options_t * const opts)
 
     fwc.active_set_num = strtol_wrapper(opts->config[CONF_IPFW_ACTIVE_SET_NUM],
             0, RCHK_MAX_IPFW_SET_NUM, NO_EXIT_UPON_ERR, &is_err);
-    if(is_err != FKO_SUCCESS)
+    if(is_err != ZTN_SUCCESS)
     {
         log_msg(LOG_ERR, "[*] IPFW_ACTIVE_SET_NUM '%s' 超出范围 [%d-%d]。",
                 opts->config[CONF_IPFW_ACTIVE_SET_NUM], 0, RCHK_MAX_IPFW_SET_NUM);
@@ -187,7 +187,7 @@ fw_config_init(fko_srv_options_t * const opts)
  
     fwc.expire_set_num = strtol_wrapper(opts->config[CONF_IPFW_EXPIRE_SET_NUM],
             0, RCHK_MAX_IPFW_SET_NUM, NO_EXIT_UPON_ERR, &is_err);
-    if(is_err != FKO_SUCCESS)
+    if(is_err != ZTN_SUCCESS)
     {
         log_msg(LOG_ERR, "[*] IPFW_MAX_EXPIRE_SET_NUM '%s' 超出范围 [%d-%d]。",
                 opts->config[CONF_IPFW_EXPIRE_SET_NUM], 0, RCHK_MAX_IPFW_SET_NUM);
@@ -196,7 +196,7 @@ fw_config_init(fko_srv_options_t * const opts)
 
     fwc.purge_interval = strtol_wrapper(opts->config[CONF_IPFW_EXPIRE_PURGE_INTERVAL],
             0, RCHK_MAX_IPFW_PURGE_INTERVAL, NO_EXIT_UPON_ERR, &is_err);
-    if(is_err != FKO_SUCCESS)
+    if(is_err != ZTN_SUCCESS)
     {
         log_msg(LOG_ERR, "[*] IPFW_EXPIRE_PURGE_INTERVAL '%s' 超出范围 [%d-%d]。",
                 opts->config[CONF_IPFW_EXPIRE_PURGE_INTERVAL], 0, RCHK_MAX_IPFW_PURGE_INTERVAL);
@@ -215,7 +215,7 @@ fw_config_init(fko_srv_options_t * const opts)
 }
 
 int
-fw_initialize(const fko_srv_options_t * const opts)
+fw_initialize(const ztn_srv_options_t * const opts)
 {
     int             res = 0, is_err;
     unsigned short  curr_rule;
@@ -333,7 +333,7 @@ fw_initialize(const fko_srv_options_t * const opts)
         {
             curr_rule = strtol_wrapper(ndx, 0, -1, NO_EXIT_UPON_ERR, &is_err);
 
-            if (is_err == FKO_SUCCESS)
+            if (is_err == ZTN_SUCCESS)
             {
                 if (curr_rule >= fwc.start_rule_num
                   && curr_rule < fwc.start_rule_num + fwc.max_rules)
@@ -355,7 +355,7 @@ fw_initialize(const fko_srv_options_t * const opts)
 }
 
 int
-fw_cleanup(const fko_srv_options_t * const opts)
+fw_cleanup(const ztn_srv_options_t * const opts)
 {
     int     res, got_err = 0;
 
@@ -426,7 +426,7 @@ fw_cleanup(const fko_srv_options_t * const opts)
 /* 规则处理 - 创建一个访问请求...
 */
 int
-process_spa_request(const fko_srv_options_t * const opts,
+process_spa_request(const ztn_srv_options_t * const opts,
         const acc_stanza_t * const acc, spa_data_t * const spadat)
 {
     unsigned short   rule_num;
@@ -453,8 +453,8 @@ process_spa_request(const fko_srv_options_t * const opts,
 
     /* 对于直接访问请求，我们当前支持多个协议/端口请求。
     */
-    if (spadat->message_type == FKO_ACCESS_MSG
-      || spadat->message_type == FKO_CLIENT_TIMEOUT_ACCESS_MSG)
+    if (spadat->message_type == ZTN_ACCESS_MSG
+      || spadat->message_type == ZTN_CLIENT_TIMEOUT_ACCESS_MSG)
     {
         /* 获取下一个可用的规则编号。
         */
@@ -522,13 +522,13 @@ process_spa_request(const fko_srv_options_t * const opts,
     {
         /* 目前不支持其他 SPA 请求模式。
         */
-        if (spadat->message_type == FKO_LOCAL_NAT_ACCESS_MSG
-          || spadat->message_type == FKO_CLIENT_TIMEOUT_LOCAL_NAT_ACCESS_MSG)
+        if (spadat->message_type == ZTN_LOCAL_NAT_ACCESS_MSG
+          || spadat->message_type == ZTN_CLIENT_TIMEOUT_LOCAL_NAT_ACCESS_MSG)
         {
             log_msg(LOG_WARNING, "当前不支持本地 NAT 请求。");
         }
-        else if (spadat->message_type == FKO_NAT_ACCESS_MSG
-          || spadat->message_type == FKO_CLIENT_TIMEOUT_NAT_ACCESS_MSG)
+        else if (spadat->message_type == ZTN_NAT_ACCESS_MSG
+          || spadat->message_type == ZTN_CLIENT_TIMEOUT_NAT_ACCESS_MSG)
         {
             log_msg(LOG_WARNING, "当前不支持转发/NAT 请求。");
         }
@@ -544,7 +544,7 @@ process_spa_request(const fko_srv_options_t * const opts,
 
 
 void
-check_firewall_rules(const fko_srv_options_t * const opts,
+check_firewall_rules(const ztn_srv_options_t * const opts,
         const int chk_rm_all)
 {
     char            exp_str[12]     = {0};
@@ -686,7 +686,7 @@ if(ndx == NULL)
         /* 将规则编号字符串转换为整数。*/
         curr_rule = strtol_wrapper(rule_num_str, 0, -1, NO_EXIT_UPON_ERR, &is_err);
 
-        if (is_err == FKO_SUCCESS) {
+        if (is_err == ZTN_SUCCESS) {
             zero_cmd_buffers();
 
             /* 将规则移动到已过期规则集合。*/
@@ -738,7 +738,7 @@ if(ndx == NULL)
         fwc.next_expire = min_exp;
 }
 void
-ipfw_purge_expired_rules(const fko_srv_options_t *opts)
+ipfw_purge_expired_rules(const ztn_srv_options_t *opts)
 {
     char *ndx, *co_end;
     int i, res, is_err;
@@ -813,7 +813,7 @@ ipfw_purge_expired_rules(const fko_srv_options_t *opts)
             if (isdigit(*ndx)) {
                 curr_rule = strtol_wrapper(ndx, 0, -1, NO_EXIT_UPON_ERR, &is_err);
 
-                if (is_err == FKO_SUCCESS) {
+                if (is_err == ZTN_SUCCESS) {
                     if (curr_rule >= fwc.start_rule_num
                       && curr_rule < fwc.start_rule_num + fwc.max_rules)
                         fwc.rule_map[curr_rule - fwc.start_rule_num] = RULE_TMP_MARKED;

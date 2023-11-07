@@ -10,7 +10,7 @@
   #include <sys/time.h>
 #endif
 
-#include "fko_common.h"
+#include "ztn_common.h"
 #include "cipher_funcs.h"
 #include "digest.h"
 
@@ -93,7 +93,7 @@ rij_salt_and_iv(RIJNDAEL_context *ctx, const char *key,
     int             final_key_len = 0;
     size_t          kiv_len = 0;
 
-    if(mode_flag == FKO_ENC_MODE_CBC_LEGACY_IV)
+    if(mode_flag == ZTN_ENC_MODE_CBC_LEGACY_IV)
     {
         /* 用“0”个字符填充密码，最大不超过Rijndael密钥的最小大小。 */
         if(key_len < RIJNDAEL_MIN_KEYSIZE)
@@ -156,18 +156,18 @@ rijndael_init(RIJNDAEL_context *ctx, const char *key,
 {
 
     /* CBC模式下的默认值为Rijndael */
-    if(encryption_mode == FKO_ENC_MODE_CBC
-            || encryption_mode == FKO_ENC_MODE_CBC_LEGACY_IV)
+    if(encryption_mode == ZTN_ENC_MODE_CBC
+            || encryption_mode == ZTN_ENC_MODE_CBC_LEGACY_IV)
         ctx->mode = MODE_CBC;
-    else if(encryption_mode == FKO_ENC_MODE_CTR)
+    else if(encryption_mode == ZTN_ENC_MODE_CTR)
         ctx->mode = MODE_CTR;
-    else if(encryption_mode == FKO_ENC_MODE_PCBC)
+    else if(encryption_mode == ZTN_ENC_MODE_PCBC)
         ctx->mode = MODE_PCBC;
-    else if(encryption_mode == FKO_ENC_MODE_OFB)
+    else if(encryption_mode == ZTN_ENC_MODE_OFB)
         ctx->mode = MODE_OFB;
-    else if(encryption_mode == FKO_ENC_MODE_CFB)
+    else if(encryption_mode == ZTN_ENC_MODE_CFB)
         ctx->mode = MODE_CFB;
-    else if(encryption_mode == FKO_ENC_MODE_ECB)
+    else if(encryption_mode == ZTN_ENC_MODE_ECB)
         ctx->mode = MODE_ECB;
     else  /* 不应该走这么远 */
         ctx->mode = encryption_mode;
@@ -267,19 +267,19 @@ rij_decrypt(unsigned char *in, size_t in_len,
 
 /* 看看是否需要将“Salted__”字符串添加到 */
 int
-add_salted_str(fko_ctx_t ctx)
+add_salted_str(ztn_ctx_t ctx)
 {
     char           *tbuf;
 
 #if AFL_FUZZING
     ctx->added_salted_str = 1;
-    return(FKO_SUCCESS);
+    return(ZTN_SUCCESS);
 #endif
 
     /* 我们只将base64编码的salt添加到已经是base64的数据中 */
     if(is_base64((unsigned char *)ctx->encrypted_msg,
             ctx->encrypted_msg_len) == 0)
-        return(FKO_ERROR_INVALID_DATA_ENCODE_NOTBASE64);
+        return(ZTN_ERROR_INVALID_DATA_ENCODE_NOTBASE64);
 
     if(constant_runtime_cmp(ctx->encrypted_msg,
             B64_RIJNDAEL_SALT, B64_RIJNDAEL_SALT_STR_LEN) != 0)
@@ -288,7 +288,7 @@ add_salted_str(fko_ctx_t ctx)
         tbuf = realloc(ctx->encrypted_msg, ctx->encrypted_msg_len
                     + B64_RIJNDAEL_SALT_STR_LEN+1);
         if(tbuf == NULL)
-            return(FKO_ERROR_MEMORY_ALLOCATION);
+            return(ZTN_ERROR_MEMORY_ALLOCATION);
 
         memmove(tbuf+B64_RIJNDAEL_SALT_STR_LEN, tbuf, ctx->encrypted_msg_len);
 
@@ -302,19 +302,19 @@ add_salted_str(fko_ctx_t ctx)
         ctx->added_salted_str = 1;
     }
 
-    return(FKO_SUCCESS);
+    return(ZTN_SUCCESS);
 }
 
 /* 看看我们是否需要将“hQ”字符串添加到 */
 int
-add_gpg_prefix(fko_ctx_t ctx)
+add_gpg_prefix(ztn_ctx_t ctx)
 {
     char           *tbuf;
 
     /* 我们只将base64编码的salt添加到已经是base64的数据中 */
     if(is_base64((unsigned char *)ctx->encrypted_msg,
                 ctx->encrypted_msg_len) == 0)
-        return(FKO_ERROR_INVALID_DATA_ENCODE_NOTBASE64);
+        return(ZTN_ERROR_INVALID_DATA_ENCODE_NOTBASE64);
 
     if(constant_runtime_cmp(ctx->encrypted_msg,
             B64_GPG_PREFIX, B64_GPG_PREFIX_STR_LEN) != 0)
@@ -323,7 +323,7 @@ add_gpg_prefix(fko_ctx_t ctx)
         tbuf = realloc(ctx->encrypted_msg, ctx->encrypted_msg_len
                     + B64_GPG_PREFIX_STR_LEN+1);
         if(tbuf == NULL)
-            return(FKO_ERROR_MEMORY_ALLOCATION);
+            return(ZTN_ERROR_MEMORY_ALLOCATION);
 
         memmove(tbuf+B64_GPG_PREFIX_STR_LEN, tbuf, ctx->encrypted_msg_len);
 
@@ -337,7 +337,7 @@ add_gpg_prefix(fko_ctx_t ctx)
         ctx->added_gpg_prefix = 1;
     }
 
-    return(FKO_SUCCESS);
+    return(ZTN_SUCCESS);
 }
 
 #ifdef HAVE_C_UNIT_TESTS /* LCOV_EXCL_START */

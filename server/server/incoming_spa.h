@@ -18,6 +18,6 @@
  * \param opts Main program data struct
  *
  */
-void incoming_spa(fko_srv_options_t *opts);
+void incoming_spa(ztn_srv_options_t *opts);
 
 #endif  /* INCOMING_SPA_H */

@@ -15,8 +15,8 @@ size_t rij_encrypt(unsigned char *in, size_t len,
 size_t rij_decrypt(unsigned char *in, size_t len,
     const char *key, const int key_len,
     unsigned char *out, int encryption_mode);
-int add_salted_str(fko_ctx_t ctx);
-int add_gpg_prefix(fko_ctx_t ctx);
+int add_salted_str(ztn_ctx_t ctx);
+int add_gpg_prefix(ztn_ctx_t ctx);
 
 #endif /* 密码_FUNCS_H */
 

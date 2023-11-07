@@ -13,7 +13,7 @@
 
 #include "replay_cache.h"
 #include "log_msg.h"
-#include "fwknopd_errors.h"
+#include "spad_errors.h"
 #include "utils.h"
 
 #include <sys/stat.h>
@@ -61,7 +61,7 @@
 /* 通过重命名来轮换摘要文件。
 */
 static void
-rotate_digest_cache_file(fko_srv_options_t *opts)
+rotate_digest_cache_file(ztn_srv_options_t *opts)
 {
 #ifdef NO_DIGEST_CACHE
     log_msg(LOG_WARNING, "Digest cache not supported. Nothing to rotate.");
@@ -118,7 +118,7 @@ rotate_digest_cache_file(fko_srv_options_t *opts)
 }
 
 static void
-replay_warning(fko_srv_options_t *opts, digest_cache_info_t *digest_info)
+replay_warning(ztn_srv_options_t *opts, digest_cache_info_t *digest_info)
 {
     char        src_ip[INET_ADDRSTRLEN+1] = {0};
     char        orig_src_ip[INET_ADDRSTRLEN+1] = {0};
@@ -188,7 +188,7 @@ replay_warning(fko_srv_options_t *opts, digest_cache_info_t *digest_info)
 
 #if USE_FILE_CACHE
 static int
-replay_file_cache_init(fko_srv_options_t *opts)
+replay_file_cache_init(ztn_srv_options_t *opts)
 {
     FILE           *digest_file_ptr = NULL;
     unsigned int    num_lines = 0, digest_ctr = 0;
@@ -348,7 +348,7 @@ replay_file_cache_init(fko_srv_options_t *opts)
 /* 检查重放DBM文件是否存在，如果不存在则创建它。返回DB条目的数量，或在出现错误时返回-1。
 */
 static int
-replay_db_cache_init(fko_srv_options_t *opts)
+replay_db_cache_init(ztn_srv_options_t *opts)
 {
 #ifdef NO_DIGEST_CACHE
     return(-1);
@@ -409,7 +409,7 @@ replay_db_cache_init(fko_srv_options_t *opts)
 
 #if USE_FILE_CACHE
 static int
-is_replay_file_cache(fko_srv_options_t *opts, char *digest)
+is_replay_file_cache(ztn_srv_options_t *opts, char *digest)
 {
     int         digest_len = 0;
 
@@ -435,7 +435,7 @@ is_replay_file_cache(fko_srv_options_t *opts, char *digest)
 }
 
 static int
-add_replay_file_cache(fko_srv_options_t *opts, char *digest)
+add_replay_file_cache(ztn_srv_options_t *opts, char *digest)
 {
     FILE       *digest_file_ptr = NULL;
     int         digest_len = 0;
@@ -449,14 +449,14 @@ add_replay_file_cache(fko_srv_options_t *opts, char *digest)
     if ((digest_elm = calloc(1, sizeof(struct digest_cache_list))) == NULL)
     {
         log_msg(LOG_WARNING, "Error calloc() returned NULL for digest cache element",
-            fko_errstr(SPA_MSG_ERROR));
+            ztn_errstr(SPA_MSG_ERROR));
 
         return(SPA_MSG_ERROR);
     }
     if ((digest_elm->cache_info.digest = calloc(1, digest_len+1)) == NULL)
     {
         log_msg(LOG_WARNING, "Error calloc() returned NULL for digest cache string",
-            fko_errstr(SPA_MSG_ERROR));
+            ztn_errstr(SPA_MSG_ERROR));
         free(digest_elm);
         return(SPA_MSG_ERROR);
     }
@@ -504,7 +504,7 @@ add_replay_file_cache(fko_srv_options_t *opts, char *digest)
 
 #if !USE_FILE_CACHE
 static int
-is_replay_dbm_cache(fko_srv_options_t *opts, char *digest)
+is_replay_dbm_cache(ztn_srv_options_t *opts, char *digest)
 {
 #ifdef NO_DIGEST_CACHE
     return 0;
@@ -573,7 +573,7 @@ is_replay_dbm_cache(fko_srv_options_t *opts, char *digest)
 }
 
 static int
-add_replay_dbm_cache(fko_srv_options_t *opts, char *digest)
+add_replay_dbm_cache(ztn_srv_options_t *opts, char *digest)
 {
 #ifdef NO_DIGEST_CACHE
     return 0;
@@ -659,7 +659,7 @@ add_replay_dbm_cache(fko_srv_options_t *opts, char *digest)
 /* 释放重放列表的内存
 */
 void
-free_replay_list(fko_srv_options_t *opts)
+free_replay_list(ztn_srv_options_t *opts)
 {
     struct digest_cache_list *digest_list_ptr = NULL, *digest_tmp = NULL;
 
@@ -693,7 +693,7 @@ free_replay_list(fko_srv_options_t *opts)
 #endif
 
 int
-replay_cache_init(fko_srv_options_t *opts)
+replay_cache_init(ztn_srv_options_t *opts)
 {
 #ifdef NO_DIGEST_CACHE
     return(-1);
@@ -714,7 +714,7 @@ replay_cache_init(fko_srv_options_t *opts)
 }
 
 int
-add_replay(fko_srv_options_t *opts, char *digest)
+add_replay(ztn_srv_options_t *opts, char *digest)
 {
 #ifdef NO_DIGEST_CACHE
     return(-1);
@@ -734,10 +734,10 @@ add_replay(fko_srv_options_t *opts, char *digest)
 #endif /* 没有摘要缓存 */
 }
 
-/* 获取一个fko上下文，提取摘要并将其用作用于检查重放数据库（摘要缓存）的键。
+/* 获取一个ztn上下文，提取摘要并将其用作用于检查重放数据库（摘要缓存）的键。
 */
 int
-is_replay(fko_srv_options_t *opts, char *digest)
+is_replay(ztn_srv_options_t *opts, char *digest)
 {
 #ifdef NO_DIGEST_CACHE
     return(-1);

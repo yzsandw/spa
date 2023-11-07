@@ -4,7 +4,7 @@
 
 /*
 
-    FKO_DIGEST_NAME：摘要算法名称。
+    ZTN_DIGEST_NAME：摘要算法名称。
     ENCRYPTION_MODE：加密模式。
     NAT_LOCAL：本地网络地址转换（NAT）设置。
     NAT_PORT：NAT端口设置。
@@ -40,7 +40,7 @@
 
 */
 enum {
-    FKO_DIGEST_NAME     = 0x100,
+    ZTN_DIGEST_NAME     = 0x100,
     ENCRYPTION_MODE,
     NAT_LOCAL,
     NAT_PORT,
@@ -213,7 +213,7 @@ static struct option cmd_opts[] =
     {"stanza-list",         0, NULL, STANZA_LIST},
     {"no-save-args",        0, NULL, NO_SAVE_ARGS},
     {"server-cmd",          1, NULL, 'C'},
-    {"digest-type",         1, NULL, FKO_DIGEST_NAME},
+    {"digest-type",         1, NULL, ZTN_DIGEST_NAME},
     {"destination",         1, NULL, 'D'},
     {"save-args-file",      1, NULL, 'E'},
     {"encryption-mode",     1, NULL, ENCRYPTION_MODE},

@@ -1,17 +1,17 @@
 /**
  * \file server/nfq_capture.c
  *
- * \brief 这是使用libnetfilter_queue的fwknopd的捕获例程。
+ * \brief 这是使用libnetfilter_queue的spad的捕获例程。
  */
 
 
-#include "fwknopd_common.h"
+#include "spad_common.h"
 #include "nfq_capture.h"
 #include "process_packet.h"
 #include "sig_handler.h"
 #include "fw_util.h"
 #include "log_msg.h"
-#include "fwknopd_errors.h"
+#include "spad_errors.h"
 #include "sig_handler.h"
 #include "tcp_server.h"
 #include <fcntl.h>
@@ -32,7 +32,7 @@ static int process_nfq_packet(struct nfq_q_handle *qh,
     int pkt_len = 0;
     int verdict;
     unsigned char *full_packet;
-    fko_srv_options_t   *opts = (fko_srv_options_t *)data;
+    ztn_srv_options_t   *opts = (ztn_srv_options_t *)data;
 
     ph = nfq_get_msg_packet_hdr(nfa);
     if (ph) {
@@ -62,7 +62,7 @@ static int process_nfq_packet(struct nfq_q_handle *qh,
 /* nfq捕获例程。
 */
 int
-nfq_capture(fko_srv_options_t *opts)
+nfq_capture(ztn_srv_options_t *opts)
 {
     int                 res, child_pid, fd_flags;
     int                 nfq_errcnt = 0;
@@ -138,7 +138,7 @@ nfq_capture(fko_srv_options_t *opts)
         exit(EXIT_FAILURE);
     }
 
-    log_msg(LOG_INFO, "Starting fwknopd main event loop.");
+    log_msg(LOG_INFO, "Starting spad main event loop.");
 
     /* 进入我们自己编写的数据包捕获循环。
     */
@@ -232,7 +232,7 @@ nfq_capture(fko_srv_options_t *opts)
         }
         else if(pending_break == 1 || res == -2)
         {
-            log_msg(LOG_INFO, "Gracefully leaving the fwknopd event loop.");
+            log_msg(LOG_INFO, "Gracefully leaving the spad event loop.");
             break;
         }
         else

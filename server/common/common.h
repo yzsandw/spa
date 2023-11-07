@@ -1,10 +1,10 @@
 /* * */
 
-/* Fwknop主要由文件“AUTHORS”中列出的人员开发。 */
+/* Spa主要由文件“AUTHORS”中列出的人员开发。 */
 #ifndef _COMMON_H
 #define _COMMON_H
 
-/* 常见的包括我们的其他fwknop客户端和服务器源文件。 */
+/* 常见的包括我们的其他spa客户端和服务器源文件。 */
 #if HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -95,25 +95,25 @@
   #define PATH_SEP      '/'
 #endif
 
-#include "fko.h"
-#include "fko_limits.h"
-#include "fko_util.h"
+#include "ztn.h"
+#include "ztn_limits.h"
+#include "ztn_util.h"
 
 /* 从version（在config.h中定义）获取我们的程序版本。 */
 #define MY_VERSION VERSION
 
 enum {
-    FKO_PROTO_UDP,
-    FKO_PROTO_UDP_RAW,
-    FKO_PROTO_TCP,
-    FKO_PROTO_TCP_RAW,
-    FKO_PROTO_ICMP,
-    FKO_PROTO_HTTP,
+    ZTN_PROTO_UDP,
+    ZTN_PROTO_UDP_RAW,
+    ZTN_PROTO_TCP,
+    ZTN_PROTO_TCP_RAW,
+    ZTN_PROTO_ICMP,
+    ZTN_PROTO_HTTP,
 };
 
 /* 其他常见定义 */
-#define FKO_DEFAULT_PROTO   FKO_PROTO_UDP
-#define FKO_DEFAULT_PORT    62201
+#define ZTN_DEFAULT_PROTO   ZTN_PROTO_UDP
+#define ZTN_DEFAULT_PORT    62201
 #define DEFAULT_NAT_PORT    55000
 #define MIN_HIGH_PORT       10000  /* SPA目标端口的合理最小值 */
 #define ANY_PORT            0      /* 用作通配符 */

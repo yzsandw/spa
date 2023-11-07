@@ -16,6 +16,6 @@
     #define DEF_PCAP_NONBLOCK 1
 #endif
 
-int pcap_capture(fko_srv_options_t *opts);
+int pcap_capture(ztn_srv_options_t *opts);
 
 #endif  /* PCAP_CAPTURE_H */

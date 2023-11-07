@@ -1,13 +1,13 @@
 /**
  * \file server/utils.h
  *
- * \brief utils.c fwknopd服务器程序的头文件。
+ * \brief utils.c spad服务器程序的头文件。
  */
 
 #ifndef UTILS_H
 #define UTILS_H
 
-#include "fko.h"
+#include "ztn.h"
 
 /* 一些方便的宏 */
 
@@ -35,7 +35,7 @@
 
 /* 原型
 */
-char* dump_ctx(fko_ctx_t ctx);
+char* dump_ctx(ztn_ctx_t ctx);
 int   is_valid_dir(const char *path);
 int   is_valid_exe(const char *path);
 int   is_valid_file(const char *path);

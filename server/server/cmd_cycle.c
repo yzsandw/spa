@@ -1,11 +1,11 @@
 /**
  * \file server/cmd_cycle.c
  *
- * \brief Fwknop例程，用于管理通过access.conf节（CMD_CYCLE_OPEN和CMD_CYCLE_CLOSE）定义的命令周期。
+ * \brief Spa例程，用于管理通过access.conf节（CMD_CYCLE_OPEN和CMD_CYCLE_CLOSE）定义的命令周期。
  */
 
 
-#include "fwknopd_common.h"
+#include "spad_common.h"
 #include "log_msg.h"
 #include "extcmd.h"
 #include "cmd_cycle.h"
@@ -150,7 +150,7 @@ build_cmd(spa_data_t *spadat, const char * const cmd_cycle_str, int timer)
 }
 
 static int
-cmd_open(fko_srv_options_t *opts, acc_stanza_t *acc,
+cmd_open(ztn_srv_options_t *opts, acc_stanza_t *acc,
         spa_data_t *spadat, const int stanza_num)
 {
     /* CMD_CYCLE_OPEN：必要时通过变量替换来构建打开命令
@@ -177,7 +177,7 @@ cmd_open(fko_srv_options_t *opts, acc_stanza_t *acc,
 }
 
 static int
-add_cmd_close(fko_srv_options_t *opts, acc_stanza_t *acc,
+add_cmd_close(ztn_srv_options_t *opts, acc_stanza_t *acc,
         spa_data_t *spadat, const int stanza_num)
 {
     cmd_cycle_list_t   *last_clist=NULL, *new_clist=NULL, *tmp_clist=NULL;
@@ -263,7 +263,7 @@ add_cmd_close(fko_srv_options_t *opts, acc_stanza_t *acc,
 /* 这是打开/关闭命令循环的主要驱动程序
 */
 int
-cmd_cycle_open(fko_srv_options_t *opts, acc_stanza_t *acc,
+cmd_cycle_open(ztn_srv_options_t *opts, acc_stanza_t *acc,
         spa_data_t *spadat, const int stanza_num, int *res)
 {
     if(! cmd_open(opts, acc, spadat, stanza_num))
@@ -291,7 +291,7 @@ free_cycle_list_node(cmd_cycle_list_t *list_node)
 /* 根据过期计时器运行所有关闭命令
 */
 void
-cmd_cycle_close(fko_srv_options_t *opts)
+cmd_cycle_close(ztn_srv_options_t *opts)
 {
     cmd_cycle_list_t   *curr=NULL, *prev=NULL;
     int                 do_delete=1;
@@ -346,7 +346,7 @@ cmd_cycle_close(fko_srv_options_t *opts)
 }
 
 void
-free_cmd_cycle_list(fko_srv_options_t *opts)
+free_cmd_cycle_list(ztn_srv_options_t *opts)
 {
     cmd_cycle_list_t   *tmp_clist=NULL, *clist=NULL;
 

@@ -1,7 +1,7 @@
 /**
  * \file server/config_init.h
  *
- * \brief fwknopd config_init的头文件。
+ * \brief spad config_init的头文件。
  */
 
 #ifndef CONFIG_INIT_H
@@ -18,9 +18,9 @@
  *
  * 此函数设置默认的配置选项，并从命令行加载配置信息。
  *
- * \param opts用配置填充的fko_srv_options_t结构
+ * \param opts用配置填充的ztn_srv_options_t结构
  */
-void config_init(fko_srv_options_t *opts, int argc, char **argv);
+void config_init(ztn_srv_options_t *opts, int argc, char **argv);
 
 /**
  * \brief 将当前配置转储到std-out
@@ -28,15 +28,15 @@ void config_init(fko_srv_options_t *opts, int argc, char **argv);
  * \param opts指向要转储的程序选项结构的指针
  *
  */
-void dump_config(const fko_srv_options_t *opts);
+void dump_config(const ztn_srv_options_t *opts);
 
 /**
  * \brief 释放配置内存
  *
- * \param opts要释放的fko_srv_options_t结构
+ * \param opts要释放的ztn_srv_options_t结构
  *
  */
-void free_configs(fko_srv_options_t *opts);
+void free_configs(ztn_srv_options_t *opts);
 
 /**
  * \brief 将程序帮助消息打印到stdout

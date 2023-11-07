@@ -1,10 +1,10 @@
 /**
  * \file server/tcp_server.c
  *
- * \brief 为fwknopd生成虚拟tcp服务器。其目的是接受tcp连接，然后在第一个数据包之后丢弃它。
+ * \brief 为spad生成虚拟tcp服务器。其目的是接受tcp连接，然后在第一个数据包之后丢弃它。
  */
 
-#include "fwknopd_common.h"
+#include "spad_common.h"
 #include "tcp_server.h"
 #include "log_msg.h"
 #include "utils.h"
@@ -26,7 +26,7 @@
 /* 分叉并运行“虚拟”TCP服务器。返回值是子进程的PID，如果存在分叉错误，则返回-1。
 */
 int
-run_tcp_server(fko_srv_options_t *opts)
+run_tcp_server(ztn_srv_options_t *opts)
 {
 #if !CODE_COVERAGE
     pid_t               pid, ppid;

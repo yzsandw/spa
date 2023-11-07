@@ -25,7 +25,7 @@
 #else
   #define PF_LIST_ANCHOR_RULES_ARGS   "-a %s -s rules 2> /dev/null"
 #endif
-#define PF_ANCHOR_CHECK_ARGS          "-s Anchor" SH_REDIR  /* to check for fwknop anchor */
+#define PF_ANCHOR_CHECK_ARGS          "-s Anchor" SH_REDIR  /* to check for spa anchor */
 #define PF_DEL_ALL_ANCHOR_RULES       "-a %s -F all" SH_REDIR
 #define PF_ANY_IP                     "any"
 

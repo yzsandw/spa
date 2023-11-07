@@ -1,6 +1,6 @@
 /* * */
 
-#include "fwknop_common.h"
+#include "spanop_common.h"
 #include "utils.h"
 
 #include <errno.h>
@@ -31,7 +31,7 @@ struct url
 
 /* 2023/7/20 15:29:56 */
 static int
-try_url(struct url *url, fko_cli_options_t *options)
+try_url(struct url *url, ztn_cli_options_t *options)
 {
     int     sock=-1, sock_success=0, res, error, http_buf_len, i;
     int     bytes_read = 0, position = 0;
@@ -214,7 +214,7 @@ parse_url(char *res_url, struct url* url)
     if(e_ndx != NULL)
     {
         port = strtol_wrapper(e_ndx+1, 1, MAX_PORT, NO_EXIT_UPON_ERR, &is_err);
-        if(is_err != FKO_SUCCESS)
+        if(is_err != ZTN_SUCCESS)
         {
             log_msg(LOG_VERBOSITY_ERROR,
                 "[*] resolve-url port value is invalid, must be in [%d-%d]",
@@ -272,7 +272,7 @@ parse_url(char *res_url, struct url* url)
 }
 
 int
-resolve_ip_https(fko_cli_options_t *options)
+resolve_ip_https(ztn_cli_options_t *options)
 {
     int     o1, o2, o3, o4, got_resp=0, i=0;
     char   *ndx, resp[MAX_IPV4_STR_LEN+1] = {0};
@@ -461,7 +461,7 @@ resolve_ip_https(fko_cli_options_t *options)
 //解析http
 /* 这是一个C语言函数，用于通过HTTPS解析IP地址。函数接受一个名为选项的结构体指针作为参数，并返回一个整数。 */
 int
-resolve_ip_http(fko_cli_options_t *options)
+resolve_ip_http(ztn_cli_options_t *options)
 {
     int     res;
     struct  url url;

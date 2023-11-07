@@ -1,6 +1,6 @@
 
 
-#include "fwknop_common.h"
+#include "spanop_common.h"
 #include "log_msg.h"
 #include <stdarg.h>
 

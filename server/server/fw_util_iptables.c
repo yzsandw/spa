@@ -1,11 +1,11 @@
 /**
  * \file server/fw_util_iptables.c
  *
- * \brief Fwknop routines for managing iptables firewall rules.
+ * \brief Spa routines for managing iptables firewall rules.
  */
 
-/*  Fwknop is developed primarily by the people listed in the file 'AUTHORS'.
- *  Copyright (C) 2009-2015 fwknop developers and contributors. For a full
+/*  Spa is developed primarily by the people listed in the file 'AUTHORS'.
+ *  Copyright (C) 2009-2015 spa developers and contributors. For a full
  *  list of contributors, see the file 'CREDITS'.
  *
  *  License (GNU General Public License):
@@ -28,7 +28,7 @@
  *****************************************************************************
 */
 
-#include "fwknopd_common.h"
+#include "spad_common.h"
 
 #ifdef FIREWALL_IPTABLES
 
@@ -59,7 +59,7 @@ zero_cmd_buffers(void)
 static int pid_status = 0;
 
 static int
-rule_exists_no_chk_support(const fko_srv_options_t * const opts,
+rule_exists_no_chk_support(const ztn_srv_options_t * const opts,
         const struct fw_chain * const fwc,
         const unsigned int proto,
         const char * const srcip,
@@ -85,7 +85,7 @@ rule_exists_no_chk_support(const fko_srv_options_t * const opts,
     /* If we're maximizing code coverage, then exercise the run_extcmd_write()
      * function which is normally only used for the PF firewall. This is to
      * maximize code coverage in conjunction with the test suite, and is never
-     * compiled in for a production release of fwknop.
+     * compiled in for a production release of spa.
     */
     if(run_extcmd_write("/bin/grep -v test", "/bin/echo test", &pid_status, opts) == 0)
         log_msg(LOG_WARNING, "[ignore] Code coverage: Executed command");
@@ -185,7 +185,7 @@ rule_exists_no_chk_support(const fko_srv_options_t * const opts,
 }
 
 static int
-rule_exists_chk_support(const fko_srv_options_t * const opts,
+rule_exists_chk_support(const ztn_srv_options_t * const opts,
         const char * const chain, const char * const rule)
 {
     int     rule_exists = 0;
@@ -222,7 +222,7 @@ rule_exists_chk_support(const fko_srv_options_t * const opts,
 }
 
 static int
-rule_exists(const fko_srv_options_t * const opts,
+rule_exists(const ztn_srv_options_t * const opts,
         const struct fw_chain * const fwc,
         const char * const rule,
         const unsigned int proto,
@@ -253,7 +253,7 @@ rule_exists(const fko_srv_options_t * const opts,
 }
 
 static void
-ipt_chk_support(const fko_srv_options_t * const opts)
+ipt_chk_support(const ztn_srv_options_t * const opts)
 {
     int               res = 1;
     struct fw_chain  *in_chain = &(opts->fw_config->chain[IPT_INPUT_ACCESS]);
@@ -325,7 +325,7 @@ ipt_chk_support(const fko_srv_options_t * const opts)
 }
 
 static int
-comment_match_exists(const fko_srv_options_t * const opts)
+comment_match_exists(const ztn_srv_options_t * const opts)
 {
     int               res = 1;
     char             *ndx = NULL;
@@ -394,7 +394,7 @@ comment_match_exists(const fko_srv_options_t * const opts)
 }
 
 static int
-add_jump_rule(const fko_srv_options_t * const opts, const int chain_num)
+add_jump_rule(const ztn_srv_options_t * const opts, const int chain_num)
 {
     int res = 0, rv = 0;
 
@@ -429,7 +429,7 @@ add_jump_rule(const fko_srv_options_t * const opts, const int chain_num)
 }
 
 static int
-chain_exists(const fko_srv_options_t * const opts, const int chain_num)
+chain_exists(const ztn_srv_options_t * const opts, const int chain_num)
 {
     int res = 0;
 
@@ -460,7 +460,7 @@ chain_exists(const fko_srv_options_t * const opts, const int chain_num)
 }
 
 static int
-jump_rule_exists_chk_support(const fko_srv_options_t * const opts, const int chain_num)
+jump_rule_exists_chk_support(const ztn_srv_options_t * const opts, const int chain_num)
 {
     int    exists = 0;
     char   rule_buf[CMD_BUFSIZE] = {0};
@@ -482,7 +482,7 @@ jump_rule_exists_chk_support(const fko_srv_options_t * const opts, const int cha
 }
 
 static int
-jump_rule_exists_no_chk_support(const fko_srv_options_t * const opts,
+jump_rule_exists_no_chk_support(const ztn_srv_options_t * const opts,
         const int chain_num)
 {
     int     exists = 0;
@@ -512,7 +512,7 @@ jump_rule_exists_no_chk_support(const fko_srv_options_t * const opts,
 }
 
 static int
-jump_rule_exists(const fko_srv_options_t * const opts, const int chain_num)
+jump_rule_exists(const ztn_srv_options_t * const opts, const int chain_num)
 {
     int    exists = 0;
 
@@ -524,11 +524,11 @@ jump_rule_exists(const fko_srv_options_t * const opts, const int chain_num)
     return exists;
 }
 
-/* Print all firewall rules currently instantiated by the running fwknopd
+/* Print all firewall rules currently instantiated by the running spad
  * daemon to stdout.
 */
 int
-fw_dump_rules(const fko_srv_options_t * const opts)
+fw_dump_rules(const ztn_srv_options_t * const opts)
 {
     int     i, res, got_err = 0;
 
@@ -539,7 +539,7 @@ fw_dump_rules(const fko_srv_options_t * const opts)
         fprintf(stdout, "Listing all iptables rules in applicable tables...\n");
         fflush(stdout);
 
-        for(i=0; i < NUM_FWKNOP_ACCESS_TYPES; i++)
+        for(i=0; i < NUM_SPA_ACCESS_TYPES; i++)
         {
             if(fwc.chain[i].target[0] == '\0')
                 continue;
@@ -570,10 +570,10 @@ fw_dump_rules(const fko_srv_options_t * const opts)
     }
     else
     {
-        fprintf(stdout, "Listing rules in fwknopd iptables chains...\n");
+        fprintf(stdout, "Listing rules in spad iptables chains...\n");
         fflush(stdout);
 
-        for(i=0; i < NUM_FWKNOP_ACCESS_TYPES; i++)
+        for(i=0; i < NUM_SPA_ACCESS_TYPES; i++)
         {
             if(fwc.chain[i].target[0] == '\0')
                 continue;
@@ -610,14 +610,14 @@ fw_dump_rules(const fko_srv_options_t * const opts)
     return(got_err);
 }
 
-/* Quietly flush and delete all fwknop custom chains.
+/* Quietly flush and delete all spa custom chains.
 */
 static void
-delete_all_chains(const fko_srv_options_t * const opts)
+delete_all_chains(const ztn_srv_options_t * const opts)
 {
     int     i, res, cmd_ctr = 0;
 
-    for(i=0; i < NUM_FWKNOP_ACCESS_TYPES; i++)
+    for(i=0; i < NUM_SPA_ACCESS_TYPES; i++)
     {
         if(fwc.chain[i].target[0] == '\0')
             continue;
@@ -764,7 +764,7 @@ delete_all_chains(const fko_srv_options_t * const opts)
 }
 
 static int
-create_chain(const fko_srv_options_t * const opts, const int chain_num)
+create_chain(const ztn_srv_options_t * const opts, const int chain_num)
 {
     int res = 0, rv = 0;
 
@@ -796,7 +796,7 @@ create_chain(const fko_srv_options_t * const opts, const int chain_num)
 }
 
 static int
-mk_chain(const fko_srv_options_t * const opts, const int chain_num)
+mk_chain(const ztn_srv_options_t * const opts, const int chain_num)
 {
     int err = 0;
 
@@ -813,17 +813,17 @@ mk_chain(const fko_srv_options_t * const opts, const int chain_num)
     return err;
 }
 
-/* Create the fwknop custom chains (at least those that are configured).
+/* Create the spa custom chains (at least those that are configured).
 */
 static int
-create_fw_chains(const fko_srv_options_t * const opts)
+create_fw_chains(const ztn_srv_options_t * const opts)
 {
     int     i, got_err = 0;
 #if USE_LIBNETFILTER_QUEUE
     int     res = 0;
 #endif
 
-    for(i=0; i < NUM_FWKNOP_ACCESS_TYPES; i++)
+    for(i=0; i < NUM_SPA_ACCESS_TYPES; i++)
     {
         if(fwc.chain[i].target[0] == '\0')
             continue;
@@ -1001,7 +1001,7 @@ set_fw_chain_conf(const int type, const char * const conf_str)
     /* Pull and set Jump_rule_position */
     chain->jump_rule_pos = strtol_wrapper(chain_fields[3],
             0, RCHK_MAX_IPT_RULE_NUM, NO_EXIT_UPON_ERR, &is_err);
-    if(is_err != FKO_SUCCESS)
+    if(is_err != ZTN_SUCCESS)
     {
         log_msg(LOG_ERR, "[*] invalid jump rule position in Line: %s",
             conf_str);
@@ -1014,7 +1014,7 @@ set_fw_chain_conf(const int type, const char * const conf_str)
     /* Pull and set to_chain rule position */
     chain->rule_pos = strtol_wrapper(chain_fields[5],
             0, RCHK_MAX_IPT_RULE_NUM, NO_EXIT_UPON_ERR, &is_err);
-    if(is_err != FKO_SUCCESS)
+    if(is_err != ZTN_SUCCESS)
     {
         log_msg(LOG_ERR, "[*] invalid to_chain rule position in Line: %s",
             conf_str);
@@ -1024,7 +1024,7 @@ set_fw_chain_conf(const int type, const char * const conf_str)
 }
 
 int
-fw_config_init(fko_srv_options_t * const opts)
+fw_config_init(ztn_srv_options_t * const opts)
 {
     memset(&fwc, 0x0, sizeof(struct fw_config));
 
@@ -1036,14 +1036,14 @@ fw_config_init(fko_srv_options_t * const opts)
     fiu_return_on("fw_config_init", 0);
 #endif
 
-    /* Pull the fwknop chain config info and setup our internal
+    /* Pull the spa chain config info and setup our internal
      * config struct.  The IPT_INPUT is the only one that is
      * required. The rest are optional.
     */
     if(set_fw_chain_conf(IPT_INPUT_ACCESS, opts->config[CONF_IPT_INPUT_ACCESS]) != 1)
         return 0;
 
-    /* The FWKNOP_OUTPUT_ACCESS requires ENABLE_IPT_OUTPUT_ACCESS == Y
+    /* The SPA_OUTPUT_ACCESS requires ENABLE_IPT_OUTPUT_ACCESS == Y
     */
     if(strncasecmp(opts->config[CONF_ENABLE_IPT_OUTPUT], "Y", 1)==0)
         if(set_fw_chain_conf(IPT_OUTPUT_ACCESS, opts->config[CONF_IPT_OUTPUT_ACCESS]) != 1)
@@ -1091,7 +1091,7 @@ fw_config_init(fko_srv_options_t * const opts)
 }
 
 int
-fw_initialize(const fko_srv_options_t * const opts)
+fw_initialize(const ztn_srv_options_t * const opts)
 {
     int res = 1;
 
@@ -1113,7 +1113,7 @@ fw_initialize(const fko_srv_options_t * const opts)
     if(create_fw_chains(opts) != 0)
     {
         log_msg(LOG_WARNING,
-                "fw_initialize() Warning: Errors detected during fwknop custom chain creation");
+                "fw_initialize() Warning: Errors detected during spa custom chain creation");
         res = 0;
     }
 
@@ -1136,7 +1136,7 @@ fw_initialize(const fko_srv_options_t * const opts)
 }
 
 int
-fw_cleanup(const fko_srv_options_t * const opts)
+fw_cleanup(const ztn_srv_options_t * const opts)
 {
     if(strncasecmp(opts->config[CONF_FLUSH_IPT_AT_EXIT], "N", 1) == 0
             && opts->fw_flush == 0)
@@ -1147,7 +1147,7 @@ fw_cleanup(const fko_srv_options_t * const opts)
 }
 
 static int
-create_rule(const fko_srv_options_t * const opts,
+create_rule(const ztn_srv_options_t * const opts,
         const char * const fw_chain, const char * const fw_rule)
 {
     int res = 0;
@@ -1182,7 +1182,7 @@ create_rule(const fko_srv_options_t * const opts,
 }
 
 static void
-ipt_rule(const fko_srv_options_t * const opts,
+ipt_rule(const ztn_srv_options_t * const opts,
         const char * const complete_rule_buf,
         const char * const fw_rule_macro,
         const char * const srcip,
@@ -1245,7 +1245,7 @@ ipt_rule(const fko_srv_options_t * const opts,
     return;
 }
 
-static void forward_access_rule(const fko_srv_options_t * const opts,
+static void forward_access_rule(const ztn_srv_options_t * const opts,
         const acc_stanza_t * const acc,
         struct fw_chain * const fwd_chain,
         const char * const nat_ip,
@@ -1298,7 +1298,7 @@ static void forward_access_rule(const fko_srv_options_t * const opts,
     return;
 }
 
-static void dnat_rule(const fko_srv_options_t * const opts,
+static void dnat_rule(const ztn_srv_options_t * const opts,
         const acc_stanza_t * const acc,
         struct fw_chain * const dnat_chain,
         const char * const nat_ip,
@@ -1357,7 +1357,7 @@ static void dnat_rule(const fko_srv_options_t * const opts,
     return;
 }
 
-static void snat_rule(const fko_srv_options_t * const opts,
+static void snat_rule(const ztn_srv_options_t * const opts,
         const acc_stanza_t * const acc,
         const char * const nat_ip,
         const unsigned int nat_port,
@@ -1474,7 +1474,7 @@ static void snat_rule(const fko_srv_options_t * const opts,
 /* Rule Processing - Create an access request...
 */
 int
-process_spa_request(const fko_srv_options_t * const opts,
+process_spa_request(const ztn_srv_options_t * const opts,
         const acc_stanza_t * const acc, spa_data_t * const spadat)
 {
     char            nat_ip[MAX_IPV4_STR_LEN] = {0};
@@ -1527,10 +1527,10 @@ process_spa_request(const fko_srv_options_t * const opts,
 
     /* deal with SPA packets that themselves request a NAT operation
     */
-    if(spadat->message_type == FKO_LOCAL_NAT_ACCESS_MSG
-      || spadat->message_type == FKO_CLIENT_TIMEOUT_LOCAL_NAT_ACCESS_MSG
-      || spadat->message_type == FKO_NAT_ACCESS_MSG
-      || spadat->message_type == FKO_CLIENT_TIMEOUT_NAT_ACCESS_MSG
+    if(spadat->message_type == ZTN_LOCAL_NAT_ACCESS_MSG
+      || spadat->message_type == ZTN_CLIENT_TIMEOUT_LOCAL_NAT_ACCESS_MSG
+      || spadat->message_type == ZTN_NAT_ACCESS_MSG
+      || spadat->message_type == ZTN_CLIENT_TIMEOUT_NAT_ACCESS_MSG
       || acc->force_nat)
     {
         if(acc->force_nat)
@@ -1581,7 +1581,7 @@ process_spa_request(const fko_srv_options_t * const opts,
 
                 nat_port = strtol_wrapper(ndx+1, 0, MAX_PORT,
                         NO_EXIT_UPON_ERR, &is_err);
-                if(is_err != FKO_SUCCESS)
+                if(is_err != ZTN_SUCCESS)
                 {
                     log_msg(LOG_INFO, "Invalid NAT port in SPA message");
                     free_acc_port_list(port_list);
@@ -1597,8 +1597,8 @@ process_spa_request(const fko_srv_options_t * const opts,
             }
         }
 
-        if(spadat->message_type == FKO_LOCAL_NAT_ACCESS_MSG
-                || spadat->message_type == FKO_CLIENT_TIMEOUT_LOCAL_NAT_ACCESS_MSG)
+        if(spadat->message_type == ZTN_LOCAL_NAT_ACCESS_MSG
+                || spadat->message_type == ZTN_CLIENT_TIMEOUT_LOCAL_NAT_ACCESS_MSG)
         {
             ipt_rule(opts, NULL, IPT_RULE_ARGS, spadat->use_src_ip,
                 (fwc.use_destination ? spadat->pkt_destination_ip : IPT_ANY_IP),
@@ -1658,7 +1658,7 @@ process_spa_request(const fko_srv_options_t * const opts,
 }
 
 static void
-rm_expired_rules(const fko_srv_options_t * const opts,
+rm_expired_rules(const ztn_srv_options_t * const opts,
         const char * const ipt_output_buf,
         char *ndx, struct fw_chain *ch, int cpos, time_t now)
 {
@@ -1743,7 +1743,7 @@ rm_expired_rules(const fko_srv_options_t * const opts,
 
             rule_num = strtol_wrapper(rule_num_str, rn_offset, RCHK_MAX_IPT_RULE_NUM,
                     NO_EXIT_UPON_ERR, &is_err);
-            if(is_err != FKO_SUCCESS)
+            if(is_err != ZTN_SUCCESS)
             {
                 log_msg(LOG_ERR,
                     "Rule parse error while finding rule number in chain %i",
@@ -1816,7 +1816,7 @@ rm_expired_rules(const fko_srv_options_t * const opts,
  * firewall rules.
 */
 void
-check_firewall_rules(const fko_srv_options_t * const opts,
+check_firewall_rules(const ztn_srv_options_t * const opts,
         const int chk_rm_all)
 {
     char            *ndx;
@@ -1831,7 +1831,7 @@ check_firewall_rules(const fko_srv_options_t * const opts,
 
     /* Iterate over each chain and look for active rules to delete.
     */
-    for(i=0; i < NUM_FWKNOP_ACCESS_TYPES; i++)
+    for(i=0; i < NUM_SPA_ACCESS_TYPES; i++)
     {
         /* If there are no active rules or we have not yet
          * reached our expected next expire time, continue.
@@ -1849,7 +1849,7 @@ check_firewall_rules(const fko_srv_options_t * const opts,
          * any that have expired. Note that chk_rm_all puts us in
          * garbage collection mode, and allows any rules that have
          * been manually added (potentially by a program separate
-         * from fwknopd) to take advantage of fwknopd's timeout
+         * from spad) to take advantage of spad's timeout
          * mechanism.
         */
         snprintf(cmd_buf, CMD_BUFSIZE-1, "%s " IPT_LIST_RULES_ARGS,

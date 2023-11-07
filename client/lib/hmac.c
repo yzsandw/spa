@@ -42,7 +42,7 @@ hmac_md5(const char *msg, const unsigned int msg_len,
     int final_len = hmac_key_len;
 
     if (padded_msg == NULL)
-        return FKO_ERROR_MEMORY_ALLOCATION;
+        return ZTN_ERROR_MEMORY_ALLOCATION;
 	
     if(MD5_BLOCK_LEN < hmac_key_len)
     {
@@ -71,7 +71,7 @@ hmac_md5(const char *msg, const unsigned int msg_len,
     md5(hmac, padded_hash, MD5_BLOCK_LEN + MD5_DIGEST_LEN);
 
     free(padded_msg);
-    return FKO_SUCCESS;
+    return ZTN_SUCCESS;
 }
 
 int
@@ -87,7 +87,7 @@ hmac_sha1(const char *msg, const unsigned int msg_len,
     int final_len = hmac_key_len;
 
     if (padded_msg == NULL)
-        return FKO_ERROR_MEMORY_ALLOCATION;
+        return ZTN_ERROR_MEMORY_ALLOCATION;
 
     if(SHA1_BLOCK_LEN < hmac_key_len)
     {
@@ -116,7 +116,7 @@ hmac_sha1(const char *msg, const unsigned int msg_len,
     sha1(hmac, padded_hash, SHA1_BLOCK_LEN + SHA1_DIGEST_LEN);
 
     free(padded_msg);
-    return FKO_SUCCESS;
+    return ZTN_SUCCESS;
 }
 
 int
@@ -132,7 +132,7 @@ hmac_sha256(const char *msg, const unsigned int msg_len,
     int final_len = hmac_key_len;
 
     if (padded_msg == NULL)
-        return FKO_ERROR_MEMORY_ALLOCATION;
+        return ZTN_ERROR_MEMORY_ALLOCATION;
 
     if(SHA256_BLOCK_LEN < hmac_key_len)
     {
@@ -161,7 +161,7 @@ hmac_sha256(const char *msg, const unsigned int msg_len,
     sha256(hmac, padded_hash, SHA256_BLOCK_LEN + SHA256_DIGEST_LEN);
 
     free(padded_msg);
-    return FKO_SUCCESS;
+    return ZTN_SUCCESS;
 }
 
 int
@@ -177,7 +177,7 @@ hmac_sha384(const char *msg, const unsigned int msg_len,
     int final_len = hmac_key_len;
 
     if (padded_msg == NULL)
-        return FKO_ERROR_MEMORY_ALLOCATION;
+        return ZTN_ERROR_MEMORY_ALLOCATION;
 
     if(SHA384_BLOCK_LEN < hmac_key_len)
     {
@@ -206,7 +206,7 @@ hmac_sha384(const char *msg, const unsigned int msg_len,
     sha384(hmac, padded_hash, SHA384_BLOCK_LEN + SHA384_DIGEST_LEN);
 
     free(padded_msg);
-    return FKO_SUCCESS;
+    return ZTN_SUCCESS;
 }
 
 int
@@ -222,7 +222,7 @@ hmac_sha512(const char *msg, const unsigned int msg_len,
     int final_len = hmac_key_len;
 
     if (padded_msg == NULL)
-        return FKO_ERROR_MEMORY_ALLOCATION;
+        return ZTN_ERROR_MEMORY_ALLOCATION;
 
     if(SHA512_BLOCK_LEN < hmac_key_len)
     {
@@ -251,7 +251,7 @@ hmac_sha512(const char *msg, const unsigned int msg_len,
     sha512(hmac, padded_hash, SHA512_BLOCK_LEN + SHA512_DIGEST_LEN);
 
     free(padded_msg);
-    return FKO_SUCCESS;
+    return ZTN_SUCCESS;
 }
 
 int
@@ -267,7 +267,7 @@ hmac_sha3_256(const char *msg, const unsigned int msg_len,
     int final_len = hmac_key_len;
 
     if (padded_msg == NULL)
-        return FKO_ERROR_MEMORY_ALLOCATION;
+        return ZTN_ERROR_MEMORY_ALLOCATION;
 
     if(SHA3_256_BLOCK_LEN < hmac_key_len)
     {
@@ -296,7 +296,7 @@ hmac_sha3_256(const char *msg, const unsigned int msg_len,
     FIPS202_SHA3_256(padded_hash, SHA3_256_BLOCK_LEN + SHA3_256_DIGEST_LEN, hmac);
 
     free(padded_msg);
-    return FKO_SUCCESS;
+    return ZTN_SUCCESS;
 }
 
 int
@@ -312,7 +312,7 @@ hmac_sha3_512(const char *msg, const unsigned int msg_len,
     int final_len = hmac_key_len;
 
     if (padded_msg == NULL)
-        return FKO_ERROR_MEMORY_ALLOCATION;
+        return ZTN_ERROR_MEMORY_ALLOCATION;
 
     if(SHA3_512_BLOCK_LEN < hmac_key_len)
     {
@@ -341,7 +341,7 @@ hmac_sha3_512(const char *msg, const unsigned int msg_len,
     FIPS202_SHA3_512(padded_hash, SHA3_512_BLOCK_LEN + SHA3_512_DIGEST_LEN, hmac);
 
     free(padded_msg);
-    return FKO_SUCCESS;
+    return ZTN_SUCCESS;
 }
 
 #ifdef HAVE_C_UNIT_TESTS /* LCOV_EXCL_START */

@@ -1,5 +1,5 @@
 
-#include "fko_common.h"
+#include "ztn_common.h"
 #include "rijndael.h"
 #include <stdlib.h>
 #include <string.h>

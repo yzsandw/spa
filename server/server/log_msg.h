@@ -19,7 +19,7 @@
 
 #define LOG_DEFAULT_VERBOSITY   LOG_INFO    
 
-void init_logging(fko_srv_options_t *opts);
+void init_logging(ztn_srv_options_t *opts);
 void free_logging(void);
 void set_log_facility(int fac);
 void log_msg(int, char*, ...);

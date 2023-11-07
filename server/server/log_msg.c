@@ -1,4 +1,4 @@
-#include "fwknopd_common.h"
+#include "spad_common.h"
 #include "utils.h"
 #include "log_msg.h"
 
@@ -10,7 +10,7 @@ static int syslog_fac = LOG_DAEMON;
 */
 static int static_log_flag = LOG_STDERR_ONLY;
 
-/* 用于日志消息中的 ID 的名称。默认为 fwknopd。
+/* 用于日志消息中的 ID 的名称。默认为 spad。
 */
 static char *log_name = NULL;
 
@@ -28,7 +28,7 @@ void free_logging(void)
 
 /* 初始化日志设置用于 syslog 的名称。
 */
-void init_logging(fko_srv_options_t *opts)
+void init_logging(ztn_srv_options_t *opts)
 {
     char *my_name = NULL;
     int is_syslog = 0;

@@ -1,7 +1,7 @@
 /**
  * \file server/process_packet.h
  *
- * \brief process_packet和其他fwknopd代码的头文件。
+ * \brief process_packet和其他spad代码的头文件。
  */
 
 #ifndef PROCESS_PACKET_H
@@ -13,7 +13,7 @@
   #define PROCESS_PKT_ARGS_TYPE unsigned char
 #else
   #define PACKET_HEADER_META unsigned short pkt_len
-  #define PROCESS_PKT_ARGS_TYPE fko_srv_options_t
+  #define PROCESS_PKT_ARGS_TYPE ztn_srv_options_t
 #endif
 
 #define IPV4_VER_MASK   0x15

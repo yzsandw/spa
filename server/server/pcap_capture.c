@@ -5,13 +5,13 @@
   #include <errno.h>
 #endif
 
-#include "fwknopd_common.h"
+#include "spad_common.h"
 #include "pcap_capture.h"
 #include "process_packet.h"
 #include "fw_util.h"
 #include "cmd_cycle.h"
 #include "log_msg.h"
-#include "fwknopd_errors.h"
+#include "spad_errors.h"
 #include "sig_handler.h"
 #include "tcp_server.h"
 
@@ -25,7 +25,7 @@
 pcap 抓包例程
 */
 int
-pcap_capture(fko_srv_options_t *opts)
+pcap_capture(ztn_srv_options_t *opts)
 {
     pcap_t              *pcap;
     char                errstr[PCAP_ERRBUF_SIZE] = {0};
@@ -154,7 +154,7 @@ if ((pcap_file_mode == 0) && (pcap_setnonblock(pcap, DEF_PCAP_NONBLOCK, errstr))
     clean_exit(opts, FW_CLEANUP, EXIT_FAILURE);
 }
 
-log_msg(LOG_INFO, "开始 fwknopd 主事件循环。");
+log_msg(LOG_INFO, "开始 spad 主事件循环。");
 
 /* 进入我们自己编写的数据包捕获循环。
 */
@@ -255,7 +255,7 @@ log_msg(LOG_INFO, "开始 fwknopd 主事件循环。");
         {
             
             // pcap_breakloop 被调用，所以我们放弃。
-            log_msg(LOG_INFO, "Gracefully leaving the fwknopd event loop.");
+            log_msg(LOG_INFO, "Gracefully leaving the spad event loop.");
             break;
         }
         else

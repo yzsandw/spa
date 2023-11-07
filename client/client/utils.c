@@ -1,6 +1,6 @@
 
 #include "common.h"
-#include "fwknop_common.h"
+#include "spanop_common.h"
 #include "utils.h"
 #ifndef WIN32
 #include <arpa/inet.h>
@@ -9,20 +9,20 @@
 static void *get_in_addr(struct sockaddr *sa);
 
 /* * */
-typedef struct fko_protocol
+typedef struct ztn_protocol
 {
-    const char  str[PROTOCOL_BUFSIZE];      /* ！<表示FKO库的协议值的字符串 */
-    int         val;                        /* ！<根据FKO库的协议值 */
-} fko_protocol_t;
+    const char  str[PROTOCOL_BUFSIZE];      /* ！<表示ZTN库的协议值的字符串 */
+    int         val;                        /* ！<根据ZTN库的协议值 */
+} ztn_protocol_t;
 
-static fko_protocol_t fko_protocol_array[] =
+static ztn_protocol_t ztn_protocol_array[] =
 {
-    { "udpraw", FKO_PROTO_UDP_RAW   },
-    { "udp",    FKO_PROTO_UDP       },
-    { "tcpraw", FKO_PROTO_TCP_RAW   },
-    { "tcp",    FKO_PROTO_TCP       },
-    { "icmp",   FKO_PROTO_ICMP      },
-    { "http",   FKO_PROTO_HTTP      }
+    { "udpraw", ZTN_PROTO_UDP_RAW   },
+    { "udp",    ZTN_PROTO_UDP       },
+    { "tcpraw", ZTN_PROTO_TCP_RAW   },
+    { "tcp",    ZTN_PROTO_TCP       },
+    { "icmp",   ZTN_PROTO_ICMP      },
+    { "http",   ZTN_PROTO_HTTP      }
 };
 
 int
@@ -33,7 +33,7 @@ verify_file_perms_ownership(const char *file, int fd)
 #if HAVE_FSTAT && HAVE_STAT
     struct stat st;
 
-    /* fwknop客户端处理的每个文件都应该拥有 */
+    /* spa客户端处理的每个文件都应该拥有 */
     if((fd >= 0 && fstat(fd, &st) == 0) || stat(file, &st) == 0)
     {
         /* 确保它是一个常规文件 */
@@ -95,7 +95,7 @@ get_in_addr(struct sockaddr *sa)
 /* * */
 int
 resolve_dst_addr(const char *dns_str, struct addrinfo *hints,
-        char *ip_str, size_t ip_bufsize, fko_cli_options_t *opts)
+        char *ip_str, size_t ip_bufsize, ztn_cli_options_t *opts)
 {
     int                 error;      /* 函数错误返回代码 */
     struct addrinfo    *result;     /* getaddrinfo（）的结果 */
@@ -161,18 +161,18 @@ short
 proto_inttostr(int proto, char *proto_str, size_t proto_size)
 {
     short           proto_error = -1;
-    unsigned char   ndx_proto;          /* fko_procol_t结构的索引 */
+    unsigned char   ndx_proto;          /* ztn_procol_t结构的索引 */
 
     /* 初始化协议字符串 */
     memset(proto_str, 0, proto_size);
 
-    /* 查看fko_procol_array以找到正确的协议 */
-    for (ndx_proto = 0 ; ndx_proto < ARRAY_SIZE(fko_protocol_array) ; ndx_proto++)
+    /* 查看ztn_procol_array以找到正确的协议 */
+    for (ndx_proto = 0 ; ndx_proto < ARRAY_SIZE(ztn_protocol_array) ; ndx_proto++)
     {
         /* 如果协议匹配，就抓住它 */
-        if (fko_protocol_array[ndx_proto].val == proto)
+        if (ztn_protocol_array[ndx_proto].val == proto)
         {
-            strlcpy(proto_str, fko_protocol_array[ndx_proto].str, proto_size);
+            strlcpy(proto_str, ztn_protocol_array[ndx_proto].str, proto_size);
             proto_error = 0;
             break;
         }
@@ -186,16 +186,16 @@ proto_inttostr(int proto, char *proto_str, size_t proto_size)
 short
 proto_strtoint(const char *pr_str)
 {
-    unsigned char   ndx_proto;          /* fko_procol_t结构的索引 */
+    unsigned char   ndx_proto;          /* ztn_procol_t结构的索引 */
     int             proto_int = -1;     /* 协议整数值 */
 
-    /* 查看fko_procol_array以找到正确的协议 */
-    for (ndx_proto = 0 ; ndx_proto < ARRAY_SIZE(fko_protocol_array) ; ndx_proto++)
+    /* 查看ztn_procol_array以找到正确的协议 */
+    for (ndx_proto = 0 ; ndx_proto < ARRAY_SIZE(ztn_protocol_array) ; ndx_proto++)
     {
         /* 如果协议匹配，就抓住它 */
-        if (strcasecmp(pr_str, fko_protocol_array[ndx_proto].str) == 0)
+        if (strcasecmp(pr_str, ztn_protocol_array[ndx_proto].str) == 0)
         {
-            proto_int = fko_protocol_array[ndx_proto].val;
+            proto_int = ztn_protocol_array[ndx_proto].val;
             break;
         }
     }

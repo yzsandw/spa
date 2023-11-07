@@ -1,6 +1,6 @@
 
 #include "base64.h"
-#include "fko_common.h"
+#include "ztn_common.h"
 
 #if !AFL_FUZZING
 static unsigned char map2[] =

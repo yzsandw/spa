@@ -1,10 +1,10 @@
 /**
  * \file server/fw_util_ipf.c
  *
- * \brief 用于管理ipf防火墙规则的Fwknop例程。
+ * \brief 用于管理ipf防火墙规则的Spa例程。
  */
 
-#include "fwknopd_common.h"
+#include "spad_common.h"
 
 #if FIREWALL_IPF
 
@@ -19,15 +19,15 @@ static char   cmd_buf[CMD_BUFSIZE];
 static char   err_buf[CMD_BUFSIZE];
 static char   cmd_out[STANDARD_CMD_OUT_BUFSIZE];
 
-/* 将正在运行的fwknopd守护程序当前实例化的所有防火墙规则打印到stdout。
+/* 将正在运行的spad守护程序当前实例化的所有防火墙规则打印到stdout。
 */
 int
-fw_dump_rules(const fko_srv_options_t *opts)
+fw_dump_rules(const ztn_srv_options_t *opts)
 {
     int     i;
     int     res, got_err = 0;
 
-    fprintf(stdout, "Listing fwknopd ipf rules...\n");
+    fprintf(stdout, "Listing spad ipf rules...\n");
     fflush(stdout);
 
     zero_cmd_buffers();
@@ -37,7 +37,7 @@ fw_dump_rules(const fko_srv_options_t *opts)
 }
 
 void
-fw_config_init(fko_srv_options_t *opts)
+fw_config_init(ztn_srv_options_t *opts)
 {
 
     memset(&fwc, 0x0, sizeof(struct fw_config));
@@ -59,7 +59,7 @@ fw_config_init(fko_srv_options_t *opts)
 }
 
 void
-fw_initialize(const fko_srv_options_t *opts)
+fw_initialize(const ztn_srv_options_t *opts)
 {
     int res = 0;
 
@@ -85,7 +85,7 @@ fw_cleanup(void)
 /* 规则处理-创建访问请求
 */
 int
-process_spa_request(const fko_srv_options_t *opts, const acc_stanza_t *acc, spa_data_t *spadat)
+process_spa_request(const ztn_srv_options_t *opts, const acc_stanza_t *acc, spa_data_t *spadat)
 {
     
 
@@ -122,7 +122,7 @@ process_spa_request(const fko_srv_options_t *opts, const acc_stanza_t *acc, spa_
 /* 遍历配置防火墙访问链并清除过期的防火墙规则。
 */
 void
-check_firewall_rules(const fko_srv_options_t *opts,
+check_firewall_rules(const ztn_srv_options_t *opts,
         const int chk_rm_all)
 {
 

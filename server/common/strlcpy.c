@@ -1,5 +1,5 @@
 
-#include "fko_common.h"
+#include "ztn_common.h"
 
 #if !HAVE_STRLCPY
 /* *将src复制到大小为siz的字符串dst。最多siz-1个字符 */

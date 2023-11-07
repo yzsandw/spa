@@ -5,7 +5,7 @@
 #include "utils.h"
 /* 2020年7月3日15:40:08 */
 static void
-dump_transmit_options(const fko_cli_options_t *options)
+dump_transmit_options(const ztn_cli_options_t *options)
 {
     char proto_str[PROTOCOL_BUFSIZE] = {0};   /* 协议字符串 */
 
@@ -61,7 +61,7 @@ chksum(unsigned short *buf, int nbytes)
 //该函数是发送的不是原始的udp或者tcp的数据包
 static int
 send_spa_packet_tcp_or_udp(const char *spa_data, const int sd_len,
-    const fko_cli_options_t *options)
+    const ztn_cli_options_t *options)
 {
     int     sock=-1, sock_success=0, res=0, error;
     struct  addrinfo *result=NULL, *rp, hints;
@@ -80,7 +80,7 @@ send_spa_packet_tcp_or_udp(const char *spa_data, const int sd_len,
    
     //如果是UDP，设置udp相关的
     /* 这段代码是根据给定的条件设置提示结构体中与套接字类型和协议相关的字段，以便在使用UDP协议发送SPA数据包时使用。 */
-    if (options->spa_proto == FKO_PROTO_UDP)
+    if (options->spa_proto == ZTN_PROTO_UDP)
     {
         /* 通过单个UDP数据包发送SPA数据包-这是 */
         hints.ai_socktype = SOCK_DGRAM;
@@ -188,7 +188,7 @@ send_spa_packet_tcp_or_udp(const char *spa_data, const int sd_len,
 static int
 send_spa_packet_tcp_raw(const char *spa_data, const int sd_len,
     const struct sockaddr_in *saddr, const struct sockaddr_in *daddr,
-    const fko_cli_options_t *options)
+    const ztn_cli_options_t *options)
 {
 #ifdef WIN32
     log_msg(LOG_VERBOSITY_ERROR,
@@ -300,7 +300,7 @@ send_spa_packet_tcp_raw(const char *spa_data, const int sd_len,
 static int
 send_spa_packet_udp_raw(const char *spa_data, const int sd_len,
     const struct sockaddr_in *saddr, const struct sockaddr_in *daddr,
-    const fko_cli_options_t *options)
+    const ztn_cli_options_t *options)
 {
 #ifdef WIN32
     log_msg(LOG_VERBOSITY_ERROR,
@@ -393,7 +393,7 @@ send_spa_packet_udp_raw(const char *spa_data, const int sd_len,
 static int
 send_spa_packet_icmp(const char *spa_data, const int sd_len,
     const struct sockaddr_in *saddr, const struct sockaddr_in *daddr,
-    const fko_cli_options_t *options)
+    const ztn_cli_options_t *options)
 {
 #ifdef WIN32
     log_msg(LOG_VERBOSITY_ERROR, "send_spa_packet_icmp: raw packets are not yet supported.");
@@ -488,7 +488,7 @@ send_spa_packet_icmp(const char *spa_data, const int sd_len,
 /* 首先，函数开始时定义了一些变量。http_buf是用来存放HTTP请求内容的字符数组，初始化为全0spa_data_copy是用来保存拷贝的SPA数据的指针，初始时为空。 */
 static int
 send_spa_packet_http(const char *spa_data, const int sd_len,
-    fko_cli_options_t *options)
+    ztn_cli_options_t *options)
 {
     char http_buf[HTTP_MAX_REQUEST_LEN] = {0}, *spa_data_copy = NULL;
     char *ndx = options->http_proxy;
@@ -534,7 +534,7 @@ send_spa_packet_http(const char *spa_data, const int sd_len,
         {
             *ndx = '\0';
             proxy_port = strtol_wrapper(ndx+1, 1, MAX_PORT, NO_EXIT_UPON_ERR, &is_err);
-            if(is_err != FKO_SUCCESS)
+            if(is_err != ZTN_SUCCESS)
             {
                 log_msg(LOG_VERBOSITY_ERROR,
                     "[-] proxy port value is invalid, must be in [%d-%d]",
@@ -579,7 +579,7 @@ send_spa_packet_http(const char *spa_data, const int sd_len,
 /* 这段代码是一个名为发送包裹的函数，用于发送SPA数据包。 */
 //使用该函数可以封装前面的几种协议的函数
 int
-send_spa_packet(fko_ctx_t ctx, fko_cli_options_t *options)
+send_spa_packet(ztn_ctx_t ctx, ztn_cli_options_t *options)
 {
     int                 res, sd_len;
     char               *spa_data;
@@ -597,13 +597,13 @@ send_spa_packet(fko_ctx_t ctx, fko_cli_options_t *options)
     memset(&hints, 0 , sizeof(hints));
 
     /* 点击此处获取我们的水疗数据。 */
-    res = fko_get_spa_data(ctx, &spa_data);
+    res = ztn_get_spa_data(ctx, &spa_data);
 
-    if(res != FKO_SUCCESS)
+    if(res != ZTN_SUCCESS)
     {
         log_msg(LOG_VERBOSITY_ERROR,
-            "send_spa_packet: Error #%i from fko_get_spa_data: %s",
-            res, fko_errstr(res)
+            "send_spa_packet: Error #%i from ztn_get_spa_data: %s",
+            res, ztn_errstr(res)
         );
         return(-1);
     }
@@ -624,17 +624,17 @@ send_spa_packet(fko_ctx_t ctx, fko_cli_options_t *options)
     
     dump_transmit_options(options);
 
-    if (options->spa_proto == FKO_PROTO_TCP || options->spa_proto == FKO_PROTO_UDP)
+    if (options->spa_proto == ZTN_PROTO_TCP || options->spa_proto == ZTN_PROTO_UDP)
     {
         res = send_spa_packet_tcp_or_udp(spa_data, sd_len, options);
     }
-    else if (options->spa_proto == FKO_PROTO_HTTP)
+    else if (options->spa_proto == ZTN_PROTO_HTTP)
     {
         res = send_spa_packet_http(spa_data, sd_len, options);
     }
-    else if (options->spa_proto == FKO_PROTO_TCP_RAW
-            || options->spa_proto == FKO_PROTO_UDP_RAW
-            || options->spa_proto == FKO_PROTO_ICMP)
+    else if (options->spa_proto == ZTN_PROTO_TCP_RAW
+            || options->spa_proto == ZTN_PROTO_UDP_RAW
+            || options->spa_proto == ZTN_PROTO_ICMP)
     {
         memset(&saddr, 0, sizeof(saddr));
         memset(&daddr, 0, sizeof(daddr));
@@ -683,11 +683,11 @@ send_spa_packet(fko_ctx_t ctx, fko_cli_options_t *options)
 
         daddr.sin_addr.s_addr = inet_addr(ip_str);
 
-        if (options->spa_proto == FKO_PROTO_TCP_RAW)
+        if (options->spa_proto == ZTN_PROTO_TCP_RAW)
         {
             res = send_spa_packet_tcp_raw(spa_data, sd_len, &saddr, &daddr, options);
         }
-        else if (options->spa_proto == FKO_PROTO_UDP_RAW)
+        else if (options->spa_proto == ZTN_PROTO_UDP_RAW)
         {
             res = send_spa_packet_udp_raw(spa_data, sd_len, &saddr, &daddr, options);
         }
@@ -710,19 +710,19 @@ send_spa_packet(fko_ctx_t ctx, fko_cli_options_t *options)
 /* 将SPA数据包数据写入文件系统的函数 */
 //将SPA数据写入文件
 /* 2023/7/20 16:28:35 */
-int write_spa_packet_data(fko_ctx_t ctx, const fko_cli_options_t *options)
+int write_spa_packet_data(ztn_ctx_t ctx, const ztn_cli_options_t *options)
 {
     FILE   *fp;
     char   *spa_data;
     int     res;
 
-    res = fko_get_spa_data(ctx, &spa_data);
+    res = ztn_get_spa_data(ctx, &spa_data);
 
-    if(res != FKO_SUCCESS)
+    if(res != ZTN_SUCCESS)
     {
         log_msg(LOG_VERBOSITY_ERROR,
-            "write_spa_packet_data: Error #%i from fko_get_spa_data: %s",
-            res, fko_errstr(res)
+            "write_spa_packet_data: Error #%i from ztn_get_spa_data: %s",
+            res, ztn_errstr(res)
         );
 
         return(-1);

@@ -9,7 +9,7 @@
 
 /* 功能原型
 */
-int run_tcp_server(fko_srv_options_t *opts);
+int run_tcp_server(ztn_srv_options_t *opts);
 
 #endif /* TCP_SERVER_H */
 

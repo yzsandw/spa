@@ -1,14 +1,14 @@
 /**
  * \file server/replay_cache.h
  *
- * \brief fwknopd replay_cache.c函数的头文件。
+ * \brief spad replay_cache.c函数的头文件。
  */
 
 #ifndef REPLAY_CACHE_H
 #define REPLAY_CACHE_H
 
-#include "fwknopd_common.h"
-#include "fko.h"
+#include "spad_common.h"
+#include "ztn.h"
 
 typedef struct digest_cache_info {
     unsigned int    src_ip;
@@ -33,11 +33,11 @@ struct digest_cache_list {
 #endif
 
 
-int replay_cache_init(fko_srv_options_t *opts);
-int is_replay(fko_srv_options_t *opts, char *digest);
-int add_replay(fko_srv_options_t *opts, char *digest);
+int replay_cache_init(ztn_srv_options_t *opts);
+int is_replay(ztn_srv_options_t *opts, char *digest);
+int add_replay(ztn_srv_options_t *opts, char *digest);
 #ifdef USE_FILE_CACHE
-void free_replay_list(fko_srv_options_t *opts);
+void free_replay_list(ztn_srv_options_t *opts);
 #endif
 
 #endif  /* REPLAY_CACHE_H */

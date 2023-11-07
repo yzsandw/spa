@@ -1,4 +1,4 @@
-#include "fwknopd_common.h"
+#include "spad_common.h"
 #include "utils.h"
 #include "log_msg.h"
 #include "replay_cache.h"
@@ -86,7 +86,7 @@ verify_file_perms_ownership(const char *file, int fd)
 #if HAVE_FSTAT && HAVE_STAT
     struct stat st;
 
-    /* fwknopd处理的每个文件都应该由用户拥有，并且权限设置为600（用户读/写）
+    /* spad处理的每个文件都应该由用户拥有，并且权限设置为600（用户读/写）
     */
     if ((fd >= 0 && fstat(fd, &st) == 0) || stat(file, &st) == 0)
     {
@@ -187,7 +187,7 @@ is_digits(const char * const str)
 }
 
 void
-clean_exit(fko_srv_options_t *opts, unsigned int fw_cleanup_flag, unsigned int exit_status)
+clean_exit(ztn_srv_options_t *opts, unsigned int fw_cleanup_flag, unsigned int exit_status)
 {
 #if HAVE_LIBFIU
     if (opts->config[CONF_FAULT_INJECTION_TAG] != NULL)

@@ -1,14 +1,14 @@
 /**
  * \file server/access.c
  *
- * \brief fwknop服务的Access.conf文件处理
+ * \brief spa服务的Access.conf文件处理
  */
 
 #if HAVE_SYS_SOCKET_H
   #include <sys/socket.h>
 #endif
 
-#include "fwknopd_common.h"
+#include "spad_common.h"
 #include <arpa/inet.h>
 #include "pwd.h"
 #include "access.h"
@@ -36,11 +36,11 @@
  *
  * \param curr_acc 指向当前访问节的指针
  * \param access_filename 指向包含密钥的文件的指针
- * \param opts fko_srv_options_t 服务器选项结构
+ * \param opts ztn_srv_options_t 服务器选项结构
  *
  */
 int
-include_keys_file(acc_stanza_t *, const char *, fko_srv_options_t *);
+include_keys_file(acc_stanza_t *, const char *, ztn_srv_options_t *);
 
 static int do_acc_stanza_init = 1;
 
@@ -54,7 +54,7 @@ void enable_acc_stanzas_init(void)
 */
 static void
 add_acc_string(char **var, const char *val, FILE *file_ptr,
-        fko_srv_options_t *opts)
+        ztn_srv_options_t *opts)
 {
     if(var == NULL)
     {
@@ -84,7 +84,7 @@ add_acc_string(char **var, const char *val, FILE *file_ptr,
 static void
 add_acc_user(char **user_var, uid_t *uid_var, struct passwd **upw,
         const char *val, const char *var_name, FILE *file_ptr,
-        fko_srv_options_t *opts)
+        ztn_srv_options_t *opts)
 {
     struct passwd  *pw = NULL;
 
@@ -111,7 +111,7 @@ add_acc_user(char **user_var, uid_t *uid_var, struct passwd **upw,
 static void
 add_acc_group(char **group_var, gid_t *gid_var,
         const char *val, const char *var_name, FILE *file_ptr,
-        fko_srv_options_t *opts)
+        ztn_srv_options_t *opts)
 {
     struct passwd  *pw = NULL;
 
@@ -137,7 +137,7 @@ add_acc_group(char **group_var, gid_t *gid_var,
 */
 static void
 add_acc_b64_string(char **var, int *len, const char *val, FILE *file_ptr,
-        fko_srv_options_t *opts)
+        ztn_srv_options_t *opts)
 {
     if(var == NULL)
     {
@@ -160,7 +160,7 @@ add_acc_b64_string(char **var, int *len, const char *val, FILE *file_ptr,
         clean_exit(opts, NO_FW_CLEANUP, EXIT_FAILURE);
     }
     memset(*var, 0x0, strlen(val));
-    *len = fko_base64_decode(val, (unsigned char *) *var);
+    *len = ztn_base64_decode(val, (unsigned char *) *var);
 
     if (*len < 0)
     {
@@ -185,7 +185,7 @@ add_acc_bool(unsigned char *var, const char *val)
 /* 添加过期时间-将日期转换为epoch seconds
 */
 static int
-add_acc_expire_time(fko_srv_options_t *opts, time_t *access_expire_time, const char *val)
+add_acc_expire_time(ztn_srv_options_t *opts, time_t *access_expire_time, const char *val)
 {
     struct tm tm;
 
@@ -220,7 +220,7 @@ add_acc_expire_time(fko_srv_options_t *opts, time_t *access_expire_time, const c
 /* 通过access.conf中定义的epoch seconds添加过期时间
 */
 static void
-add_acc_expire_time_epoch(fko_srv_options_t *opts,
+add_acc_expire_time_epoch(ztn_srv_options_t *opts,
         time_t *access_expire_time, const char *val, FILE *file_ptr)
 {
     char *endptr;
@@ -247,7 +247,7 @@ add_acc_expire_time_epoch(fko_srv_options_t *opts,
 
 #if defined(FIREWALL_FIREWALLD) || defined(FIREWALL_IPTABLES)
 static void
-add_acc_force_nat(fko_srv_options_t *opts, acc_stanza_t *curr_acc,
+add_acc_force_nat(ztn_srv_options_t *opts, acc_stanza_t *curr_acc,
         const char *val, FILE *file_ptr)
 {
     char      ip_str[MAX_IPV4_STR_LEN] = {0};
@@ -288,7 +288,7 @@ add_acc_force_nat(fko_srv_options_t *opts, acc_stanza_t *curr_acc,
 }
 
 static void
-add_acc_force_snat(fko_srv_options_t *opts, acc_stanza_t *curr_acc,
+add_acc_force_snat(ztn_srv_options_t *opts, acc_stanza_t *curr_acc,
         const char *val, FILE *file_ptr)
 {
     char      ip_str[MAX_IPV4_STR_LEN] = {0};
@@ -401,7 +401,7 @@ add_int_ent(acc_int_list_t **ilist, const char *ip)
                     /* CIDR mask
                     */
                     mask = strtol_wrapper(ndx+1, 1, 32, NO_EXIT_UPON_ERR, &is_err);
-                    if(is_err != FKO_SUCCESS)
+                    if(is_err != ZTN_SUCCESS)
                     {
                         log_msg(LOG_ERR, "[*] Invalid IP mask str '%s'.", ndx+1);
                         free(new_sle);
@@ -554,7 +554,7 @@ parse_proto_and_port(char *pstr, int *proto, int *port)
     strlcpy(proto_str, pstr, (ndx - pstr)+1);
 
     *port = strtol_wrapper(ndx+1, 0, MAX_PORT, NO_EXIT_UPON_ERR, &is_err);
-    if(is_err != FKO_SUCCESS)
+    if(is_err != ZTN_SUCCESS)
     {
         log_msg(LOG_ERR,
             "[*] Invalid port '%s' in access request, must be in [%d,%d]",
@@ -815,7 +815,7 @@ static void
 zero_buf_wrapper(char *buf, int len)
 {
 
-    if(zero_buf(buf, len) != FKO_SUCCESS)
+    if(zero_buf(buf, len) != ZTN_SUCCESS)
         log_msg(LOG_ERR,
                 "[*] Could not zero out sensitive data buffer.");
 
@@ -932,7 +932,7 @@ free_acc_stanza_data(acc_stanza_t *acc)
 /* 展开可能是多值的任何访问条目
 */
 static void
-expand_acc_ent_lists(fko_srv_options_t *opts)
+expand_acc_ent_lists(ztn_srv_options_t *opts)
 {
     acc_stanza_t   *acc = opts->acc_stanzas;
 
@@ -1007,7 +1007,7 @@ expand_acc_ent_lists(fko_srv_options_t *opts)
 }
 
 void
-free_acc_stanzas(fko_srv_options_t *opts)
+free_acc_stanzas(ztn_srv_options_t *opts)
 {
     acc_stanza_t    *acc, *last_acc;
 
@@ -1037,7 +1037,7 @@ free_acc_stanzas(fko_srv_options_t *opts)
  */
 
 void
-free_last_acc_stanza(fko_srv_options_t *opts)
+free_last_acc_stanza(ztn_srv_options_t *opts)
 {
     acc_stanza_t *tmp_root = opts->acc_stanzas;
 
@@ -1069,7 +1069,7 @@ free_last_acc_stanza(fko_srv_options_t *opts)
 /* free_acc_stanzas（）的包装器，可以在这里放置额外的初始化代码。
 */
 static void
-acc_stanza_init(fko_srv_options_t *opts)
+acc_stanza_init(ztn_srv_options_t *opts)
 {
     if(do_acc_stanza_init)
     {
@@ -1090,7 +1090,7 @@ acc_stanza_init(fko_srv_options_t *opts)
 /* 添加一个新的节区，在所需的位置分配所需的内存地点
 */
 static acc_stanza_t*
-acc_stanza_add(fko_srv_options_t *opts)
+acc_stanza_add(ztn_srv_options_t *opts)
 {
     acc_stanza_t    *acc     = opts->acc_stanzas;
     acc_stanza_t    *new_acc = calloc(1, sizeof(acc_stanza_t));
@@ -1125,7 +1125,7 @@ acc_stanza_add(fko_srv_options_t *opts)
 /* 扫描尚未设置但需要默认值的条目的访问选项。
 */
 static void
-set_acc_defaults(fko_srv_options_t *opts)
+set_acc_defaults(ztn_srv_options_t *opts)
 {
     acc_stanza_t    *acc = opts->acc_stanzas;
     int              i=1;
@@ -1199,16 +1199,16 @@ set_acc_defaults(fko_srv_options_t *opts)
             }
         }
 
-        if(acc->encryption_mode == FKO_ENC_MODE_UNKNOWN)
-            acc->encryption_mode = FKO_DEFAULT_ENC_MODE;
+        if(acc->encryption_mode == ZTN_ENC_MODE_UNKNOWN)
+            acc->encryption_mode = ZTN_DEFAULT_ENC_MODE;
 
         /* 如果我们正在使用HMAC键，并且没有为HMAC_digest_type设置HMAC摘要类型，则假设它是SHA256
         */
 
-        if(acc->hmac_type == FKO_HMAC_UNKNOWN
+        if(acc->hmac_type == ZTN_HMAC_UNKNOWN
                 && acc->hmac_key_len > 0 && acc->hmac_key != NULL)
         {
-            acc->hmac_type = FKO_DEFAULT_HMAC_MODE;
+            acc->hmac_type = ZTN_DEFAULT_HMAC_MODE;
         }
 
         acc = acc->next;
@@ -1220,7 +1220,7 @@ set_acc_defaults(fko_srv_options_t *opts)
 /* 对acc节数据执行健全性检查。
 */
 static int
-acc_data_is_valid(fko_srv_options_t *opts,
+acc_data_is_valid(ztn_srv_options_t *opts,
         struct passwd *user_pw, struct passwd *sudo_user_pw,
         acc_stanza_t * const acc)
 {
@@ -1244,7 +1244,7 @@ acc_data_is_valid(fko_srv_options_t *opts,
 
     if(acc->use_rijndael && acc->key != NULL)
     {
-        if((acc->encryption_mode == FKO_ENC_MODE_CBC_LEGACY_IV)
+        if((acc->encryption_mode == ZTN_ENC_MODE_CBC_LEGACY_IV)
                 && (acc->key_len > 16))
         {
             log_msg(LOG_INFO,
@@ -1395,7 +1395,7 @@ acc_data_is_valid(fko_srv_options_t *opts,
 }
 
 int
-parse_access_folder(fko_srv_options_t *opts, char *access_folder, int *depth)
+parse_access_folder(ztn_srv_options_t *opts, char *access_folder, int *depth)
 {
     char            *extension;
     DIR             *dir_ptr;
@@ -1439,7 +1439,7 @@ parse_access_folder(fko_srv_options_t *opts, char *access_folder, int *depth)
 /* 读取并解析访问文件，在执行过程中填充访问数据。
 */
 int
-parse_access_file(fko_srv_options_t *opts, char *access_filename, int *depth)
+parse_access_file(ztn_srv_options_t *opts, char *access_filename, int *depth)
 {
     FILE           *file_ptr;
     char           *ndx;
@@ -1691,7 +1691,7 @@ parse_access_file(fko_srv_options_t *opts, char *access_filename, int *depth)
         {
             curr_acc->fw_access_timeout = strtol_wrapper(val, 0,
                     RCHK_MAX_FW_TIMEOUT, NO_EXIT_UPON_ERR, &is_err);
-            if(is_err != FKO_SUCCESS)
+            if(is_err != ZTN_SUCCESS)
             {
                 log_msg(LOG_ERR,
                     "[*] FW_ACCESS_TIMEOUT value not in range.");
@@ -1703,7 +1703,7 @@ parse_access_file(fko_srv_options_t *opts, char *access_filename, int *depth)
         {
             curr_acc->max_fw_timeout = strtol_wrapper(val, 0,
                     RCHK_MAX_FW_TIMEOUT, NO_EXIT_UPON_ERR, &is_err);
-            if(is_err != FKO_SUCCESS)
+            if(is_err != ZTN_SUCCESS)
             {
                 log_msg(LOG_ERR,
                     "[*] MAX_FW_TIMEOUT value not in range.");
@@ -1758,7 +1758,7 @@ parse_access_file(fko_srv_options_t *opts, char *access_filename, int *depth)
             curr_acc->cmd_cycle_timer = strtol_wrapper(val,
                     RCHK_MIN_CMD_CYCLE_TIMER, RCHK_MAX_CMD_CYCLE_TIMER,
                     NO_EXIT_UPON_ERR, &is_err);
-            if(is_err != FKO_SUCCESS)
+            if(is_err != ZTN_SUCCESS)
             {
                 log_msg(LOG_ERR,
                     "[*] CMD_CYCLE_TIMER value not in range [1,%d].",
@@ -1848,7 +1848,7 @@ parse_access_file(fko_srv_options_t *opts, char *access_filename, int *depth)
                 && (strncasecmp(opts->config[CONF_ENABLE_FIREWD_LOCAL_NAT], "Y", 1) !=0 ))
             {
                 log_msg(LOG_ERR,
-                    "[*] FORCE_NAT requires either ENABLE_FIREWD_FORWARDING or ENABLE_FIREWD_LOCAL_NAT in fwknopd.conf");
+                    "[*] FORCE_NAT requires either ENABLE_FIREWD_FORWARDING or ENABLE_FIREWD_LOCAL_NAT in spad.conf");
                 fclose(file_ptr);
                 return EXIT_FAILURE;
             }
@@ -1858,7 +1858,7 @@ parse_access_file(fko_srv_options_t *opts, char *access_filename, int *depth)
                 && (strncasecmp(opts->config[CONF_ENABLE_IPT_LOCAL_NAT], "Y", 1) !=0 ))
             {
                 log_msg(LOG_ERR,
-                    "[*] FORCE_NAT requires either ENABLE_IPT_FORWARDING or ENABLE_IPT_LOCAL_NAT in fwknopd.conf");
+                    "[*] FORCE_NAT requires either ENABLE_IPT_FORWARDING or ENABLE_IPT_LOCAL_NAT in spad.conf");
                 fclose(file_ptr);
                 return EXIT_FAILURE;
             }
@@ -1877,7 +1877,7 @@ parse_access_file(fko_srv_options_t *opts, char *access_filename, int *depth)
                 && (strncasecmp(opts->config[CONF_ENABLE_FIREWD_LOCAL_NAT], "Y", 1) !=0 ))
             {
                 log_msg(LOG_ERR,
-                    "[*] FORCE_SNAT requires either ENABLE_FIREWD_FORWARDING or ENABLE_FIREWD_LOCAL_NAT in fwknopd.conf");
+                    "[*] FORCE_SNAT requires either ENABLE_FIREWD_FORWARDING or ENABLE_FIREWD_LOCAL_NAT in spad.conf");
                 fclose(file_ptr);
                 return EXIT_FAILURE;
             }
@@ -1887,7 +1887,7 @@ parse_access_file(fko_srv_options_t *opts, char *access_filename, int *depth)
                 && (strncasecmp(opts->config[CONF_ENABLE_IPT_LOCAL_NAT], "Y", 1) !=0 ))
             {
                 log_msg(LOG_ERR,
-                    "[*] FORCE_SNAT requires either ENABLE_IPT_FORWARDING or ENABLE_IPT_LOCAL_NAT in fwknopd.conf");
+                    "[*] FORCE_SNAT requires either ENABLE_IPT_FORWARDING or ENABLE_IPT_LOCAL_NAT in spad.conf");
                 fclose(file_ptr);
                 return EXIT_FAILURE;
             }
@@ -2147,13 +2147,13 @@ cleanup_and_bail:
 /* 转储配置
 */
 void
-dump_access_list(const fko_srv_options_t *opts)
+dump_access_list(const ztn_srv_options_t *opts)
 {
     int             i = 0;
 
     acc_stanza_t    *acc = opts->acc_stanzas;
 
-    fprintf(stdout, "Current fwknopd access settings:\n");
+    fprintf(stdout, "Current spad access settings:\n");
 
     if(!acc)
     {
@@ -2258,7 +2258,7 @@ dump_access_list(const fko_srv_options_t *opts)
 }
 
 int
-include_keys_file(acc_stanza_t *curr_acc, const char *access_filename, fko_srv_options_t *opts)
+include_keys_file(acc_stanza_t *curr_acc, const char *access_filename, ztn_srv_options_t *opts)
 {
     FILE           *file_ptr;
     unsigned int    num_lines = 0;

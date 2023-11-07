@@ -1,10 +1,10 @@
 /**
  * \file server/fw_util.c
  *
- * \brief 用于管理防火墙规则的Fwknop例程。
+ * \brief 用于管理防火墙规则的Spa例程。
  */
 
-#include "fwknopd_common.h"
+#include "spad_common.h"
 #include "fw_util.h"
 #include "utils.h"
 #include "log_msg.h"

@@ -8,7 +8,7 @@
   #include <termios.h>
 #endif
 
-#include "fwknop_common.h"
+#include "spanop_common.h"
 #include "getpasswd.h"
 #include "utils.h"
 
@@ -269,7 +269,7 @@ getpasswd(const char *prompt, int fd)
 */
 int
 get_key_file(char *key, int *key_len, const char *key_file,
-    fko_ctx_t ctx, const fko_cli_options_t *options)
+    ztn_ctx_t ctx, const ztn_cli_options_t *options)
 {
     FILE           *pwfile_ptr;
     unsigned int    numLines = 0, i = 0, found_dst;

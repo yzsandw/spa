@@ -78,7 +78,7 @@ enum {
  */
 int run_extcmd(const char *cmd, char *so_buf, const size_t so_buf_sz,
         const int want_stderr, const int timeout, int *pid_status,
-        const fko_srv_options_t * const opts);
+        const ztn_srv_options_t * const opts);
 
 /**
  * \brief 以给定用户和组的身份运行外部命令
@@ -101,7 +101,7 @@ int run_extcmd(const char *cmd, char *so_buf, const size_t so_buf_sz,
  */
 int run_extcmd_as(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
         const size_t so_buf_sz, const int want_stderr, const int timeout,
-        int *pid_status, const fko_srv_options_t * const opts);
+        int *pid_status, const ztn_srv_options_t * const opts);
 
 /**
  * \brief 运行外部命令，搜索子字符串
@@ -119,7 +119,7 @@ int run_extcmd_as(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
  */
 int search_extcmd(const char *cmd, const int want_stderr,
         const int timeout, const char *substr_search,
-        int *pid_status, const fko_srv_options_t * const opts);
+        int *pid_status, const ztn_srv_options_t * const opts);
 
 /**
  * \brief 运行外部命令，返回一行输出
@@ -143,7 +143,7 @@ int search_extcmd(const char *cmd, const int want_stderr,
  */
 int search_extcmd_getline(const char *cmd, char *so_buf, const size_t so_buf_sz,
         const int timeout, const char *substr_search, int *pid_status,
-        const fko_srv_options_t * const opts);
+        const ztn_srv_options_t * const opts);
 
 /**
  * \brief 运行一个外部命令，并将其输入stdin
@@ -158,7 +158,7 @@ int search_extcmd_getline(const char *cmd, char *so_buf, const size_t so_buf_sz,
  *
  */
 int run_extcmd_write(const char *cmd, const char *cmd_write, int *pid_status,
-        const fko_srv_options_t * const opts);
+        const ztn_srv_options_t * const opts);
 #endif /* EXTCMD_H */
 
 /***EOF***/

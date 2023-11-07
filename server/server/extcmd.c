@@ -4,7 +4,7 @@
  * \brief 用于执行和处理外部命令的例程。
  */
 
-#include "fwknopd_common.h"
+#include "spad_common.h"
 #include "extcmd.h"
 #include "log_msg.h"
 #include "utils.h"
@@ -92,7 +92,7 @@ static int
 _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
         const size_t so_buf_sz, const int cflag, const int timeout,
         const char *substr_search, int *pid_status,
-        const fko_srv_options_t * const opts)
+        const ztn_srv_options_t * const opts)
 {
     char    so_read_buf[IO_READ_BUF_LEN] = {0};
     pid_t   pid=0;
@@ -181,7 +181,7 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
             log_msg(LOG_ERR, "run_extcmd(): execvp() failed: %s", strerror(errno));
 
         /* 只有当execvp（）出现问题时，我们才会在这里执行，
-        *  所以在这里exit（）是为了不让另一个fwknopd进程在fork（）之后运行。
+        *  所以在这里exit（）是为了不让另一个spad进程在fork（）之后运行。
         */
         exit(es);
     }
@@ -531,7 +531,7 @@ _run_extcmd(uid_t uid, gid_t gid, const char *cmd, char *so_buf,
 #endif
 
 int _run_extcmd_write(const char *cmd, const char *cmd_write, int *pid_status,
-        const fko_srv_options_t * const opts)
+        const ztn_srv_options_t * const opts)
 {
     int     retval = EXTCMD_SUCCESS_ALL_OUTPUT;
     char   *argv_new[MAX_CMDLINE_ARGS]; /* for validation and/or execvp() */
@@ -637,7 +637,7 @@ int _run_extcmd_write(const char *cmd, const char *cmd_write, int *pid_status,
 int
 run_extcmd(const char *cmd, char *so_buf, const size_t so_buf_sz,
         const int want_stderr, const int timeout, int *pid_status,
-        const fko_srv_options_t * const opts)
+        const ztn_srv_options_t * const opts)
 {
     return _run_extcmd(ROOT_UID, ROOT_GID, cmd, so_buf, so_buf_sz,
             want_stderr, timeout, NULL, pid_status, opts);
@@ -648,7 +648,7 @@ run_extcmd(const char *cmd, char *so_buf, const size_t so_buf_sz,
 int
 run_extcmd_as(uid_t uid, gid_t gid, const char *cmd,char *so_buf,
         const size_t so_buf_sz, const int want_stderr, const int timeout,
-        int *pid_status, const fko_srv_options_t * const opts)
+        int *pid_status, const ztn_srv_options_t * const opts)
 {
     return _run_extcmd(uid, gid, cmd, so_buf, so_buf_sz,
             want_stderr, timeout, NULL, pid_status, opts);
@@ -659,7 +659,7 @@ run_extcmd_as(uid_t uid, gid_t gid, const char *cmd,char *so_buf,
 int
 search_extcmd(const char *cmd, const int want_stderr, const int timeout,
         const char *substr_search, int *pid_status,
-        const fko_srv_options_t * const opts)
+        const ztn_srv_options_t * const opts)
 {
     return _run_extcmd(ROOT_UID, ROOT_GID, cmd, NULL, 0, want_stderr,
             timeout, substr_search, pid_status, opts);
@@ -670,7 +670,7 @@ search_extcmd(const char *cmd, const int want_stderr, const int timeout,
 int
 search_extcmd_getline(const char *cmd, char *so_buf, const size_t so_buf_sz,
         const int timeout, const char *substr_search, int *pid_status,
-        const fko_srv_options_t * const opts)
+        const ztn_srv_options_t * const opts)
 {
     return _run_extcmd(ROOT_UID, ROOT_GID, cmd, so_buf, so_buf_sz,
             WANT_STDERR | WANT_STDOUT_GETLINE, timeout, substr_search,
@@ -680,7 +680,7 @@ search_extcmd_getline(const char *cmd, char *so_buf, const size_t so_buf_sz,
 /* _run_extcmd_write（）包装器，运行期望通过stdin输入的命令
 */
 int run_extcmd_write(const char *cmd, const char *cmd_write, int *pid_status,
-        const fko_srv_options_t * const opts)
+        const ztn_srv_options_t * const opts)
 {
     return _run_extcmd_write(cmd, cmd_write, pid_status, opts);
 }

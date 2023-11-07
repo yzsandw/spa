@@ -1,13 +1,13 @@
 /**
  * \file server/cmd_opts.h
  *
- * \brief Header file for fwknopd command line options.
+ * \brief Header file for spad command line options.
  */
 
 #ifndef CMD_OPTS_H
 #define CMD_OPTS_H
 
-/* 配置条目索引是在fwknopd_common.h中定义的，现在创建了一个配置条目名称映射
+/* 配置条目索引是在spad_common.h中定义的，现在创建了一个配置条目名称映射
  *
  *
 */
@@ -104,11 +104,11 @@ static char *config_map[NUMBER_OF_CONFIG_ENTRIES] = {
 #elif FIREWALL_IPF
     /* --DSS Place-holder */
 #endif /* FIREWALL type */
-    "FWKNOP_RUN_DIR",
-    "FWKNOP_CONF_DIR",
+    "SPA_RUN_DIR",
+    "SPA_CONF_DIR",
     "ACCESS_FILE",
     "ACCESS_FOLDER",
-    "FWKNOP_PID_FILE",
+    "SPA_PID_FILE",
 #if USE_FILE_CACHE
     "DIGEST_FILE",
 #else

@@ -23,7 +23,7 @@
  * \param res
  *
  */
-int cmd_cycle_open(fko_srv_options_t *opts, acc_stanza_t *acc,
+int cmd_cycle_open(ztn_srv_options_t *opts, acc_stanza_t *acc,
         spa_data_t *spadat, const int stanza_num, int *res);
 
 /**
@@ -33,7 +33,7 @@ int cmd_cycle_open(fko_srv_options_t *opts, acc_stanza_t *acc,
  * \param opts
  *
  */
-void cmd_cycle_close(fko_srv_options_t *opts);
+void cmd_cycle_close(ztn_srv_options_t *opts);
 
 /**
  * \brief 释放命令周期列表
@@ -42,6 +42,6 @@ void cmd_cycle_close(fko_srv_options_t *opts);
  * \param opts
  *
  */
-void free_cmd_cycle_list(fko_srv_options_t *opts);
+void free_cmd_cycle_list(ztn_srv_options_t *opts);
 
 #endif  /* CMD_CYCLE_H */

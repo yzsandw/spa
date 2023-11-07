@@ -1,7 +1,7 @@
 /**
  * \file server/access.h
  *
- * \brief Header file for fwknopd access.c.
+ * \brief Header file for spad access.c.
  */
 
 #ifndef ACCESS_H
@@ -33,14 +33,14 @@
  * \brief 加载access.conf文件
  *
  *
- * \param opts指向要填充的fko_srv_options_t结构的指针
+ * \param opts指向要填充的ztn_srv_options_t结构的指针
  * \param ccess_filename指向要加载的文件名的指针
  * \param depth指向当前深度的指针。这从0开始，每次递归都会递增
  *
  * \return return返回错误状态，或EXIT_SUCCESS
  *
  */
-int parse_access_file(fko_srv_options_t *opts, char *access_filename, int *depth);
+int parse_access_file(ztn_srv_options_t *opts, char *access_filename, int *depth);
 
 /**
  * \brief 加载文件夹中的access.conf文件
@@ -49,7 +49,7 @@ int parse_access_file(fko_srv_options_t *opts, char *access_filename, int *depth
  *对于每个包含的文件。此函数不会增加深度int。
  *
  */
-int parse_access_folder(fko_srv_options_t *opts, char *access_folder, int *depth);
+int parse_access_folder(ztn_srv_options_t *opts, char *access_folder, int *depth);
 
 /**
  * \brief 访问节的基本验证
@@ -104,7 +104,7 @@ int acc_check_port_access(acc_stanza_t *acc, char *port_str);
  * \param opts指向服务器选项结构的指针
  *
  */
-void dump_access_list(const fko_srv_options_t *opts);
+void dump_access_list(const ztn_srv_options_t *opts);
 
 /**
  * \brief 将proto/port字符串扩展为访问proto-port结构的列表。
@@ -128,10 +128,10 @@ void enable_acc_stanzas_init(void);
 /**
  * \brief 所有访问节的可用内存
  *
- * \param opts指向fko_srv_options_t的指针，该指针包含要释放的访问节链
+ * \param opts指向ztn_srv_options_t的指针，该指针包含要释放的访问节链
  *
  */
-void free_acc_stanzas(fko_srv_options_t *opts);
+void free_acc_stanzas(ztn_srv_options_t *opts);
 
 /**
  * \brief 释放端口列表

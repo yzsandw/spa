@@ -13,6 +13,6 @@
 
 /* 原型
 */
-int nfq_capture(fko_srv_options_t *opts);
+int nfq_capture(ztn_srv_options_t *opts);
 
 #endif  /* NFQ_CAPTURE_H */

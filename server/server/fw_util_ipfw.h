@@ -39,7 +39,7 @@ enum {
   #define IPFW_LIST_SET_DYN_RULES_ARGS "-d set %u list"
 #endif
 
-void ipfw_purge_expired_rules(const fko_srv_options_t *opts);
+void ipfw_purge_expired_rules(const ztn_srv_options_t *opts);
 
 #endif /* FW_UTIL_IPFW_H */
 

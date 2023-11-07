@@ -1,10 +1,10 @@
 /**
  * \file server/fw_util_pf.c
  *
- * \brief 用于管理pf防火墙规则的Fwknop例程。
+ * \brief 用于管理pf防火墙规则的Spa例程。
  */
 
-#include "fwknopd_common.h"
+#include "spad_common.h"
 
 #if FIREWALL_PF
 
@@ -27,14 +27,14 @@ zero_cmd_buffers(void)
     memset(cmd_out, 0x0, STANDARD_CMD_OUT_BUFSIZE);
 }
 
-/* 将正在运行的fwknopd守护程序当前实例化的所有防火墙规则打印到stdout。
+/* 将正在运行的spad守护程序当前实例化的所有防火墙规则打印到stdout。
 */
 int
-fw_dump_rules(const fko_srv_options_t * const opts)
+fw_dump_rules(const ztn_srv_options_t * const opts)
 {
     int     res, got_err = 0, pid_status = 0;
 
-    fprintf(stdout, "Listing fwknopd pf rules...\n");
+    fprintf(stdout, "Listing spad pf rules...\n");
     fflush(stdout);
 
     zero_cmd_buffers();
@@ -62,11 +62,11 @@ fw_dump_rules(const fko_srv_options_t * const opts)
     return(got_err);
 }
 
-/* 检查fwknop锚是否链接到主策略。如果不是，
-* fwknopd添加/删除的任何规则都不会影响实际流量。
+/* 检查spa锚是否链接到主策略。如果不是，
+* spad添加/删除的任何规则都不会影响实际流量。
 */
 static int
-anchor_active(const fko_srv_options_t *opts)
+anchor_active(const ztn_srv_options_t *opts)
 {
     int    pid_status = 0;
     char   anchor_search_str[MAX_PF_ANCHOR_SEARCH_LEN] = {0};
@@ -92,7 +92,7 @@ anchor_active(const fko_srv_options_t *opts)
 }
 
 static void
-delete_all_anchor_rules(const fko_srv_options_t *opts)
+delete_all_anchor_rules(const ztn_srv_options_t *opts)
 {
     int res = 0, pid_status = 0;
 
@@ -113,7 +113,7 @@ delete_all_anchor_rules(const fko_srv_options_t *opts)
 }
 
 int
-fw_config_init(fko_srv_options_t * const opts)
+fw_config_init(ztn_srv_options_t * const opts)
 {
     memset(&fwc, 0x0, sizeof(struct fw_config));
 
@@ -138,17 +138,17 @@ fw_config_init(fko_srv_options_t * const opts)
 }
 
 int
-fw_initialize(const fko_srv_options_t * const opts)
+fw_initialize(const ztn_srv_options_t * const opts)
 {
 
     if (! anchor_active(opts))
     {
         log_msg(LOG_WARNING,
-                "Warning: the fwknop anchor is not active in the pf policy");
+                "Warning: the spa anchor is not active in the pf policy");
         return 0;
     }
 
-    /* 删除fwknop锚定中的任何现有规则
+    /* 删除spa锚定中的任何现有规则
     */
     delete_all_anchor_rules(opts);
 
@@ -156,7 +156,7 @@ fw_initialize(const fko_srv_options_t * const opts)
 }
 
 int
-fw_cleanup(const fko_srv_options_t * const opts)
+fw_cleanup(const ztn_srv_options_t * const opts)
 {
     delete_all_anchor_rules(opts);
     return(0);
@@ -167,7 +167,7 @@ fw_cleanup(const fko_srv_options_t * const opts)
 /* 规则处理-创建访问请求
 */
 int
-process_spa_request(const fko_srv_options_t * const opts,
+process_spa_request(const ztn_srv_options_t * const opts,
         const acc_stanza_t * const acc, spa_data_t * const spadat)
 {
     char             new_rule[MAX_PF_NEW_RULE_LEN] = {0};
@@ -195,8 +195,8 @@ process_spa_request(const fko_srv_options_t * const opts,
 
     /* 对于直接访问请求，我们目前支持多协议/端口请求。
     */
-    if(spadat->message_type == FKO_ACCESS_MSG
-      || spadat->message_type == FKO_CLIENT_TIMEOUT_ACCESS_MSG)
+    if(spadat->message_type == ZTN_ACCESS_MSG
+      || spadat->message_type == ZTN_CLIENT_TIMEOUT_ACCESS_MSG)
     {
         /* 为源ip的每个协议/端口创建访问命令。
         */
@@ -281,13 +281,13 @@ process_spa_request(const fko_srv_options_t * const opts,
     {
         /* 尚不支持其他SPA请求模式。
         */
-        if(spadat->message_type == FKO_LOCAL_NAT_ACCESS_MSG
-          || spadat->message_type == FKO_CLIENT_TIMEOUT_LOCAL_NAT_ACCESS_MSG)
+        if(spadat->message_type == ZTN_LOCAL_NAT_ACCESS_MSG
+          || spadat->message_type == ZTN_CLIENT_TIMEOUT_LOCAL_NAT_ACCESS_MSG)
         {
             log_msg(LOG_WARNING, "Local NAT requests are not currently supported.");
         }
-        else if(spadat->message_type == FKO_NAT_ACCESS_MSG
-          || spadat->message_type == FKO_CLIENT_TIMEOUT_NAT_ACCESS_MSG)
+        else if(spadat->message_type == ZTN_NAT_ACCESS_MSG
+          || spadat->message_type == ZTN_CLIENT_TIMEOUT_NAT_ACCESS_MSG)
         {
             log_msg(LOG_WARNING, "Forwarding/NAT requests are not currently supported.");
         }
@@ -303,7 +303,7 @@ process_spa_request(const fko_srv_options_t * const opts,
 /* 遍历配置防火墙访问链并清除过期的防火墙规则。
 */
 void
-check_firewall_rules(const fko_srv_options_t * const opts,
+check_firewall_rules(const ztn_srv_options_t * const opts,
         const int chk_rm_all)
 {
     char            exp_str[12] = {0};

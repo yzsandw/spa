@@ -7,7 +7,7 @@
 
 #define CONF_VAR_IS(n, v) (strcmp(n, v) == 0)
 
-void config_init(fko_cli_options_t *options, int argc, char **argv);
+void config_init(ztn_cli_options_t *options, int argc, char **argv);
 void usage(void);
 
 #ifdef HAVE_C_UNIT_TESTS

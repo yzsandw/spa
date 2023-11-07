@@ -1,5 +1,5 @@
 
-#include "fko_common.h"
+#include "ztn_common.h"
 
 #if !HAVE_STRLCAT
 /* *将src附加到大小为siz的字符串dst（与strncat不同，siz是 */

@@ -28,7 +28,6 @@ target_compile_definitions(main PRIVATE
         HAVE_CTYPE_H=1
         HAVE_TIME_H=1
         HAVE_LOCALE_H=1
-        # 版本号
         VERSION="0.0.1"
         # 防火墙的执行文件？
         FIREWALL_EXE="iptables"
@@ -43,9 +42,9 @@ target_compile_definitions(main PRIVATE
         FIREWALL_PF=0
         FIREWALL_IPF=0
         # 配置文件的位置和执行文件的地址
-        SYSCONFDIR="/home/catlee/fko_test"
+        SYSCONFDIR="/home/catlee/ztn_test"
         PACKAGE_NAME="myconfig"
-        SYSRUNDIR="/home/catlee/fko_test"
+        SYSRUNDIR="/home/catlee/ztn_test"
         #使用pcap
         USE_LIBPCAP=1
 )
