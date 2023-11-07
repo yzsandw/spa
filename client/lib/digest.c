@@ -1,6 +1,6 @@
 
 
-#include "fko_common.h"
+
 #include "digest.h"
 #include "base64.h"
 #ifdef HAVE_C_UNIT_TESTS /* LCOV_EXCL_START */

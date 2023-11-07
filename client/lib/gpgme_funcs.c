@@ -1,6 +1,6 @@
 
 
-#include "fko_common.h"
+
 #include "fko.h"
 
 #if HAVE_LIBGPGME

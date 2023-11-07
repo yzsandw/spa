@@ -195,15 +195,6 @@ Client_IS_TOP_LEVEL:STATIC=ON
 //Value Computed by CMake
 Client_SOURCE_DIR:STATIC=/home/catlee/work/client
 
-//Value Computed by CMake
-untitled2_BINARY_DIR:STATIC=/home/catlee/work/client/cmake-build-debug
-
-//Value Computed by CMake
-untitled2_IS_TOP_LEVEL:STATIC=ON
-
-//Value Computed by CMake
-untitled2_SOURCE_DIR:STATIC=/home/catlee/work/client
-
 
 ########################
 # INTERNAL cache entries

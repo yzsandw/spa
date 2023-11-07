@@ -122,6 +122,7 @@
   #define END_C_DECLS
 #endif /* __cplusplus */
 
+
 #include "fko_util.h"
 #include "fko_limits.h"
 #include "fko_state.h"

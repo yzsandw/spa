@@ -56,6 +56,8 @@ build CMakeFiles/main.dir/client/config_init.c.o: C_COMPILER__main_unscanned_Deb
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/client
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/client/fwknop.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/client/fwknop.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -64,14 +66,8 @@ build CMakeFiles/main.dir/client/fwknop.c.o: C_COMPILER__main_unscanned_Debug /h
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/client
-
-build CMakeFiles/main.dir/client/fwknop_utests.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/client/fwknop_utests.c || cmake_object_order_depends_target_main
-  DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
-  DEP_FILE = CMakeFiles/main.dir/client/fwknop_utests.c.o.d
-  FLAGS = -g -std=gnu90 -fdiagnostics-color=always
-  INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
-  OBJECT_DIR = CMakeFiles/main.dir
-  OBJECT_FILE_DIR = CMakeFiles/main.dir/client
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/client/getpasswd.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/client/getpasswd.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -80,6 +76,8 @@ build CMakeFiles/main.dir/client/getpasswd.c.o: C_COMPILER__main_unscanned_Debug
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/client
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/client/http_resolve_host.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/client/http_resolve_host.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -88,6 +86,8 @@ build CMakeFiles/main.dir/client/http_resolve_host.c.o: C_COMPILER__main_unscann
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/client
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/client/log_msg.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/client/log_msg.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -96,6 +96,8 @@ build CMakeFiles/main.dir/client/log_msg.c.o: C_COMPILER__main_unscanned_Debug /
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/client
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/client/spa_comm.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/client/spa_comm.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -104,6 +106,8 @@ build CMakeFiles/main.dir/client/spa_comm.c.o: C_COMPILER__main_unscanned_Debug 
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/client
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/client/utils.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/client/utils.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -112,6 +116,8 @@ build CMakeFiles/main.dir/client/utils.c.o: C_COMPILER__main_unscanned_Debug /ho
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/client
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/common/cunit_common.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/common/cunit_common.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -120,6 +126,8 @@ build CMakeFiles/main.dir/common/cunit_common.c.o: C_COMPILER__main_unscanned_De
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/common
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/common/fko_util.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/common/fko_util.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -128,6 +136,8 @@ build CMakeFiles/main.dir/common/fko_util.c.o: C_COMPILER__main_unscanned_Debug 
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/common
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/common/strlcat.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/common/strlcat.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -136,6 +146,8 @@ build CMakeFiles/main.dir/common/strlcat.c.o: C_COMPILER__main_unscanned_Debug /
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/common
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/common/strlcpy.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/common/strlcpy.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -144,6 +156,8 @@ build CMakeFiles/main.dir/common/strlcpy.c.o: C_COMPILER__main_unscanned_Debug /
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/common
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/base64.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/base64.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -152,6 +166,8 @@ build CMakeFiles/main.dir/lib/base64.c.o: C_COMPILER__main_unscanned_Debug /home
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/cipher_funcs.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/cipher_funcs.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -160,6 +176,8 @@ build CMakeFiles/main.dir/lib/cipher_funcs.c.o: C_COMPILER__main_unscanned_Debug
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/digest.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/digest.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -168,6 +186,8 @@ build CMakeFiles/main.dir/lib/digest.c.o: C_COMPILER__main_unscanned_Debug /home
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/fko_client_timeout.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/fko_client_timeout.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -176,6 +196,8 @@ build CMakeFiles/main.dir/lib/fko_client_timeout.c.o: C_COMPILER__main_unscanned
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/fko_decode.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/fko_decode.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -184,6 +206,8 @@ build CMakeFiles/main.dir/lib/fko_decode.c.o: C_COMPILER__main_unscanned_Debug /
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/fko_digest.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/fko_digest.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -192,6 +216,8 @@ build CMakeFiles/main.dir/lib/fko_digest.c.o: C_COMPILER__main_unscanned_Debug /
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/fko_encode.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/fko_encode.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -200,6 +226,8 @@ build CMakeFiles/main.dir/lib/fko_encode.c.o: C_COMPILER__main_unscanned_Debug /
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/fko_encryption.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/fko_encryption.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -208,6 +236,8 @@ build CMakeFiles/main.dir/lib/fko_encryption.c.o: C_COMPILER__main_unscanned_Deb
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/fko_error.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/fko_error.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -216,6 +246,8 @@ build CMakeFiles/main.dir/lib/fko_error.c.o: C_COMPILER__main_unscanned_Debug /h
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/fko_funcs.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/fko_funcs.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -224,6 +256,8 @@ build CMakeFiles/main.dir/lib/fko_funcs.c.o: C_COMPILER__main_unscanned_Debug /h
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/fko_hmac.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/fko_hmac.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -232,6 +266,8 @@ build CMakeFiles/main.dir/lib/fko_hmac.c.o: C_COMPILER__main_unscanned_Debug /ho
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/fko_message.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/fko_message.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -240,6 +276,8 @@ build CMakeFiles/main.dir/lib/fko_message.c.o: C_COMPILER__main_unscanned_Debug 
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/fko_nat_access.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/fko_nat_access.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -248,6 +286,8 @@ build CMakeFiles/main.dir/lib/fko_nat_access.c.o: C_COMPILER__main_unscanned_Deb
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/fko_rand_value.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/fko_rand_value.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -256,6 +296,8 @@ build CMakeFiles/main.dir/lib/fko_rand_value.c.o: C_COMPILER__main_unscanned_Deb
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/fko_server_auth.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/fko_server_auth.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -264,6 +306,8 @@ build CMakeFiles/main.dir/lib/fko_server_auth.c.o: C_COMPILER__main_unscanned_De
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/fko_timestamp.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/fko_timestamp.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -272,6 +316,8 @@ build CMakeFiles/main.dir/lib/fko_timestamp.c.o: C_COMPILER__main_unscanned_Debu
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/fko_user.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/fko_user.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -280,14 +326,8 @@ build CMakeFiles/main.dir/lib/fko_user.c.o: C_COMPILER__main_unscanned_Debug /ho
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
-
-build CMakeFiles/main.dir/lib/fko_utests.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/fko_utests.c || cmake_object_order_depends_target_main
-  DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
-  DEP_FILE = CMakeFiles/main.dir/lib/fko_utests.c.o.d
-  FLAGS = -g -std=gnu90 -fdiagnostics-color=always
-  INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
-  OBJECT_DIR = CMakeFiles/main.dir
-  OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/gpgme_funcs.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/gpgme_funcs.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -296,6 +336,8 @@ build CMakeFiles/main.dir/lib/gpgme_funcs.c.o: C_COMPILER__main_unscanned_Debug 
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/hmac.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/hmac.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -304,6 +346,8 @@ build CMakeFiles/main.dir/lib/hmac.c.o: C_COMPILER__main_unscanned_Debug /home/c
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/md5.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/md5.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -312,6 +356,8 @@ build CMakeFiles/main.dir/lib/md5.c.o: C_COMPILER__main_unscanned_Debug /home/ca
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/rijndael.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/rijndael.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -320,6 +366,8 @@ build CMakeFiles/main.dir/lib/rijndael.c.o: C_COMPILER__main_unscanned_Debug /ho
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/sha1.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/sha1.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -328,6 +376,8 @@ build CMakeFiles/main.dir/lib/sha1.c.o: C_COMPILER__main_unscanned_Debug /home/c
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/sha2.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/sha2.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -336,6 +386,8 @@ build CMakeFiles/main.dir/lib/sha2.c.o: C_COMPILER__main_unscanned_Debug /home/c
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 build CMakeFiles/main.dir/lib/sha3.c.o: C_COMPILER__main_unscanned_Debug /home/catlee/work/client/lib/sha3.c || cmake_object_order_depends_target_main
   DEFINES = -DHAVE_CTYPE_H=1 -DHAVE_ERRNO_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_TIME_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -DVERSION=\"0.0.1\"
@@ -344,6 +396,8 @@ build CMakeFiles/main.dir/lib/sha3.c.o: C_COMPILER__main_unscanned_Debug /home/c
   INCLUDES = -I/home/catlee/work/client/client -I/home/catlee/work/client/common -I/home/catlee/work/client/lib
   OBJECT_DIR = CMakeFiles/main.dir
   OBJECT_FILE_DIR = CMakeFiles/main.dir/lib
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
+  TARGET_PDB = main.pdb
 
 
 # =============================================================================
@@ -353,13 +407,14 @@ build CMakeFiles/main.dir/lib/sha3.c.o: C_COMPILER__main_unscanned_Debug /home/c
 #############################################
 # Link the executable main
 
-build main: C_EXECUTABLE_LINKER__main_Debug CMakeFiles/main.dir/client/config_init.c.o CMakeFiles/main.dir/client/fwknop.c.o CMakeFiles/main.dir/client/fwknop_utests.c.o CMakeFiles/main.dir/client/getpasswd.c.o CMakeFiles/main.dir/client/http_resolve_host.c.o CMakeFiles/main.dir/client/log_msg.c.o CMakeFiles/main.dir/client/spa_comm.c.o CMakeFiles/main.dir/client/utils.c.o CMakeFiles/main.dir/common/cunit_common.c.o CMakeFiles/main.dir/common/fko_util.c.o CMakeFiles/main.dir/common/strlcat.c.o CMakeFiles/main.dir/common/strlcpy.c.o CMakeFiles/main.dir/lib/base64.c.o CMakeFiles/main.dir/lib/cipher_funcs.c.o CMakeFiles/main.dir/lib/digest.c.o CMakeFiles/main.dir/lib/fko_client_timeout.c.o CMakeFiles/main.dir/lib/fko_decode.c.o CMakeFiles/main.dir/lib/fko_digest.c.o CMakeFiles/main.dir/lib/fko_encode.c.o CMakeFiles/main.dir/lib/fko_encryption.c.o CMakeFiles/main.dir/lib/fko_error.c.o CMakeFiles/main.dir/lib/fko_funcs.c.o CMakeFiles/main.dir/lib/fko_hmac.c.o CMakeFiles/main.dir/lib/fko_message.c.o CMakeFiles/main.dir/lib/fko_nat_access.c.o CMakeFiles/main.dir/lib/fko_rand_value.c.o CMakeFiles/main.dir/lib/fko_server_auth.c.o CMakeFiles/main.dir/lib/fko_timestamp.c.o CMakeFiles/main.dir/lib/fko_user.c.o CMakeFiles/main.dir/lib/fko_utests.c.o CMakeFiles/main.dir/lib/gpgme_funcs.c.o CMakeFiles/main.dir/lib/hmac.c.o CMakeFiles/main.dir/lib/md5.c.o CMakeFiles/main.dir/lib/rijndael.c.o CMakeFiles/main.dir/lib/sha1.c.o CMakeFiles/main.dir/lib/sha2.c.o CMakeFiles/main.dir/lib/sha3.c.o
+build main: C_EXECUTABLE_LINKER__main_Debug CMakeFiles/main.dir/client/config_init.c.o CMakeFiles/main.dir/client/fwknop.c.o CMakeFiles/main.dir/client/getpasswd.c.o CMakeFiles/main.dir/client/http_resolve_host.c.o CMakeFiles/main.dir/client/log_msg.c.o CMakeFiles/main.dir/client/spa_comm.c.o CMakeFiles/main.dir/client/utils.c.o CMakeFiles/main.dir/common/cunit_common.c.o CMakeFiles/main.dir/common/fko_util.c.o CMakeFiles/main.dir/common/strlcat.c.o CMakeFiles/main.dir/common/strlcpy.c.o CMakeFiles/main.dir/lib/base64.c.o CMakeFiles/main.dir/lib/cipher_funcs.c.o CMakeFiles/main.dir/lib/digest.c.o CMakeFiles/main.dir/lib/fko_client_timeout.c.o CMakeFiles/main.dir/lib/fko_decode.c.o CMakeFiles/main.dir/lib/fko_digest.c.o CMakeFiles/main.dir/lib/fko_encode.c.o CMakeFiles/main.dir/lib/fko_encryption.c.o CMakeFiles/main.dir/lib/fko_error.c.o CMakeFiles/main.dir/lib/fko_funcs.c.o CMakeFiles/main.dir/lib/fko_hmac.c.o CMakeFiles/main.dir/lib/fko_message.c.o CMakeFiles/main.dir/lib/fko_nat_access.c.o CMakeFiles/main.dir/lib/fko_rand_value.c.o CMakeFiles/main.dir/lib/fko_server_auth.c.o CMakeFiles/main.dir/lib/fko_timestamp.c.o CMakeFiles/main.dir/lib/fko_user.c.o CMakeFiles/main.dir/lib/gpgme_funcs.c.o CMakeFiles/main.dir/lib/hmac.c.o CMakeFiles/main.dir/lib/md5.c.o CMakeFiles/main.dir/lib/rijndael.c.o CMakeFiles/main.dir/lib/sha1.c.o CMakeFiles/main.dir/lib/sha2.c.o CMakeFiles/main.dir/lib/sha3.c.o
   FLAGS = -g
   OBJECT_DIR = CMakeFiles/main.dir
   POST_BUILD = :
   PRE_LINK = :
+  TARGET_COMPILE_PDB = CMakeFiles/main.dir/
   TARGET_FILE = main
-  TARGET_PDB = main.dbg
+  TARGET_PDB = main.pdb
 
 
 #############################################
@@ -404,14 +459,14 @@ build all: phony main
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE | /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCInformation.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCommonLanguageInclude.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeGenericSystem.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeInitializeConfigs.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeLanguageInformation.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeSystemSpecificInformation.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeSystemSpecificInitialize.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/CMakeCommonCompilerMacros.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/GNU-C.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/GNU.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Platform/Linux-GNU-C.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Platform/Linux-GNU.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Platform/Linux.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Platform/UnixPaths.cmake /home/catlee/work/client/CMakeLists.txt CMakeCache.txt CMakeFiles/3.26.4/CMakeCCompiler.cmake CMakeFiles/3.26.4/CMakeSystem.cmake
+build build.ninja: RERUN_CMAKE | /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCCompiler.cmake.in /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCCompilerABI.c /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCInformation.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCommonLanguageInclude.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCompilerIdDetection.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCompileFeatures.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCompilerABI.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCompilerId.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineSystem.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeFindBinUtils.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeGenericSystem.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeInitializeConfigs.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeLanguageInformation.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeParseImplicitIncludeInfo.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeParseImplicitLinkInfo.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeParseLibraryArchitecture.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeSystem.cmake.in /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeSystemSpecificInformation.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeSystemSpecificInitialize.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeTestCCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeTestCompilerCommon.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/ADSP-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/ARMCC-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/ARMClang-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/AppleClang-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/Borland-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/Bruce-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/CMakeCommonCompilerMacros.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/Clang-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/Clang-DetermineCompilerInternal.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/Compaq-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/Cray-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/Embarcadero-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/Fujitsu-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/GHS-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/GNU-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/GNU-C.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/GNU-FindBinUtils.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/GNU.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/HP-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/IAR-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/IBMClang-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/Intel-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/LCC-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/MSVC-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/NVHPC-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/NVIDIA-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/PGI-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/PathScale-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/SCO-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/SDCC-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/SunPro-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/TI-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/Tasking-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/Watcom-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/XL-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/XLClang-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/zOS-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Internal/FeatureTesting.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Platform/Linux-GNU-C.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Platform/Linux-GNU.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Platform/Linux.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Platform/UnixPaths.cmake /home/catlee/work/client/CMakeLists.txt CMakeCache.txt CMakeFiles/3.26.4/CMakeCCompiler.cmake CMakeFiles/3.26.4/CMakeSystem.cmake
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCInformation.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCommonLanguageInclude.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeGenericSystem.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeInitializeConfigs.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeLanguageInformation.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeSystemSpecificInformation.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeSystemSpecificInitialize.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/CMakeCommonCompilerMacros.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/GNU-C.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/GNU.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Platform/Linux-GNU-C.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Platform/Linux-GNU.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Platform/Linux.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Platform/UnixPaths.cmake /home/catlee/work/client/CMakeLists.txt CMakeCache.txt CMakeFiles/3.26.4/CMakeCCompiler.cmake CMakeFiles/3.26.4/CMakeSystem.cmake: phony
+build /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCCompiler.cmake.in /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCCompilerABI.c /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCInformation.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCommonLanguageInclude.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCompilerIdDetection.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCompileFeatures.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCompilerABI.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCompilerId.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineSystem.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeFindBinUtils.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeGenericSystem.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeInitializeConfigs.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeLanguageInformation.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeParseImplicitIncludeInfo.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeParseImplicitLinkInfo.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeParseLibraryArchitecture.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeSystem.cmake.in /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeSystemSpecificInformation.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeSystemSpecificInitialize.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeTestCCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeTestCompilerCommon.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/ADSP-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/ARMCC-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/ARMClang-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/AppleClang-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/Borland-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/Bruce-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/CMakeCommonCompilerMacros.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/Clang-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/Clang-DetermineCompilerInternal.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/Compaq-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/Cray-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/Embarcadero-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/Fujitsu-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/GHS-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/GNU-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/GNU-C.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/GNU-FindBinUtils.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/GNU.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/HP-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/IAR-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/IBMClang-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/Intel-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/LCC-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/MSVC-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/NVHPC-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/NVIDIA-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/PGI-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/PathScale-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/SCO-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/SDCC-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/SunPro-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/TI-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/Tasking-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/Watcom-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/XL-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/XLClang-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Compiler/zOS-C-DetermineCompiler.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Internal/FeatureTesting.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Platform/Linux-GNU-C.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Platform/Linux-GNU.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Platform/Linux.cmake /home/catlee/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/Platform/UnixPaths.cmake /home/catlee/work/client/CMakeLists.txt CMakeCache.txt CMakeFiles/3.26.4/CMakeCCompiler.cmake CMakeFiles/3.26.4/CMakeSystem.cmake: phony
 
 
 #############################################

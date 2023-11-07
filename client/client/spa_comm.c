@@ -515,7 +515,11 @@ send_spa_packet_http(const char *spa_data, const int sd_len,
     if(options->http_proxy[0] == 0x0)
     {
         snprintf(http_buf, HTTP_MAX_REQUEST_LEN,
-            "GET /%s HTTP/1.1\r\nUser-Agent: %s\r\nAccept: */* \\r\n“ */
+                 "GET /%s HTTP/1.1\r\nUser-Agent: %s\r\nAccept: */*\r\n"
+                 "Host: %s\r\nConnection: close\r\n\r\n",
+                 spa_data_copy,
+                 options->http_user_agent,
+                 options->spa_server_str  /* hostname or IP */
         );
     }
     else /* 我们正在通过HTTP代理发送SPA数据包 */
@@ -545,7 +549,12 @@ send_spa_packet_http(const char *spa_data, const int sd_len,
             options->spa_dst_port = proxy_port;
 
         snprintf(http_buf, HTTP_MAX_REQUEST_LEN,
-            "GET http://%s/%s HTTP/1.1\r\nUser-Agent: %s\r\nAccept: */* \\r\n“ */
+                 "GET http://%s/%s HTTP/1.1\r\nUser-Agent: %s\r\nAccept: */*\r\n"
+                 "Host: %s\r\nConnection: close\r\n\r\n",
+                 options->spa_server_str,
+                 spa_data_copy,
+                 options->http_user_agent,
+                 options->http_proxy  /* hostname or IP */
         );
         strlcpy(options->spa_server_str, options->http_proxy,
                 sizeof(options->spa_server_str));

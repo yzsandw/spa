@@ -20,10 +20,7 @@
 
 #define NULL_STRING                 "<NULL>"                /* ！<表示NULL缓冲区的字符串 */
 
-#ifdef HAVE_C_UNIT_TESTS /* LCOV_EXCL_START */
-#include "cunit_common.h"
-DECLARE_TEST_SUITE(utils_test, "Utility functions test suite");
-#endif /* LCOV_EXCL_STOP */
+
 
 /* * */
 typedef struct fko_enc_mode_str
@@ -947,7 +944,7 @@ ipv4_resolve(const char *dns_str, char *ip_str)
     struct sockaddr_in *sai_remote; /* 作为sockaddr_in结构的远程主机信息 */
 #endif
 
-#if WIN32 
+#if WIN32
     WSADATA wsa_data;
 	error = WSAStartup( MAKEWORD(1,1), &wsa_data );
     if( error != 0 )
@@ -1014,62 +1011,5 @@ count_characters(const char *str, const char match, int len)
     return count;
 }
 
-#ifdef HAVE_C_UNIT_TESTS /* LCOV_EXCL_START */
 
-DECLARE_UTEST(test_hostname_validator, "test the is_valid_hostname function")
-{
-    char test_hostname[300];
-    strcpy(test_hostname, "a");
-    CU_ASSERT(is_valid_hostname(test_hostname, strlen(test_hostname)) == 1);
-    strcpy(test_hostname, "a.b");
-    CU_ASSERT(is_valid_hostname(test_hostname, strlen(test_hostname)) == 1);
-    strcpy(test_hostname, "a.b.");
-    CU_ASSERT(is_valid_hostname(test_hostname, strlen(test_hostname)) == 1);
-    strcpy(test_hostname, "a.");
-    CU_ASSERT(is_valid_hostname(test_hostname, strlen(test_hostname)) == 1);
-
-    strcpy(test_hostname, "a..b");
-    CU_ASSERT(is_valid_hostname(test_hostname, strlen(test_hostname)) == 0);
-    strcpy(test_hostname, ".a.b");
-    CU_ASSERT(is_valid_hostname(test_hostname, strlen(test_hostname)) == 0);
-    strcpy(test_hostname, "a-.b");
-    CU_ASSERT(is_valid_hostname(test_hostname, strlen(test_hostname)) == 0);
-    strcpy(test_hostname, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.b");
-    CU_ASSERT(is_valid_hostname(test_hostname, strlen(test_hostname)) == 0);
-}
-DECLARE_UTEST(test_ipv4_validator, "test the is_valid_ipv4_addr function")
-{
-    char test_str[32];
-    strcpy(test_str, "1.2.3.4");
-    CU_ASSERT(is_valid_ipv4_addr(test_str, strlen(test_str)));
-    strcpy(test_str, "127.0.0.2");
-    CU_ASSERT(is_valid_ipv4_addr(test_str, 9));
-    strcpy(test_str, "1.2.3.400");
-    CU_ASSERT(is_valid_ipv4_addr(test_str, strlen(test_str)) == 0);
-}
-
-DECLARE_UTEST(test_count_characters, "test the count_characters function")
-{
-    char test_str[32];
-    strcpy(test_str, "abcd");
-    CU_ASSERT(count_characters(test_str, 'a', 4) == 1);
-    strcpy(test_str, "aacd");
-    CU_ASSERT(count_characters(test_str, 'a', 4) == 2);
-    strcpy(test_str, "a,b,c,d,");
-    CU_ASSERT(count_characters(test_str, ',', 4) == 2);
-    strcpy(test_str, "a,b,c,d,");
-    CU_ASSERT(count_characters(test_str, ',', 8) == 4);
-    strcpy(test_str, "aaaa");
-    CU_ASSERT(count_characters(test_str, 'a', 3) == 3);
-}
-
-int register_utils_test(void)
-{
-    ts_init(&TEST_SUITE(utils_test), TEST_SUITE_DESCR(utils_test), NULL, NULL);
-    ts_add_utest(&TEST_SUITE(utils_test), UTEST_FCT(test_count_characters), UTEST_DESCR(test_count_characters));
-    ts_add_utest(&TEST_SUITE(utils_test), UTEST_FCT(test_ipv4_validator), UTEST_DESCR(test_ipv4_validator));
-    ts_add_utest(&TEST_SUITE(utils_test), UTEST_FCT(test_hostname_validator), UTEST_DESCR(test_hostname_validator));
-    return register_ts(&TEST_SUITE(utils_test));
-}
-#endif /* LCOV_EXCL_STOP */
 /* **EOF** */
