@@ -97,46 +97,46 @@ read_passwd_from_stream(FILE *stream)
 
     if(stream == NULL)
         return password;
-
 #ifdef WIN32
     while((c = _getch()) != PW_CR_CHAR)
 #else
     while( ((c = getc(stream)) != EOF) && (c != PW_LF_CHAR) && (c != PW_BREAK_CHAR) )
 #endif
     {
-        /* Handle a backspace without backing up too far. */
+        /* 处理退格键，避免退得太远。 */
         if (c == PW_BS_CHAR)
         {
             if (ptr != ARRAY_FIRST_ELT_ADR(password))
                 ptr--;
         }
 
-        /* Handle a Ctrl-U to clear the password entry and start over */
+        /* 处理 Ctrl-U，清除密码输入并重新开始 */
         else if (c == PW_CLEAR_CHAR)
             ptr = ARRAY_FIRST_ELT_ADR(password);
 
-        /* Fill in the password buffer until it reaches the last -1 char.
-         * The last char is used to NULL terminate the string. */
+        /* 填充密码缓冲区直到最后一个字符前。
+         * 最后一个字符用来添加空字符终止字符串。 */
         else if (ptr < ARRAY_LAST_ELT_ADR(password))
         {
             *ptr++ = c;
         }
 
-        /* Discard char */
+        /* 丢弃字符 */
         else;
     }
 
-    /* A CTRL-C char has been detected, we discard the password */
+    /* 如果检测到 CTRL-C 字符，我们将放弃密码 */
     if (c == PW_BREAK_CHAR)
         password[0] = '\0';
 
-    /* Otherwise we NULL terminate the string here. Overflows are handled
-     * previously, so we can add the char without worrying */
+    /* 否则我们在这里添加空字符终止字符串。之前已经处理过溢出，
+     * 所以我们可以不用担心地添加字符 */
     else
         *ptr = '\0';
 
     return password;
 }
+
 
 
 /*
@@ -176,11 +176,9 @@ getpasswd(const char *prompt, int fd)
     struct termios  ts;
     tcflag_t        old_c_lflag = 0;
 #else
-	/* Force stdin on windows. */
 	fd = 0;
 #endif
 
-    /* If a valid file descriptor is supplied, we try to open a stream from it */
     if (FD_IS_VALID(fd))
     {
         fp = fdopen(fd, "r");
@@ -193,8 +191,32 @@ getpasswd(const char *prompt, int fd)
         }
     }
 
+
+
 #ifndef WIN32
-    /* Otherwise we are going to open a new stream */
+    sigset_t        sig, old_sig;
+    struct termios  ts;
+    tcflag_t        old_c_lflag = 0;
+#else
+	/* 在 Windows 上强制使用标准输入(stdin)。 */
+	fd = 0;
+#endif
+
+    /* 如果提供了有效的文件描述符，我们尝试从它创建一个流 */
+    if (FD_IS_VALID(fd))
+    {
+        fp = fdopen(fd, "r");
+        if (fp == NULL)
+        {
+           log_msg(LOG_VERBOSITY_ERROR, "getpasswd() - "
+                "Unable to create a stream from the file descriptor : %s",
+                strerror(errno));
+            return(NULL);
+        }
+    }
+
+#ifndef WIN32
+    /* 否则，我们将打开一个新的流 */
     else
     {
         if((fp = fopen(ctermid(NULL), "r+")) == NULL)
@@ -202,19 +224,17 @@ getpasswd(const char *prompt, int fd)
 
         setbuf(fp, NULL);
 
-        /* Setup blocks for SIGINT and SIGTSTP and save the original signal
-        * mask.
-        */
+        /* 阻塞 SIGINT 和 SIGTSTP 信号，并保存原始的信号掩码。 */
         sigemptyset(&sig);
         sigaddset(&sig, SIGINT);
         sigaddset(&sig, SIGTSTP);
         sigprocmask(SIG_BLOCK, &sig, &old_sig);
 
         /*
-        * Save current tty state for later restoration after we :
-        *   - disable echo of characters to the tty
-        *   - disable signal generation
-        *   - disable canonical mode (input read line by line mode)
+        * 在我们进行以下操作后保存当前终端状态，以便之后恢复：
+        *   - 禁用字符回显到终端
+        *   - 禁用信号生成
+        *   - 禁用规范模式（逐行读取输入模式）
         */
         tcgetattr(fileno(fp), &ts);
         old_c_lflag = ts.c_lflag;
@@ -226,19 +246,17 @@ getpasswd(const char *prompt, int fd)
 #else
     _cputs(prompt);
 #endif
-    /* Read the password */
+    /* 读取密码 */
     ptr = read_passwd_from_stream(fp);
 
 #ifdef WIN32
-    /* In Windows, it would be a CR-LF
-     */
+    /* 在 Windows 中，它将是 CR-LF */
     _putch(PW_CR_CHAR);
     _putch(PW_LF_CHAR);
 #else
     if(! FD_IS_VALID(fd))
     {
-        /* Reset terminal settings
-        */
+        /* 重置终端设置 */
         fputs("\n", fp);
         ts.c_lflag = old_c_lflag;
         tcsetattr(fileno(fp), TCSAFLUSH, &ts);
@@ -287,51 +305,48 @@ get_key_file(char *key, int *key_len, const char *key_file,
     }
 
     while ((fgets(conf_line_buf, MAX_LINE_LEN, pwfile_ptr)) != NULL)
-    {
-        numLines++;
-        conf_line_buf[MAX_LINE_LEN-1] = '\0';
-        lptr = conf_line_buf;
+{
+    numLines++;
+    conf_line_buf[MAX_LINE_LEN-1] = '\0';
+    lptr = conf_line_buf;
 
-        memset(tmp_char_buf, 0x0, MAX_LINE_LEN);
+    memset(tmp_char_buf, 0x0, MAX_LINE_LEN);
 
-        while (*lptr == ' ' || *lptr == '\t' || *lptr == '=')
-            lptr++;
+    while (*lptr == ' ' || *lptr == '\t' || *lptr == '=')
+        lptr++;
 
-        /* Get past comments and empty lines.
-        */
-        if (*lptr == '#' || *lptr == '\n' || *lptr == '\r' || *lptr == '\0' || *lptr == ';')
-            continue;
+    /* 跳过注释和空行。 */
+    if (*lptr == '#' || *lptr == '\n' || *lptr == '\r' || *lptr == '\0' || *lptr == ';')
+        continue;
 
-        /* Look for a line like "<SPA destination IP>: <password>" - this allows
-        * multiple keys to be placed within the same file, and the client will
-        * reference the matching one for the SPA server we are contacting
-        */
-        found_dst = 1;
-        for (i=0; i < strlen(options->spa_server_str); i++)
-            if (*lptr++ != options->spa_server_str[i])
-                found_dst = 0;
+    /* 寻找类似 "<SPA目标IP>: <密码>" 的行 - 这允许在同一个文件中放置多个密钥，
+    * 客户端将为我们正在联系的SPA服务器引用匹配的密钥 */
+    found_dst = 1;
+    for (i=0; i < strlen(options->spa_server_str); i++)
+        if (*lptr++ != options->spa_server_str[i])
+            found_dst = 0;
 
-        if (! found_dst)
-            continue;
+    if (!found_dst)
+        continue;
 
-        if (*lptr == ':')
-            lptr++;
-        else
-            continue;
+    if (*lptr == ':')
+        lptr++;
+    else
+        continue;
 
-        /* Skip whitespace until we get to the password
-        */
-        while (*lptr == ' ' || *lptr == '\t' || *lptr == '=')
-            lptr++;
+    /* 跳过空白直到我们得到密码 */
+    while (*lptr == ' ' || *lptr == '\t' || *lptr == '=')
+        lptr++;
 
-        i = 0;
-        while (*lptr != '\0' && *lptr != '\n') {
-            key[i] = *lptr;
-            lptr++;
-            i++;
-        }
-        key[i] = '\0';
+    i = 0;
+    while (*lptr != '\0' && *lptr != '\n') {
+        key[i] = *lptr;
+        lptr++;
+        i++;
     }
+    key[i] = '\0';
+}
+
 
     fclose(pwfile_ptr);
 
